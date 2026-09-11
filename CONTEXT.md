@@ -39,7 +39,7 @@ Attributi:
 - **Oggetto giuridico** a cui si applica — multi-valore, dall'insieme: firma elettronica (semplice/avanzata/qualificata), sigillo elettronico (semplice/avanzato/qualificato), marca temporale elettronica qualificata, documento elettronico, servizio di recapito elettronico certificato, identificazione elettronica, altro. Questo attributo è ciò che permette a una domanda come "può un giudice non considerare un documento firmato elettronicamente?" di trovare l'art. 25 anche se il testo letterale non contiene "giudice" o "documento": la domanda si aggancia all'oggetto giuridico, non solo al testo.
 - **Stato/validità temporale**, **condizione di applicabilità**, **stato di validazione/validato da/data di validazione** — stessa semantica dell'Obbligo (lookup `stati_norma`, condiviso tra i due tipi di nodo)
 
-Perimetro: qualunque norma dichiarativa di eIDAS o CAD, non solo quelle relative a strumenti gestiti dai QTSP — decisione presa perché l'utente deve poter rispondere a quesiti operativi reali (es. di natura probatoria/processuale) con richiami puntuali alle norme, anche quando la norma non riguarda direttamente un obbligo di un QTSP. Questo allarga la Destination del progetto oltre i soli "obblighi applicabili ai QTSP" (vedi map.md).
+Perimetro: qualunque norma dichiarativa delle Fonti censite (non solo quelle relative a strumenti gestiti dai QTSP) — decisione presa perché l'utente deve poter rispondere a quesiti operativi reali (es. di natura probatoria/processuale) con richiami puntuali alle norme, anche quando la norma non riguarda direttamente un obbligo di un QTSP. Questo allarga la Destination del progetto oltre i soli "obblighi applicabili ai QTSP" (vedi map.md).
 
 ### Categorie di soggetto
 
@@ -64,6 +64,6 @@ L'artefatto complessivo: un **knowledge graph** di due tipi di nodo, Obbligo e P
 
 ## Perimetro del pilota
 
-Fonti: **eIDAS** (incluso eIDAS2 dove applicabile) e **CAD**. Altre fonti (AgID, ETSI, ISO, GDPR) restano fuori dal pilota, da estendere in iterazioni successive.
+Fonti: **eIDAS** (incluso eIDAS2 dove applicabile), **CAD** e **DPCM 22 febbraio 2013** (regole tecniche FEA/firme elettroniche). Il censimento è concepito per crescere nel tempo: altre fonti (AgID, ETSI, ISO, GDPR, ...) verranno integrate in iterazioni successive, non solo eIDAS/CAD.
 
-Contenuto: obblighi applicabili ai QTSP **e** principi/effetti giuridici dichiarativi di eIDAS/CAD in generale (non solo quelli relativi a strumenti gestiti dai QTSP) — vedi entità Principio sopra e map.md per la cronologia della decisione.
+Contenuto: obblighi applicabili ai QTSP **e** principi/effetti giuridici dichiarativi delle Fonti censite in generale (non solo quelli relativi a strumenti gestiti dai QTSP) — vedi entità Principio sopra e map.md per la cronologia della decisione.

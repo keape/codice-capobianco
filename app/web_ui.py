@@ -23,6 +23,8 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
+import qmd_search
+
 DB_PATH = Path(__file__).parent / "censimento.db"
 
 app = FastAPI(title="Censimento Obblighi QTSP", docs_url=None, redoc_url=None)
@@ -82,6 +84,7 @@ def _riga_obbligo(conn, row, tipi_obbligo, stati_norma, fonti):
         "fonte": fonti.get(row["fonte_id"], "?"),
         "riferimento": row["riferimento"],
         "testo": row["testo"],
+        "testo_integrale": row["testo_integrale"],
         "tipo_obbligo": tipi_obbligo.get(row["tipo_obbligo_id"], "?"),
         "stato_obbligo": stati_norma.get(row["stato_id"], "?"),
         "severita": row["severita"],
@@ -104,6 +107,7 @@ def _riga_principio(conn, row, tipi_principio, stati_norma, fonti):
         "fonte": fonti.get(row["fonte_id"], "?"),
         "riferimento": row["riferimento"],
         "testo": row["testo"],
+        "testo_integrale": row["testo_integrale"],
         "tipo_principio": tipi_principio.get(row["tipo_principio_id"], "?"),
         "stato_obbligo": stati_norma.get(row["stato_id"], "?"),
         "condizione_applicabilita": row["condizione_applicabilita"],
@@ -112,6 +116,44 @@ def _riga_principio(conn, row, tipi_principio, stati_norma, fonti):
         "data_validazione": row["data_validazione"],
         "oggetti_giuridici": oggetti,
     }
+
+
+# ------------------------------------------------------- ricerca semantica
+
+@app.get("/api/ricerca-semantica")
+def ricerca_semantica(q: str, n: int = 10):
+    """Ricerca per significato via qmd (locale, `qmd query` con reranking).
+
+    Additiva rispetto alla ricerca full-text di /api/obblighi e /api/principi,
+    non la sostituisce. Vedi docs/qmd-semantic-search-spec.md.
+    """
+    if not q.strip():
+        return {"status": "ok", "risultati": []}
+
+    trovati, errore = qmd_search.ricerca_semantica(q, n)
+    if errore is not None:
+        return JSONResponse(status_code=503, content={"status": "errore", "messaggio": errore})
+
+    with _conn() as conn:
+        tipi_obbligo_map, stati_obbligo_map, _, fonti = _lookup_maps(conn)
+        tipi_principio_map = _tipi_principio_map(conn)
+        risultati = []
+        for r in trovati:
+            if r["tipo_nodo"] == "obbligo":
+                row = conn.execute("SELECT * FROM obblighi WHERE id = ?", (r["id"],)).fetchone()
+                if row is None:
+                    continue
+                riga = _riga_obbligo(conn, row, tipi_obbligo_map, stati_obbligo_map, fonti)
+            else:
+                row = conn.execute("SELECT * FROM principi WHERE id = ?", (r["id"],)).fetchone()
+                if row is None:
+                    continue
+                riga = _riga_principio(conn, row, tipi_principio_map, stati_obbligo_map, fonti)
+            riga["score"] = r["score"]
+            riga["snippet"] = r["snippet"]
+            risultati.append(riga)
+
+    return {"status": "ok", "risultati": risultati}
 
 
 # --------------------------------------------------------------- lookup/stats
@@ -183,7 +225,8 @@ def cerca_obblighi(
                 continue
             if stato_ids is not None and row["stato_id"] not in stato_ids:
                 continue
-            if needle and needle not in row["testo"].lower() and needle not in row["riferimento"].lower():
+            if needle and needle not in row["testo"].lower() and needle not in row["riferimento"].lower() \
+                    and needle not in (row["testo_integrale"] or "").lower():
                 continue
             obbligati, destinatari = _soggetti_di(conn, row["id"])
             if categoria_soggetto:
@@ -278,7 +321,8 @@ def cerca_principi(
                 continue
             if tipo_ids is not None and row["tipo_principio_id"] not in tipo_ids:
                 continue
-            if needle and needle not in row["testo"].lower() and needle not in row["riferimento"].lower():
+            if needle and needle not in row["testo"].lower() and needle not in row["riferimento"].lower() \
+                    and needle not in (row["testo_integrale"] or "").lower():
                 continue
             oggetti = _oggetti_di_principio(conn, row["id"])
             if oggetto_giuridico and not any(o in oggetti for o in oggetto_giuridico):
@@ -345,6 +389,7 @@ def valida_bozza(obbligo_id: int, body: CorrezioneBozza):
             conn.execute("INSERT INTO obbligo_soggetti (obbligo_id, categoria_soggetto_id, ruolo) VALUES (?,?,?)",
                          (obbligo_id, cats[nome], "destinatario"))
         conn.commit()
+    qmd_search.sync_qmd()
     return {"status": "ok", "obbligo_id": obbligo_id}
 
 
@@ -356,6 +401,7 @@ def rifiuta_bozza(obbligo_id: int):
         if cur.rowcount == 0:
             raise HTTPException(404, "Bozza non trovata (già validata/rifiutata?)")
         conn.commit()
+    qmd_search.sync_qmd()
     return {"status": "ok"}
 
 
@@ -570,7 +616,15 @@ async function renderConsultazione(){
       <div class="facet"><div class="lbl">Oggetto giuridico</div>${chipRow("f-ogg", lk.oggetti_giuridici, f.oggetto_giuridico)}</div>
     </div>
   </div>
-  <div class="panel"><h2>Risultati</h2><div id="reslist" class="spin">Caricamento…</div></div>`;
+  <div class="panel"><h2>Risultati</h2><div id="reslist" class="spin">Caricamento…</div></div>
+  <div class="panel">
+    <h2>Ricerca per significato <span class="muted" style="font-weight:normal;font-size:12px">(sperimentale, via qmd)</span></h2>
+    <div class="controls">
+      <input type="text" id="qsem" placeholder="descrivi cosa cerchi, anche senza parole esatte del testo…">
+      <button id="btnsem">Cerca</button>
+    </div>
+    <div id="ressem"></div>
+  </div>`;
 
   $("#q").oninput = () => { clearTimeout($("#q")._t); $("#q")._t = setTimeout(() => { f.q = $("#q").value; searchNow(); }, 250); };
   $("#solovalidati").onchange = () => { f.solo_validati = $("#solovalidati").checked; searchNow(); };
@@ -585,7 +639,24 @@ async function renderConsultazione(){
   bindChips("f-tprinc", f.tipo_principio);
   bindChips("f-ogg", f.oggetto_giuridico);
 
+  $("#btnsem").onclick = ricercaSemantica;
+  $("#qsem").addEventListener("keydown", e => { if(e.key === "Enter") ricercaSemantica(); });
+
   await searchNow(true);
+}
+
+async function ricercaSemantica(){
+  const q = $("#qsem").value.trim();
+  const box = document.getElementById("ressem");
+  if(!q){ box.innerHTML = ""; return; }
+  box.innerHTML = `<div class="spin">Ricerca semantica…</div>`;
+  let data;
+  try{ data = await api("/api/ricerca-semantica?" + new URLSearchParams({q, n: 10}).toString()); }
+  catch(e){ box.innerHTML = `<div class="muted">Ricerca semantica non disponibile: ${esc(e.message)}</div>`; return; }
+  if(!data.risultati || !data.risultati.length){ box.innerHTML = `<div class="muted">Nessun risultato.</div>`; return; }
+  box.innerHTML = data.risultati.map(o => (o.tipo_nodo === "principio" ? cardPrincipio(o) : cardObbligo(o))
+    .replace('<div class="hd">', `<div class="hd"><span class="tag" title="punteggio di rilevanza semantica">score ${o.score.toFixed(2)}</span>`)
+  ).join("");
 }
 
 async function searchNow(first){
@@ -698,8 +769,18 @@ function renderDettaglio(){
       <tr><td class="muted" style="padding:4px 0">Condizione di applicabilità</td><td>${esc(o.condizione_applicabilita||"—")}</td></tr>
       <tr><td class="muted" style="padding:4px 0">Validato da</td><td>${esc(o.validato_da||"—")} ${o.data_validazione?`(${esc(o.data_validazione)})`:""}</td></tr>
     </table>
+    ${renderTestoIntegrale(o.testo_integrale)}
   </div>
   ${renderVicini(vicini)}`;
+}
+
+function renderTestoIntegrale(testo){
+  if(!testo) return `<p class="muted" style="font-size:13px;margin-top:10px">Testo normativo integrale non disponibile.</p>`;
+  return `
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;font-size:13px;color:#555">Testo normativo integrale</summary>
+      <p style="font-size:13px;white-space:pre-wrap;margin-top:8px">${esc(testo)}</p>
+    </details>`;
 }
 
 function renderDettaglioPrincipio(){
@@ -720,6 +801,7 @@ function renderDettaglioPrincipio(){
       <tr><td class="muted" style="padding:4px 0">Condizione di applicabilità</td><td>${esc(o.condizione_applicabilita||"—")}</td></tr>
       <tr><td class="muted" style="padding:4px 0">Validato da</td><td>${esc(o.validato_da||"—")} ${o.data_validazione?`(${esc(o.data_validazione)})`:""}</td></tr>
     </table>
+    ${renderTestoIntegrale(o.testo_integrale)}
   </div>
   ${renderVicini(vicini)}`;
 }
@@ -865,6 +947,8 @@ def main():
     import uvicorn
     print(f"Censimento Obblighi QTSP — http://{args.host}:{args.port}")
     print(f"  SQLite: {DB_PATH}")
+    ok, msg = qmd_search.sync_qmd()
+    print(f"  qmd sync: {'ok' if ok else 'fallita (' + msg + ')'}")
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
 
