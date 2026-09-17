@@ -73,7 +73,7 @@ Ogni riga estratta nasce con `stato_validazione='bozza'` e richiede validazione 
 
 `GET /api/obblighi`/`GET /api/principi` restano il listato faceted (filtri fonte/tipo/stato/categoria + `q` opzionale): il match testuale su `q` usa l'indice full-text Lucene (query a frase con boost sul campo `riferimento`, `_query_lucene` in `web_ui.py`) invece dello scan Python case-insensitive pre-migrazione, ma il filtraggio per facet resta in Python sull'intero risultato (dataset piccolo, nessuna necessità di spingere i filtri in Cypher).
 
-`GET /api/ricerca` (Fase 6, ADR-0006) è il nuovo endpoint di ricerca per rilevanza, sostituisce la vecchia ricerca semantica via `qmd` (rimossa, vedi `docs/qmd-semantic-search-spec.md` per lo storico): pre-filtra per facet + range temporale (`data_riferimento`, mai un termine pesato — un nodo non vigente non deve mai comparire), poi fonde con WRRF il ranking full-text Lucene e il ranking vettoriale (embedding calcolato al volo con lo stesso modello di `embed_neo4j.py`, caricato pigramente al primo uso — `_embedding_model()` in `web_ui.py`). Pannello "Ricerca ibrida" nel frontend.
+`GET /api/ricerca` (Fase 6, ADR-0006) è l'endpoint di ricerca per rilevanza: pre-filtra per facet + range temporale (`data_riferimento`, mai un termine pesato — un nodo non vigente non deve mai comparire), poi fonde con WRRF il ranking full-text Lucene e il ranking vettoriale (embedding calcolato al volo con lo stesso modello di `embed_neo4j.py`, caricato pigramente al primo uso — `_embedding_model()` in `web_ui.py`). Pannello "Ricerca ibrida" nel frontend.
 
 ### Testo integrale in UI: presente in DB, ora anche in dettaglio
 

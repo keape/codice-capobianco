@@ -26,7 +26,13 @@ versione installata (`importlib.metadata.version("neo4j")`) e solleva
 di proposito (nuova versione verificata compatibile), aggiornare quella
 costante nello stesso commit.
 
-## 2. Il venv `app/.venv` si blocca in modo intermittente e indipendente dal driver
+## 2. [RISOLTO 2026-09-17 — repo spostato fuori iCloud] Il venv `app/.venv` si blocca in modo intermittente e indipendente dal driver
+
+> **Stato: non più applicabile.** Il repo è stato spostato da iCloud Drive a
+> `/Volumes/Ext.Lexar/Costola del Mac/codice-capobianco` (volume esterno, non
+> sincronizzato). `app/.venv` non è più dataless/on-demand: questa intera
+> classe di blocco non può più verificarsi. Sezione mantenuta come
+> riferimento storico (cronologia di decisione, non procedura attiva).
 
 **Sintomo:** comandi Python/pip lenti o bloccati anche per operazioni che
 non toccano Neo4j.
@@ -84,7 +90,7 @@ Checklist rapida (sostituisce la diagnosi da zero):
 2. `python -c "from importlib.metadata import version; print(version('neo4j'))"`
    nel venv che si userà → deve stampare `5.28.1`. Se no, punto 1 (la
    guardia in `get_driver()` lo segnala comunque al primo uso).
-3. Se il venv sotto iCloud mostra blocchi anomali su comandi banali → punto 2.
+3. **[Storico, non più applicabile dal 2026-09-17]** Se il venv sotto iCloud mostrava blocchi anomali su comandi banali → punto 2 (il repo non è più sotto iCloud).
 
 Se uno di questi problemi si ripresenta in una forma nuova (non coperta
 sopra), risolverlo **in una sessione/subagent dedicato alla sola
@@ -127,3 +133,15 @@ prima di considerarlo bloccato e passare al venv di fallback
 mentre si attende, per non confondere lentezza-per-attesa con blocco
 reale. Se anche con timeout lungo non completa, usare il fallback (punto
 2) senza insistere oltre.
+
+**2026-09-17** — Repo spostato da iCloud Drive (`~/Library/Mobile Documents/...`)
+a `/Volumes/Ext.Lexar/Costola del Mac/codice-capobianco` (volume esterno).
+`app/.venv` ricreato da zero alla nuova posizione con le stesse dipendenze
+pinnate (`neo4j==5.28.1` incluso), verificato con import diretti (`neo4j`,
+`sentence_transformers`, `web_ui`) tutti OK. Il punto 2 e il punto 3 del
+checklist sopra sono da considerarsi risolti strutturalmente, non solo
+mitigati: non c'è più un venv sotto iCloud da cui possa ripresentarsi il
+sintomo. Il venv di fallback `~/venvs/codice-capobianco` (creato per
+bypassare l'iCloud lento) non ha più la sua ragione d'essere originaria —
+valutare con l'utente se rimuoverlo, non cancellato automaticamente qui
+perché esterno al repo.

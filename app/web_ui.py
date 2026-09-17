@@ -12,8 +12,7 @@ parte del grafo.
 
 Ricerca: faceted + full-text Lucene su `/api/obblighi`/`/api/principi` (sostituisce lo scan
 Python case-insensitive pre-migrazione), più un endpoint di ricerca ibrida a fusione WRRF
-(lessicale + semantico, ADR-0006) su `/api/ricerca` — sostituisce la vecchia "ricerca per
-significato" via qmd.
+(lessicale + semantico, ADR-0006) su `/api/ricerca`.
 
     app/.venv/bin/python app/seed.py       # una tantum / per ripartire puliti (scrive su Neo4j)
     app/.venv/bin/python app/migrate_to_neo4j.py   # se si riparte invece da censimento.db
@@ -463,10 +462,8 @@ def ricerca_ibrida(
     stato_validazione: list[str] = Query(default=[]),
     data_riferimento: str | None = None,
 ):
-    """Ricerca ibrida a fusione WRRF (lessicale Lucene + semantico vettoriale, ADR-0006).
-
-    Sostituisce la vecchia ricerca semantica via qmd: stesso scopo (rilevanza, non solo
-    presenza/assenza), motore diverso (indici nativi Neo4j invece di file-store esterno).
+    """Ricerca ibrida a fusione WRRF (lessicale Lucene + semantico vettoriale, ADR-0006):
+    rilevanza per rango, non solo presenza/assenza, su indici nativi Neo4j.
     """
     if not q.strip():
         return {"status": "ok", "risultati": []}

@@ -5,10 +5,9 @@ campo `testo` (sintesi densa, già pensata per essere breve e rappresentativa), 
 `testo_integrale` chunkato. Motivo: 1 vettore per nodo è coerente con la vector index dichiarata
 in Fase 2 come proprietà singola (`Obbligo.embedding`/`Principio.embedding`); N vettori per nodo
 richiederebbe nodi satellite `:TextUnit` (un pezzo di SAT-Graph mai deciso per questo censimento,
-vedi ADR-0006 "Chiarimento"). Si perde granularità sui pochi nodi con `testo_integrale` lungo
-(quelli sopra `export_qmd.SOGLIA_CHUNKING`), ma la ricerca full-text Lucene (Fase 2) copre già
-`testo_integrale` per intero: il vettore serve al match semantico sulla sintesi, non a sostituire
-il full-text sul testo esteso.
+vedi ADR-0006 "Chiarimento"). Si perde granularità sui pochi nodi con `testo_integrale` molto
+lungo, ma la ricerca full-text Lucene (Fase 2) copre già `testo_integrale` per intero: il vettore
+serve al match semantico sulla sintesi, non a sostituire il full-text sul testo esteso.
 
 Separato da `migrate_to_neo4j.py` (Fase 3): il calcolo embedding è la parte più lenta/con
 dipendenza da modello — separare le fasi rende ripetibile la sola migrazione strutturale senza
