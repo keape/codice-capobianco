@@ -1,197 +1,284 @@
 """UI web del censimento obblighi QTSP (nata come mockup nel ticket 07, ora in produzione).
 
-Copre le tre funzioni previste dal ticket: consultazione/ricerca con le
-relazioni tipizzate del grafo, coda di revisione delle bozze generate
-dall'estrazione (valida/correggi/rifiuta), badge di notifica per le fonti
-con modifiche rilevate dal monitoraggio (ticket 05).
+Copre le tre funzioni previste dal ticket: consultazione/ricerca con le relazioni tipizzate
+del grafo, coda di revisione delle bozze generate dall'estrazione (valida/correggi/rifiuta),
+badge di notifica per le fonti con modifiche rilevate dal monitoraggio (ticket 05).
 
-Legge/scrive `censimento.db`; non e' ancora collegata a Qdrant ne' a un vero
-LLM — la ricerca qui e' solo faceted + full-text, non semantica (quella
-arriva con l'implementazione reale, dietro `interroga_obblighi`, ticket 04).
+Storage: Neo4j (migrazione ADR-0006 / docs/plan-migrazione-neo4j.md), non più SQLite —
+`censimento.db` resta come backup storico/fonte di export una tantum (Fase 3), non è più
+letto da questa UI. Unica eccezione: `modifiche_rilevate` (monitoraggio automatico delle
+Fonti) resta su un piccolo DB SQLite dedicato (`app/monitoraggio.db`, Fase 2) perché non fa
+parte del grafo.
 
-    .venv\\Scripts\\python.exe seed.py       # una tantum / per ripartire puliti
-    .venv\\Scripts\\python.exe web_ui.py
+Ricerca: faceted + full-text Lucene su `/api/obblighi`/`/api/principi` (sostituisce lo scan
+Python case-insensitive pre-migrazione), più un endpoint di ricerca ibrida a fusione WRRF
+(lessicale + semantico, ADR-0006) su `/api/ricerca` — sostituisce la vecchia "ricerca per
+significato" via qmd.
+
+    app/.venv/bin/python app/seed.py       # una tantum / per ripartire puliti (scrive su Neo4j)
+    app/.venv/bin/python app/migrate_to_neo4j.py   # se si riparte invece da censimento.db
+    app/.venv/bin/python app/embed_neo4j.py        # (ri)calcola gli embedding per la ricerca semantica
+    app/.venv/bin/python app/web_ui.py
     -> http://127.0.0.1:8010
 """
 
 import argparse
-import sqlite3
 from datetime import date
-from pathlib import Path
+from functools import lru_cache
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
-import qmd_search
-
-DB_PATH = Path(__file__).parent / "censimento.db"
+from neo4j_common import (
+    DIRETTEZZA_PESO,
+    EMBEDDING_MODEL_NAME,
+    STATI_NORMA,
+    TIPI_OBBLIGO,
+    TIPI_PRINCIPIO,
+    TIPI_RELAZIONE_INVERSO,
+    TIPO_RELAZIONE_TO_ARCO,
+    get_database,
+    get_driver,
+    mon_conn,
+)
 
 app = FastAPI(title="Censimento Obblighi QTSP", docs_url=None, redoc_url=None)
 
+_driver = None
+_database = None
 
-def _conn() -> sqlite3.Connection:
-    if not DB_PATH.exists():
-        raise HTTPException(503, f"Database non trovato: {DB_PATH}. Esegui prima seed.py.")
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
+# Pesi WRRF (ADR-0006 § "Pesi WRRF: lessicale vs semantico") — costanti nominate, non magic
+# number sparso nella logica di fusione.
+PESO_LESSICALE = 0.55
+PESO_SEMANTICO = 0.45
 
-
-def _lookup_maps(conn):
-    tipi_obbligo = {r["id"]: r["nome"] for r in conn.execute("SELECT id, nome FROM tipi_obbligo")}
-    stati_norma = {r["id"]: r["nome"] for r in conn.execute("SELECT id, nome FROM stati_norma")}
-    categorie = {r["id"]: r["nome"] for r in conn.execute("SELECT id, nome FROM categorie_soggetto")}
-    fonti = {r["id"]: r["nome"] for r in conn.execute("SELECT id, nome FROM fonti")}
-    return tipi_obbligo, stati_norma, categorie, fonti
+ARCHI_RELAZIONE = list(TIPO_RELAZIONE_TO_ARCO.values())
 
 
-def _tipi_principio_map(conn):
-    return {r["id"]: r["nome"] for r in conn.execute("SELECT id, nome FROM tipi_principio")}
+@app.on_event("startup")
+def _startup():
+    global _driver, _database
+    _driver = get_driver()
+    _database = get_database()
 
 
-def _oggetti_giuridici_map(conn):
-    return {r["id"]: r["nome"] for r in conn.execute("SELECT id, nome FROM oggetti_giuridici")}
+@app.on_event("shutdown")
+def _shutdown():
+    if _driver is not None:
+        _driver.close()
 
 
-def _soggetti_di(conn, obbligo_id: int):
-    rows = conn.execute("""
-        SELECT cs.nome, os.ruolo FROM obbligo_soggetti os
-        JOIN categorie_soggetto cs ON cs.id = os.categoria_soggetto_id
-        WHERE os.obbligo_id = ?
-    """, (obbligo_id,)).fetchall()
-    obbligati = [r["nome"] for r in rows if r["ruolo"] == "obbligato"]
-    destinatari = [r["nome"] for r in rows if r["ruolo"] == "destinatario"]
-    return obbligati, destinatari
+def _session():
+    if _driver is None:
+        raise HTTPException(503, "Driver Neo4j non inizializzato")
+    return _driver.session(database=_database)
 
 
-def _oggetti_di_principio(conn, principio_id: int):
-    rows = conn.execute("""
-        SELECT og.nome FROM principio_oggetti po
-        JOIN oggetti_giuridici og ON og.id = po.oggetto_giuridico_id
-        WHERE po.principio_id = ?
-    """, (principio_id,)).fetchall()
-    return [r["nome"] for r in rows]
+@lru_cache(maxsize=1)
+def _embedding_model():
+    """Modello caricato pigramente: solo /api/ricerca lo usa, non serve al boot dell'app."""
+    from sentence_transformers import SentenceTransformer
+    return SentenceTransformer(EMBEDDING_MODEL_NAME)
 
 
-def _riga_obbligo(conn, row, tipi_obbligo, stati_norma, fonti):
-    obbligati, destinatari = _soggetti_di(conn, row["id"])
+# --------------------------------------------------------------- costruzione righe
+
+def _riga_obbligo(rec) -> dict:
+    n = rec["n"]
     return {
         "tipo_nodo": "obbligo",
-        "obbligo_id": row["id"],
-        "fonte_id": row["fonte_id"],
-        "fonte": fonti.get(row["fonte_id"], "?"),
-        "riferimento": row["riferimento"],
-        "testo": row["testo"],
-        "testo_integrale": row["testo_integrale"],
-        "tipo_obbligo": tipi_obbligo.get(row["tipo_obbligo_id"], "?"),
-        "stato_obbligo": stati_norma.get(row["stato_id"], "?"),
-        "severita": row["severita"],
-        "sanzioni": row["sanzioni"],
-        "condizione_applicabilita": row["condizione_applicabilita"],
-        "stato_validazione": row["stato_validazione"],
-        "validato_da": row["validato_da"],
-        "data_validazione": row["data_validazione"],
-        "soggetti_obbligati": obbligati,
-        "destinatari": destinatari,
+        "obbligo_id": n["id"],
+        "fonte_id": n["fonte_id"],
+        "fonte": rec["fonte"],
+        "riferimento": n["riferimento"],
+        "testo": n["testo"],
+        "testo_integrale": n.get("testo_integrale"),
+        "tipo_obbligo": n["tipo_obbligo"],
+        "stato_obbligo": n["stato_obbligo"],
+        "data_inizio_vigore": n.get("data_inizio_vigore"),
+        "data_fine_vigore": n.get("data_fine_vigore"),
+        "severita": n.get("severita"),
+        "sanzioni": n.get("sanzioni"),
+        "condizione_applicabilita": n.get("condizione_applicabilita"),
+        "stato_validazione": n["stato_validazione"],
+        "validato_da": n.get("validato_da"),
+        "data_validazione": n.get("data_validazione"),
+        "soggetti_obbligati": rec["soggetti_obbligati"],
+        "destinatari": rec["destinatari"],
     }
 
 
-def _riga_principio(conn, row, tipi_principio, stati_norma, fonti):
-    oggetti = _oggetti_di_principio(conn, row["id"])
+def _riga_principio(rec) -> dict:
+    n = rec["n"]
     return {
         "tipo_nodo": "principio",
-        "principio_id": row["id"],
-        "fonte_id": row["fonte_id"],
-        "fonte": fonti.get(row["fonte_id"], "?"),
-        "riferimento": row["riferimento"],
-        "testo": row["testo"],
-        "testo_integrale": row["testo_integrale"],
-        "tipo_principio": tipi_principio.get(row["tipo_principio_id"], "?"),
-        "stato_obbligo": stati_norma.get(row["stato_id"], "?"),
-        "condizione_applicabilita": row["condizione_applicabilita"],
-        "stato_validazione": row["stato_validazione"],
-        "validato_da": row["validato_da"],
-        "data_validazione": row["data_validazione"],
-        "oggetti_giuridici": oggetti,
+        "principio_id": n["id"],
+        "fonte_id": n["fonte_id"],
+        "fonte": rec["fonte"],
+        "riferimento": n["riferimento"],
+        "testo": n["testo"],
+        "testo_integrale": n.get("testo_integrale"),
+        "tipo_principio": n["tipo_principio"],
+        "stato_obbligo": n["stato_obbligo"],
+        "data_inizio_vigore": n.get("data_inizio_vigore"),
+        "data_fine_vigore": n.get("data_fine_vigore"),
+        "condizione_applicabilita": n.get("condizione_applicabilita"),
+        "stato_validazione": n["stato_validazione"],
+        "validato_da": n.get("validato_da"),
+        "data_validazione": n.get("data_validazione"),
+        "oggetti_giuridici": rec["oggetti_giuridici"],
     }
 
 
-# ------------------------------------------------------- ricerca semantica
+_OBBLIGHI_QUERY = """
+    MATCH (o:Obbligo)-[:DA_FONTE]->(f:Fonte)
+    OPTIONAL MATCH (o)-[hs:HA_SOGGETTO]->(cs:CategoriaSoggetto)
+    WITH o, f, collect(DISTINCT CASE WHEN hs.ruolo = 'obbligato' THEN cs.nome END) AS obbligati,
+               collect(DISTINCT CASE WHEN hs.ruolo = 'destinatario' THEN cs.nome END) AS destinatari
+    RETURN o AS n, f.nome AS fonte,
+           [x IN obbligati WHERE x IS NOT NULL] AS soggetti_obbligati,
+           [x IN destinatari WHERE x IS NOT NULL] AS destinatari
+    ORDER BY o.id
+"""
 
-@app.get("/api/ricerca-semantica")
-def ricerca_semantica(q: str, n: int = 10):
-    """Ricerca per significato via qmd (locale, `qmd query` con reranking).
+_PRINCIPI_QUERY = """
+    MATCH (p:Principio)-[:DA_FONTE]->(f:Fonte)
+    OPTIONAL MATCH (p)-[:HA_OGGETTO]->(og:OggettoGiuridico)
+    WITH p, f, collect(DISTINCT og.nome) AS oggetti
+    RETURN p AS n, f.nome AS fonte, oggetti AS oggetti_giuridici
+    ORDER BY p.id
+"""
 
-    Additiva rispetto alla ricerca full-text di /api/obblighi e /api/principi,
-    non la sostituisce. Vedi docs/qmd-semantic-search-spec.md.
+
+def _obblighi_all(session) -> list[dict]:
+    return [_riga_obbligo(r) for r in session.run(_OBBLIGHI_QUERY).data()]
+
+
+def _principi_all(session) -> list[dict]:
+    return [_riga_principio(r) for r in session.run(_PRINCIPI_QUERY).data()]
+
+
+# ------------------------------------------------------------------- vicini (Fase 5+7)
+
+_LABEL_DI_TIPO = {"obbligo": "Obbligo", "principio": "Principio"}
+_TIPO_DI_LABEL = {"Obbligo": "obbligo", "Principio": "principio"}
+_TIPI_ARCO_PATTERN = "|".join(ARCHI_RELAZIONE)
+
+
+def _vicini_di(session, tipo_nodo: str, nodo_id: int, profondita: int = 1) -> list[dict]:
+    """Vicini di un nodo del grafo (Obbligo o Principio, ADR-0004) via traversal Cypher nativo.
+
+    Multi-hop pesato (ADR-0006/Fase 7): profondita=1 riproduce esattamente il comportamento
+    1-hop pre-Fase-7 (nessun cambio di comportamento salvo richiesta esplicita). Per hop > 1,
+    il ranking ordina per distanza (hop count) crescente e, a parità di hop, per direttezza del
+    tipo di relazione decrescente (peso dell'ultimo arco del percorso, DIRETTEZZA_PESO — la
+    direttezza è una proprietà del tipo di relazione, non della direzione di attraversamento).
+    Se un nodo è raggiungibile con più percorsi, si tiene il migliore (hop minore, poi peso
+    maggiore).
     """
-    if not q.strip():
-        return {"status": "ok", "risultati": []}
+    label = _LABEL_DI_TIPO[tipo_nodo]
+    query = f"""
+        MATCH (start:{label} {{id: $nodo_id}})
+        MATCH path = (start)-[rels:{_TIPI_ARCO_PATTERN}*1..{int(profondita)}]-(other)
+        WHERE other <> start AND (other:Obbligo OR other:Principio)
+        WITH other, rels[-1] AS ultimo, length(path) AS hop
+        RETURN DISTINCT other AS n, labels(other) AS other_labels, hop,
+               ultimo.relazione_id AS relazione_id, ultimo.tipo_relazione AS tipo_relazione_base,
+               ultimo.evidence_type AS evidence_type, ultimo.confidence AS confidence,
+               (endNode(ultimo) = other) AS forward
+    """
+    rows = session.run(query, nodo_id=nodo_id).data()
 
-    trovati, errore = qmd_search.ricerca_semantica(q, n)
-    if errore is not None:
-        return JSONResponse(status_code=503, content={"status": "errore", "messaggio": errore})
+    fonti_cache: dict[int, str] = {}
 
-    with _conn() as conn:
-        tipi_obbligo_map, stati_obbligo_map, _, fonti = _lookup_maps(conn)
-        tipi_principio_map = _tipi_principio_map(conn)
-        risultati = []
-        for r in trovati:
-            if r["tipo_nodo"] == "obbligo":
-                row = conn.execute("SELECT * FROM obblighi WHERE id = ?", (r["id"],)).fetchone()
-                if row is None:
-                    continue
-                riga = _riga_obbligo(conn, row, tipi_obbligo_map, stati_obbligo_map, fonti)
-            else:
-                row = conn.execute("SELECT * FROM principi WHERE id = ?", (r["id"],)).fetchone()
-                if row is None:
-                    continue
-                riga = _riga_principio(conn, row, tipi_principio_map, stati_obbligo_map, fonti)
-            riga["score"] = r["score"]
-            riga["snippet"] = r["snippet"]
-            risultati.append(riga)
+    def _fonte_di(fonte_id: int) -> str:
+        if fonte_id not in fonti_cache:
+            rec = session.run("MATCH (f:Fonte {id: $id}) RETURN f.nome AS nome", id=fonte_id).single()
+            fonti_cache[fonte_id] = rec["nome"] if rec else "?"
+        return fonti_cache[fonte_id]
 
-    return {"status": "ok", "risultati": risultati}
+    migliori: dict[tuple[str, int], dict] = {}
+    for r in rows:
+        altro_label = "Obbligo" if "Obbligo" in r["other_labels"] else "Principio"
+        altro_tipo = _TIPO_DI_LABEL[altro_label]
+        chiave = (altro_tipo, r["n"]["id"])
+        peso = DIRETTEZZA_PESO.get(r["tipo_relazione_base"], 0)
+        candidato_rank = (r["hop"], -peso)
+        esistente = migliori.get(chiave)
+        if esistente is not None and esistente["_rank"] <= candidato_rank:
+            continue
+        tipo_relazione = r["tipo_relazione_base"] if r["forward"] else TIPI_RELAZIONE_INVERSO[r["tipo_relazione_base"]]
+        n = r["n"]
+        migliori[chiave] = {
+            "_rank": candidato_rank,
+            "tipo_nodo": altro_tipo,
+            ("obbligo_id" if altro_tipo == "obbligo" else "principio_id"): n["id"],
+            "relazione_id": r["relazione_id"],
+            "tipo_relazione": tipo_relazione,
+            "hop": r["hop"],
+            "evidence_type": r["evidence_type"],
+            "confidence": r["confidence"],
+            "fonte": _fonte_di(n["fonte_id"]),
+            "riferimento": n["riferimento"],
+            "testo": n["testo"],
+            "stato_validazione": n["stato_validazione"],
+        }
+
+    vicini = list(migliori.values())
+    vicini.sort(key=lambda v: v["_rank"])
+    for v in vicini:
+        del v["_rank"]
+    return vicini
 
 
 # --------------------------------------------------------------- lookup/stats
 
 @app.get("/api/lookup")
 def lookup():
-    with _conn() as conn:
-        return {
-            "status": "ok",
-            "fonti": [dict(r) for r in conn.execute(
-                "SELECT f.id AS fonte_id, f.nome, f.versione, f.url_sorgente, sf.nome AS stato "
-                "FROM fonti f JOIN stati_fonte sf ON sf.id = f.stato_id")],
-            "tipi_obbligo": [r["nome"] for r in conn.execute("SELECT nome FROM tipi_obbligo")],
-            "stati_obbligo": [r["nome"] for r in conn.execute("SELECT nome FROM stati_norma")],
-            "categorie_soggetto": [r["nome"] for r in conn.execute("SELECT nome FROM categorie_soggetto")],
-            "tipi_principio": [r["nome"] for r in conn.execute("SELECT nome FROM tipi_principio")],
-            "oggetti_giuridici": [r["nome"] for r in conn.execute("SELECT nome FROM oggetti_giuridici")],
-            "tipi_relazione": [dict(r) for r in conn.execute("SELECT nome, nome_inverso FROM tipi_relazione")],
-        }
+    with _session() as session:
+        fonti = session.run(
+            "MATCH (f:Fonte) RETURN f.id AS fonte_id, f.nome AS nome, f.versione AS versione, "
+            "f.url_sorgente AS url_sorgente, f.urn AS urn, f.stato AS stato ORDER BY f.id"
+        ).data()
+        categorie = [r["nome"] for r in session.run("MATCH (c:CategoriaSoggetto) RETURN c.nome AS nome ORDER BY nome")]
+        oggetti = [r["nome"] for r in session.run("MATCH (o:OggettoGiuridico) RETURN o.nome AS nome ORDER BY nome")]
+    return {
+        "status": "ok",
+        "fonti": fonti,
+        "tipi_obbligo": TIPI_OBBLIGO,
+        "stati_obbligo": STATI_NORMA,
+        "categorie_soggetto": categorie,
+        "tipi_principio": TIPI_PRINCIPIO,
+        "oggetti_giuridici": oggetti,
+        "tipi_relazione": [{"nome": n, "nome_inverso": i} for n, i in TIPI_RELAZIONE_INVERSO.items()],
+    }
 
 
 @app.get("/api/stats")
 def stats():
-    with _conn() as conn:
-        obblighi = conn.execute("SELECT stato_validazione, COUNT(*) c FROM obblighi GROUP BY stato_validazione").fetchall()
-        counts = {r["stato_validazione"]: r["c"] for r in obblighi}
-        n_principi = conn.execute("SELECT COUNT(*) c FROM principi").fetchone()["c"]
-        n_fonti = conn.execute("SELECT COUNT(*) c FROM fonti").fetchone()["c"]
-        n_relazioni = conn.execute("SELECT COUNT(*) c FROM relazioni").fetchone()["c"]
-        n_modifiche = conn.execute("SELECT COUNT(*) c FROM modifiche_rilevate WHERE esaminata = 0").fetchone()["c"]
-        return {
-            "fonti": n_fonti,
-            "obblighi_validati": counts.get("validato", 0),
-            "obblighi_bozza": counts.get("bozza", 0),
-            "principi": n_principi,
-            "relazioni": n_relazioni,
-            "modifiche_da_esaminare": n_modifiche,
-        }
+    with _session() as session:
+        obblighi_counts = session.run(
+            "MATCH (o:Obbligo) RETURN o.stato_validazione AS stato, count(*) AS c"
+        ).data()
+        counts = {r["stato"]: r["c"] for r in obblighi_counts}
+        n_principi = session.run("MATCH (p:Principio) RETURN count(p) AS c").single()["c"]
+        n_fonti = session.run("MATCH (f:Fonte) RETURN count(f) AS c").single()["c"]
+        n_relazioni = session.run(
+            "MATCH ()-[r]->() WHERE r.relazione_id IS NOT NULL RETURN count(r) AS c"
+        ).single()["c"]
+    with mon_conn() as mconn:
+        n_modifiche = mconn.execute(
+            "SELECT COUNT(*) c FROM modifiche_rilevate WHERE esaminata = 0"
+        ).fetchone()["c"]
+    return {
+        "fonti": n_fonti,
+        "obblighi_validati": counts.get("validato", 0),
+        "obblighi_bozza": counts.get("bozza", 0),
+        "principi": n_principi,
+        "relazioni": n_relazioni,
+        "modifiche_da_esaminare": n_modifiche,
+    }
 
 
 # ------------------------------------------------------------- consultazione
@@ -206,94 +293,47 @@ def cerca_obblighi(
     ruolo: str = Query("", pattern="^(|obbligato|destinatario)$"),
     solo_validati: bool = True,
 ):
-    with _conn() as conn:
-        tipi_obbligo_map, stati_obbligo_map, categorie_map, fonti = _lookup_maps(conn)
-        rows = conn.execute("SELECT * FROM obblighi").fetchall()
-
-    needle = q.strip().lower()
-    tipo_ids = {k for k, v in tipi_obbligo_map.items() if v in tipo_obbligo} if tipo_obbligo else None
-    stato_ids = {k for k, v in stati_obbligo_map.items() if v in stato_obbligo} if stato_obbligo else None
+    with _session() as session:
+        righe = _obblighi_all(session)
+        id_lessicali = _fulltext_ids(session, "idxTestoObbligo", q) if q.strip() else None
 
     risultati = []
-    with _conn() as conn:
-        for row in rows:
-            if solo_validati and row["stato_validazione"] != "validato":
+    for r in righe:
+        if solo_validati and r["stato_validazione"] != "validato":
+            continue
+        if fonte_id and r["fonte_id"] not in fonte_id:
+            continue
+        if tipo_obbligo and r["tipo_obbligo"] not in tipo_obbligo:
+            continue
+        if stato_obbligo and r["stato_obbligo"] not in stato_obbligo:
+            continue
+        if id_lessicali is not None and r["obbligo_id"] not in id_lessicali:
+            continue
+        if categoria_soggetto:
+            pool = (
+                r["soggetti_obbligati"] if ruolo == "obbligato"
+                else r["destinatari"] if ruolo == "destinatario"
+                else r["soggetti_obbligati"] + r["destinatari"]
+            )
+            if not any(c in pool for c in categoria_soggetto):
                 continue
-            if fonte_id and row["fonte_id"] not in fonte_id:
-                continue
-            if tipo_ids is not None and row["tipo_obbligo_id"] not in tipo_ids:
-                continue
-            if stato_ids is not None and row["stato_id"] not in stato_ids:
-                continue
-            if needle and needle not in row["testo"].lower() and needle not in row["riferimento"].lower() \
-                    and needle not in (row["testo_integrale"] or "").lower():
-                continue
-            obbligati, destinatari = _soggetti_di(conn, row["id"])
-            if categoria_soggetto:
-                pool = obbligati if ruolo == "obbligato" else destinatari if ruolo == "destinatario" else obbligati + destinatari
-                if not any(c in pool for c in categoria_soggetto):
-                    continue
-            risultati.append(_riga_obbligo(conn, row, tipi_obbligo_map, stati_obbligo_map, fonti))
+        risultati.append(r)
 
     return {"status": "ok", "totale": len(risultati), "risultati": risultati}
 
 
-def _vicini_di(conn, tipo_nodo: str, nodo_id: int, fonti):
-    """Vicini di un nodo del grafo (Obbligo o Principio, ADR-0004), a prescindere
-    dal tipo di nodo all'altra estremità della relazione."""
-    vicini_rows = conn.execute("""
-        SELECT r.id AS relazione_id, r.nodo_a_tipo AS altro_tipo, r.nodo_a_id AS altro_id, tr.nome AS tipo
-        FROM relazioni r JOIN tipi_relazione tr ON tr.id = r.tipo_relazione_id
-        WHERE r.nodo_da_tipo = ? AND r.nodo_da_id = ?
-        UNION ALL
-        SELECT r.id AS relazione_id, r.nodo_da_tipo AS altro_tipo, r.nodo_da_id AS altro_id, tr.nome_inverso AS tipo
-        FROM relazioni r JOIN tipi_relazione tr ON tr.id = r.tipo_relazione_id
-        WHERE r.nodo_a_tipo = ? AND r.nodo_a_id = ?
-    """, (tipo_nodo, nodo_id, tipo_nodo, nodo_id)).fetchall()
-    vicini = []
-    for v in vicini_rows:
-        tabella = "obblighi" if v["altro_tipo"] == "obbligo" else "principi"
-        altro = conn.execute(f"SELECT * FROM {tabella} WHERE id = ?", (v["altro_id"],)).fetchone()
-        if altro is None:
-            continue  # estremità inesistente: nessun FK a livello DB (ADR-0004), la si ignora in lettura
-        vicini.append({
-            "tipo_nodo": v["altro_tipo"],
-            "obbligo_id" if v["altro_tipo"] == "obbligo" else "principio_id": v["altro_id"],
-            "relazione_id": v["relazione_id"],
-            "tipo_relazione": v["tipo"],
-            "fonte": fonti.get(altro["fonte_id"], "?"),
-            "riferimento": altro["riferimento"],
-            "testo": altro["testo"],
-            "stato_validazione": altro["stato_validazione"],
-        })
-    return vicini
-
-
 @app.get("/api/obblighi/{obbligo_id}")
-def dettaglio_obbligo(obbligo_id: int):
-    with _conn() as conn:
-        tipi_obbligo_map, stati_norma_map, categorie_map, fonti = _lookup_maps(conn)
-        row = conn.execute("SELECT * FROM obblighi WHERE id = ?", (obbligo_id,)).fetchone()
-        if row is None:
+def dettaglio_obbligo(obbligo_id: int, profondita: int = Query(default=1, ge=1, le=4)):
+    with _session() as session:
+        rec = session.run(
+            _OBBLIGHI_QUERY.split("ORDER BY")[0].replace("MATCH (o:Obbligo)", "MATCH (o:Obbligo {id: $id})"),
+            id=obbligo_id,
+        ).data()
+        if not rec:
             raise HTTPException(404, "Obbligo non trovato")
-        obbligo = _riga_obbligo(conn, row, tipi_obbligo_map, stati_norma_map, fonti)
-        vicini = _vicini_di(conn, "obbligo", obbligo_id, fonti)
-
+        obbligo = _riga_obbligo(rec[0])
+        vicini = _vicini_di(session, "obbligo", obbligo_id, profondita=profondita)
     return {"status": "ok", "obbligo": obbligo, "vicini": vicini}
-
-
-@app.get("/api/principi/{principio_id}")
-def dettaglio_principio(principio_id: int):
-    with _conn() as conn:
-        _, stati_norma_map, _, fonti = _lookup_maps(conn)
-        tipi_principio_map = _tipi_principio_map(conn)
-        row = conn.execute("SELECT * FROM principi WHERE id = ?", (principio_id,)).fetchone()
-        if row is None:
-            raise HTTPException(404, "Principio non trovato")
-        principio = _riga_principio(conn, row, tipi_principio_map, stati_norma_map, fonti)
-        vicini = _vicini_di(conn, "principio", principio_id, fonti)
-
-    return {"status": "ok", "principio": principio, "vicini": vicini}
 
 
 @app.get("/api/principi")
@@ -304,42 +344,208 @@ def cerca_principi(
     oggetto_giuridico: list[str] = Query(default=[]),
     solo_validati: bool = True,
 ):
-    with _conn() as conn:
-        tipi_principio_map = _tipi_principio_map(conn)
-        _, stati_norma_map, _, fonti = _lookup_maps(conn)
-        rows = conn.execute("SELECT * FROM principi").fetchall()
-
-    needle = q.strip().lower()
-    tipo_ids = {k for k, v in tipi_principio_map.items() if v in tipo_principio} if tipo_principio else None
+    with _session() as session:
+        righe = _principi_all(session)
+        id_lessicali = _fulltext_ids(session, "idxTestoPrincipio", q) if q.strip() else None
 
     risultati = []
-    with _conn() as conn:
-        for row in rows:
-            if solo_validati and row["stato_validazione"] != "validato":
-                continue
-            if fonte_id and row["fonte_id"] not in fonte_id:
-                continue
-            if tipo_ids is not None and row["tipo_principio_id"] not in tipo_ids:
-                continue
-            if needle and needle not in row["testo"].lower() and needle not in row["riferimento"].lower() \
-                    and needle not in (row["testo_integrale"] or "").lower():
-                continue
-            oggetti = _oggetti_di_principio(conn, row["id"])
-            if oggetto_giuridico and not any(o in oggetti for o in oggetto_giuridico):
-                continue
-            risultati.append(_riga_principio(conn, row, tipi_principio_map, stati_norma_map, fonti))
+    for r in righe:
+        if solo_validati and r["stato_validazione"] != "validato":
+            continue
+        if fonte_id and r["fonte_id"] not in fonte_id:
+            continue
+        if tipo_principio and r["tipo_principio"] not in tipo_principio:
+            continue
+        if id_lessicali is not None and r["principio_id"] not in id_lessicali:
+            continue
+        if oggetto_giuridico and not any(o in r["oggetti_giuridici"] for o in oggetto_giuridico):
+            continue
+        risultati.append(r)
 
     return {"status": "ok", "totale": len(risultati), "risultati": risultati}
+
+
+@app.get("/api/principi/{principio_id}")
+def dettaglio_principio(principio_id: int, profondita: int = Query(default=1, ge=1, le=4)):
+    with _session() as session:
+        rec = session.run(
+            _PRINCIPI_QUERY.split("ORDER BY")[0].replace("MATCH (p:Principio)", "MATCH (p:Principio {id: $id})"),
+            id=principio_id,
+        ).data()
+        if not rec:
+            raise HTTPException(404, "Principio non trovato")
+        principio = _riga_principio(rec[0])
+        vicini = _vicini_di(session, "principio", principio_id, profondita=profondita)
+    return {"status": "ok", "principio": principio, "vicini": vicini}
+
+
+def _query_lucene(termine: str) -> str:
+    """Query Lucene a frase, con boost sul campo `riferimento` (ADR-0006): un match esatto sul
+    riferimento normativo ("Art. 32") deve premiare l'articolo corrispondente, non un articolo
+    qualunque che condivide solo alcuni termini nel testo esteso."""
+    pulito = termine.strip().replace('"', '\\"')
+    if not pulito:
+        return ""
+    return f'riferimento:"{pulito}"^3 OR testo:"{pulito}" OR testo_integrale:"{pulito}"'
+
+
+def _fulltext_ids(session, index_name: str, q: str) -> set[int]:
+    """ID dei nodi che matchano `q` sull'indice full-text Lucene indicato (ADR-0006:
+    sostituisce lo scan Python case-insensitive)."""
+    query_lucene = _query_lucene(q)
+    if not query_lucene:
+        return set()
+    rows = session.run(
+        f"CALL db.index.fulltext.queryNodes('{index_name}', $q) YIELD node RETURN node.id AS id",
+        q=query_lucene,
+    ).data()
+    return {r["id"] for r in rows}
+
+
+# ---------------------------------------------------------- Fase 6: ricerca ibrida WRRF
+
+def _candidati_pre_filtrati(
+    session, label: str, fonte_id: list[int], stato_validazione: list[str],
+    tipo_obbligo: list[str], tipo_principio: list[str], categoria_soggetto: list[str],
+    data_riferimento: str | None,
+) -> set[int]:
+    """Pre-filtro (ADR-0006): facet + range temporale come WHERE prima del retrieval, mai come
+    termine pesato nella fusione — un nodo non vigente alla data di riferimento non deve mai
+    comparire, indipendentemente dalla rilevanza lessicale/semantica."""
+    clausole = ["true"]
+    params: dict = {}
+    if fonte_id:
+        clausole.append("n.fonte_id IN $fonte_id")
+        params["fonte_id"] = fonte_id
+    if stato_validazione:
+        clausole.append("n.stato_validazione IN $stato_validazione")
+        params["stato_validazione"] = stato_validazione
+    if label == "Obbligo" and tipo_obbligo:
+        clausole.append("n.tipo_obbligo IN $tipo_obbligo")
+        params["tipo_obbligo"] = tipo_obbligo
+    if label == "Principio" and tipo_principio:
+        clausole.append("n.tipo_principio IN $tipo_principio")
+        params["tipo_principio"] = tipo_principio
+    if data_riferimento:
+        clausole.append(
+            "(n.data_inizio_vigore IS NULL OR n.data_inizio_vigore <= $data_riferimento) "
+            "AND (n.data_fine_vigore IS NULL OR n.data_fine_vigore >= $data_riferimento)"
+        )
+        params["data_riferimento"] = data_riferimento
+
+    match_extra = ""
+    if label == "Obbligo" and categoria_soggetto:
+        match_extra = "MATCH (n)-[:HA_SOGGETTO]->(cs:CategoriaSoggetto) WHERE cs.nome IN $categoria_soggetto WITH DISTINCT n"
+        params["categoria_soggetto"] = categoria_soggetto
+
+    query = f"MATCH (n:{label}) {match_extra} WHERE {' AND '.join(clausole)} RETURN n.id AS id"
+    return {r["id"] for r in session.run(query, **params).data()}
+
+
+def _wrrf(lessicali: list[int], semantici: list[int]) -> dict[int, float]:
+    """Weighted Reciprocal Rank Fusion (ADR-0006): 0.55/rank_lucene + 0.45/rank_vector."""
+    punteggi: dict[int, float] = {}
+    for rank, node_id in enumerate(lessicali, start=1):
+        punteggi[node_id] = punteggi.get(node_id, 0.0) + PESO_LESSICALE / rank
+    for rank, node_id in enumerate(semantici, start=1):
+        punteggi[node_id] = punteggi.get(node_id, 0.0) + PESO_SEMANTICO / rank
+    return punteggi
+
+
+@app.get("/api/ricerca")
+def ricerca_ibrida(
+    q: str,
+    n: int = 10,
+    fonte_id: list[int] = Query(default=[]),
+    tipo_obbligo: list[str] = Query(default=[]),
+    tipo_principio: list[str] = Query(default=[]),
+    categoria_soggetto: list[str] = Query(default=[]),
+    stato_validazione: list[str] = Query(default=[]),
+    data_riferimento: str | None = None,
+):
+    """Ricerca ibrida a fusione WRRF (lessicale Lucene + semantico vettoriale, ADR-0006).
+
+    Sostituisce la vecchia ricerca semantica via qmd: stesso scopo (rilevanza, non solo
+    presenza/assenza), motore diverso (indici nativi Neo4j invece di file-store esterno).
+    """
+    if not q.strip():
+        return {"status": "ok", "risultati": []}
+
+    with _session() as session:
+        candidati_obbligo = _candidati_pre_filtrati(
+            session, "Obbligo", fonte_id, stato_validazione, tipo_obbligo, [], categoria_soggetto,
+            data_riferimento,
+        )
+        candidati_principio = _candidati_pre_filtrati(
+            session, "Principio", fonte_id, stato_validazione, [], tipo_principio, [],
+            data_riferimento,
+        )
+
+        risultati_finali = []
+        for label, index_testo, index_vettore, candidati, tipo_nodo in (
+            ("Obbligo", "idxTestoObbligo", "idxEmbeddingObbligo", candidati_obbligo, "obbligo"),
+            ("Principio", "idxTestoPrincipio", "idxEmbeddingPrincipio", candidati_principio, "principio"),
+        ):
+            if not candidati:
+                continue
+            id_lessicali_ordinati = [
+                r["id"] for r in session.run(
+                    f"CALL db.index.fulltext.queryNodes('{index_testo}', $q) YIELD node, score "
+                    "RETURN node.id AS id ORDER BY score DESC",
+                    q=_query_lucene(q),
+                ).data()
+                if r["id"] in candidati
+            ]
+
+            vettore_query = _embedding_model().encode(q, normalize_embeddings=True).tolist()
+            k = max(50, n * 5)
+            id_semantici_ordinati = [
+                r["id"] for r in session.run(
+                    f"CALL db.index.vector.queryNodes('{index_vettore}', $k, $vec) YIELD node, score "
+                    "RETURN node.id AS id ORDER BY score DESC",
+                    k=k, vec=vettore_query,
+                ).data()
+                if r["id"] in candidati
+            ]
+
+            punteggi = _wrrf(id_lessicali_ordinati, id_semantici_ordinati)
+            for node_id, score in punteggi.items():
+                risultati_finali.append((score, tipo_nodo, node_id))
+
+        risultati_finali.sort(key=lambda t: t[0], reverse=True)
+        risultati_finali = risultati_finali[:n]
+
+        righe = []
+        for score, tipo_nodo, node_id in risultati_finali:
+            if tipo_nodo == "obbligo":
+                rec = session.run(
+                    _OBBLIGHI_QUERY.split("ORDER BY")[0].replace("MATCH (o:Obbligo)", "MATCH (o:Obbligo {id: $id})"),
+                    id=node_id,
+                ).data()
+                riga = _riga_obbligo(rec[0])
+            else:
+                rec = session.run(
+                    _PRINCIPI_QUERY.split("ORDER BY")[0].replace("MATCH (p:Principio)", "MATCH (p:Principio {id: $id})"),
+                    id=node_id,
+                ).data()
+                riga = _riga_principio(rec[0])
+            riga["score"] = round(score, 4)
+            righe.append(riga)
+
+    return {"status": "ok", "risultati": righe}
 
 
 # ---------------------------------------------------------------- revisione
 
 @app.get("/api/revisione")
 def coda_revisione():
-    with _conn() as conn:
-        tipi_obbligo_map, stati_obbligo_map, categorie_map, fonti = _lookup_maps(conn)
-        rows = conn.execute("SELECT * FROM obblighi WHERE stato_validazione = 'bozza' ORDER BY id").fetchall()
-        bozze = [_riga_obbligo(conn, r, tipi_obbligo_map, stati_obbligo_map, fonti) for r in rows]
+    with _session() as session:
+        rows = session.run(
+            _OBBLIGHI_QUERY.split("ORDER BY")[0].replace(
+                "MATCH (o:Obbligo)", "MATCH (o:Obbligo {stato_validazione: 'bozza'})"
+            ) + " ORDER BY o.id",
+        ).data()
+        bozze = [_riga_obbligo(r) for r in rows]
     return {"status": "ok", "bozze": bozze}
 
 
@@ -348,6 +554,8 @@ class CorrezioneBozza(BaseModel):
     testo: str
     tipo_obbligo: str
     stato_obbligo: str
+    data_inizio_vigore: str | None = None
+    data_fine_vigore: str | None = None
     severita: str | None = None
     sanzioni: str | None = None
     condizione_applicabilita: str | None = None
@@ -358,50 +566,66 @@ class CorrezioneBozza(BaseModel):
 
 @app.post("/api/revisione/{obbligo_id}/valida")
 def valida_bozza(obbligo_id: int, body: CorrezioneBozza):
-    with _conn() as conn:
-        tipo_row = conn.execute("SELECT id FROM tipi_obbligo WHERE nome = ?", (body.tipo_obbligo,)).fetchone()
-        stato_row = conn.execute("SELECT id FROM stati_norma WHERE nome = ?", (body.stato_obbligo,)).fetchone()
-        if tipo_row is None or stato_row is None:
-            raise HTTPException(400, "Valore di lookup sconosciuto (tipo_obbligo/stato_obbligo)")
-        cur = conn.execute("SELECT id FROM obblighi WHERE id = ? AND stato_validazione = 'bozza'", (obbligo_id,))
-        if cur.fetchone() is None:
+    if body.tipo_obbligo not in TIPI_OBBLIGO or body.stato_obbligo not in STATI_NORMA:
+        raise HTTPException(400, "Valore di lookup sconosciuto (tipo_obbligo/stato_obbligo)")
+
+    with _session() as session:
+        esiste = session.run(
+            "MATCH (o:Obbligo {id: $id, stato_validazione: 'bozza'}) RETURN o.id AS id", id=obbligo_id
+        ).single()
+        if esiste is None:
             raise HTTPException(404, "Bozza non trovata (già validata/rifiutata?)")
 
-        conn.execute("""
-            UPDATE obblighi SET riferimento = ?, testo = ?, tipo_obbligo_id = ?, stato_id = ?,
-                severita = ?, sanzioni = ?, condizione_applicabilita = ?,
-                stato_validazione = 'validato', validato_da = ?, data_validazione = ?
-            WHERE id = ?
-        """, (body.riferimento, body.testo, tipo_row["id"], stato_row["id"],
-              body.severita, body.sanzioni, body.condizione_applicabilita,
-              body.validato_da, date.today().isoformat(), obbligo_id))
+        categorie_esistenti = {
+            r["nome"] for r in session.run("MATCH (c:CategoriaSoggetto) RETURN c.nome AS nome")
+        }
+        for nome in [*body.soggetti_obbligati, *body.destinatari]:
+            if nome not in categorie_esistenti:
+                raise HTTPException(400, f"Categoria di soggetto sconosciuta: {nome}")
 
-        conn.execute("DELETE FROM obbligo_soggetti WHERE obbligo_id = ?", (obbligo_id,))
-        cats = {r["nome"]: r["id"] for r in conn.execute("SELECT id, nome FROM categorie_soggetto")}
+        session.run(
+            """
+            MATCH (o:Obbligo {id: $id})
+            SET o.riferimento = $riferimento, o.testo = $testo, o.tipo_obbligo = $tipo_obbligo,
+                o.stato_obbligo = $stato_obbligo, o.data_inizio_vigore = $data_inizio_vigore,
+                o.data_fine_vigore = $data_fine_vigore, o.severita = $severita, o.sanzioni = $sanzioni,
+                o.condizione_applicabilita = $condizione_applicabilita, o.stato_validazione = 'validato',
+                o.validato_da = $validato_da, o.data_validazione = $data_validazione
+            """,
+            id=obbligo_id, riferimento=body.riferimento, testo=body.testo, tipo_obbligo=body.tipo_obbligo,
+            stato_obbligo=body.stato_obbligo, data_inizio_vigore=body.data_inizio_vigore,
+            data_fine_vigore=body.data_fine_vigore, severita=body.severita, sanzioni=body.sanzioni,
+            condizione_applicabilita=body.condizione_applicabilita, validato_da=body.validato_da,
+            data_validazione=date.today().isoformat(),
+        )
+
+        session.run("MATCH (:Obbligo {id: $id})-[r:HA_SOGGETTO]->() DELETE r", id=obbligo_id)
         for nome in body.soggetti_obbligati:
-            if nome not in cats:
-                raise HTTPException(400, f"Categoria di soggetto sconosciuta: {nome}")
-            conn.execute("INSERT INTO obbligo_soggetti (obbligo_id, categoria_soggetto_id, ruolo) VALUES (?,?,?)",
-                         (obbligo_id, cats[nome], "obbligato"))
+            session.run(
+                "MATCH (o:Obbligo {id: $id}), (c:CategoriaSoggetto {nome: $nome}) "
+                "CREATE (o)-[:HA_SOGGETTO {ruolo: 'obbligato'}]->(c)",
+                id=obbligo_id, nome=nome,
+            )
         for nome in body.destinatari:
-            if nome not in cats:
-                raise HTTPException(400, f"Categoria di soggetto sconosciuta: {nome}")
-            conn.execute("INSERT INTO obbligo_soggetti (obbligo_id, categoria_soggetto_id, ruolo) VALUES (?,?,?)",
-                         (obbligo_id, cats[nome], "destinatario"))
-        conn.commit()
-    qmd_search.sync_qmd()
+            session.run(
+                "MATCH (o:Obbligo {id: $id}), (c:CategoriaSoggetto {nome: $nome}) "
+                "CREATE (o)-[:HA_SOGGETTO {ruolo: 'destinatario'}]->(c)",
+                id=obbligo_id, nome=nome,
+            )
+
     return {"status": "ok", "obbligo_id": obbligo_id}
 
 
 @app.post("/api/revisione/{obbligo_id}/rifiuta")
 def rifiuta_bozza(obbligo_id: int):
     # Decisione ticket 03: le bozze rifiutate vengono eliminate, nessuna traccia storica.
-    with _conn() as conn:
-        cur = conn.execute("DELETE FROM obblighi WHERE id = ? AND stato_validazione = 'bozza'", (obbligo_id,))
-        if cur.rowcount == 0:
+    with _session() as session:
+        rec = session.run(
+            "MATCH (o:Obbligo {id: $id, stato_validazione: 'bozza'}) DETACH DELETE o RETURN count(o) AS c",
+            id=obbligo_id,
+        ).single()
+        if rec["c"] == 0:
             raise HTTPException(404, "Bozza non trovata (già validata/rifiutata?)")
-        conn.commit()
-    qmd_search.sync_qmd()
     return {"status": "ok"}
 
 
@@ -409,15 +633,26 @@ def rifiuta_bozza(obbligo_id: int):
 
 @app.get("/api/monitoraggio")
 def monitoraggio_stato():
-    with _conn() as conn:
-        fonti = {r["id"]: r["nome"] for r in conn.execute("SELECT id, nome FROM fonti")}
-        rows = conn.execute("""
-            SELECT * FROM modifiche_rilevate WHERE esaminata = 0 ORDER BY fonte_id, data_rilevamento
-        """).fetchall()
+    with mon_conn() as mconn:
+        righe = mconn.execute(
+            "SELECT * FROM modifiche_rilevate WHERE esaminata = 0 ORDER BY fonte_id, data_rilevamento"
+        ).fetchall()
+
+    if not righe:
+        return {"status": "ok", "fonti_con_modifiche": []}
+
+    with _session() as session:
+        fonti = {
+            r["id"]: r["nome"] for r in session.run("MATCH (f:Fonte) RETURN f.id AS id, f.nome AS nome").data()
+        }
         per_fonte: dict[int, dict] = {}
-        for r in rows:
-            impattati = [row["id"] for row in conn.execute(
-                "SELECT id FROM obblighi WHERE fonte_id = ? AND riferimento = ?", (r["fonte_id"], r["riferimento"]))]
+        for r in righe:
+            impattati = [
+                rec["id"] for rec in session.run(
+                    "MATCH (o:Obbligo {fonte_id: $fonte_id, riferimento: $riferimento}) RETURN o.id AS id",
+                    fonte_id=r["fonte_id"], riferimento=r["riferimento"],
+                ).data()
+            ]
             entry = per_fonte.setdefault(r["fonte_id"], {
                 "fonte_id": r["fonte_id"], "nome": fonti.get(r["fonte_id"], "?"), "modifiche": [],
             })
@@ -434,11 +669,11 @@ def monitoraggio_stato():
 
 @app.post("/api/monitoraggio/{modifica_id}/esamina")
 def segna_esaminata(modifica_id: int):
-    with _conn() as conn:
-        cur = conn.execute("UPDATE modifiche_rilevate SET esaminata = 1 WHERE id = ?", (modifica_id,))
+    with mon_conn() as mconn:
+        cur = mconn.execute("UPDATE modifiche_rilevate SET esaminata = 1 WHERE id = ?", (modifica_id,))
         if cur.rowcount == 0:
             raise HTTPException(404, "Modifica non trovata")
-        conn.commit()
+        mconn.commit()
     return {"status": "ok"}
 
 
@@ -482,7 +717,7 @@ main{padding:20px;max-width:1100px;margin:0 auto}
 .tile .v{font-size:24px;font-weight:650;font-variant-numeric:tabular-nums}
 .tile .k{color:var(--muted);font-size:12px;margin-top:2px}
 .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-input[type=text],select{font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+input[type=text],input[type=date],select{font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
 input[type=text]{min-width:240px;flex:1}
 textarea{font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:6px;width:100%;resize:vertical}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
@@ -538,6 +773,7 @@ const state = {
             tipo_principio:new Set(), oggetto_giuridico:new Set(), solo_validati:true },
   risultati:null, dettaglio:null,
   bozze:null, monitoraggio:null,
+  validazioneInCorso:false,
 };
 
 function showErr(m){ $("#err").innerHTML = m ? `<div class="err">${esc(m)}</div>` : ""; }
@@ -601,12 +837,25 @@ async function renderConsultazione(){
     <div class="tile"><div class="v">${s?s.relazioni:"—"}</div><div class="k">relazioni tipizzate</div></div>
   </div>
   <div class="panel">
+    <h2>Ricerca ibrida <span class="muted" style="font-weight:normal;font-size:12px">(lessicale + semantica, Neo4j)</span></h2>
+    <div class="controls">
+      <input type="text" id="qsem" placeholder="descrivi cosa cerchi, anche senza parole esatte del testo…">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)">alla data
+        <input type="date" id="qsem-data">
+      </label>
+      <button id="btnsem">Cerca</button>
+    </div>
+    <div id="ressem"></div>
+  </div>
+  <div class="panel">
     <div class="controls">
       <input type="text" id="q" placeholder="cerca nel testo o nel riferimento…" value="${esc(f.q)}">
       <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)">
         <input type="checkbox" id="solovalidati" ${f.solo_validati?"checked":""}> solo validati
       </label>
     </div>
+  </div>
+  <div class="panel">
     <div class="facets">
       <div class="facet"><div class="lbl">Fonte</div>${chipRow("f-fonte", lk.fonti.map(x=>x.nome), new Set([...f.fonte_id].map(id => lk.fonti.find(x=>x.fonte_id===id)?.nome)))}</div>
       <div class="facet"><div class="lbl">Tipo obbligo</div>${chipRow("f-tipo", lk.tipi_obbligo, f.tipo_obbligo)}</div>
@@ -616,15 +865,7 @@ async function renderConsultazione(){
       <div class="facet"><div class="lbl">Oggetto giuridico</div>${chipRow("f-ogg", lk.oggetti_giuridici, f.oggetto_giuridico)}</div>
     </div>
   </div>
-  <div class="panel"><h2>Risultati</h2><div id="reslist" class="spin">Caricamento…</div></div>
-  <div class="panel">
-    <h2>Ricerca per significato <span class="muted" style="font-weight:normal;font-size:12px">(sperimentale, via qmd)</span></h2>
-    <div class="controls">
-      <input type="text" id="qsem" placeholder="descrivi cosa cerchi, anche senza parole esatte del testo…">
-      <button id="btnsem">Cerca</button>
-    </div>
-    <div id="ressem"></div>
-  </div>`;
+  <div class="panel"><h2>Risultati</h2><div id="reslist" class="spin">Caricamento…</div></div>`;
 
   $("#q").oninput = () => { clearTimeout($("#q")._t); $("#q")._t = setTimeout(() => { f.q = $("#q").value; searchNow(); }, 250); };
   $("#solovalidati").onchange = () => { f.solo_validati = $("#solovalidati").checked; searchNow(); };
@@ -639,23 +880,26 @@ async function renderConsultazione(){
   bindChips("f-tprinc", f.tipo_principio);
   bindChips("f-ogg", f.oggetto_giuridico);
 
-  $("#btnsem").onclick = ricercaSemantica;
-  $("#qsem").addEventListener("keydown", e => { if(e.key === "Enter") ricercaSemantica(); });
+  $("#btnsem").onclick = ricercaIbrida;
+  $("#qsem").addEventListener("keydown", e => { if(e.key === "Enter") ricercaIbrida(); });
 
   await searchNow(true);
 }
 
-async function ricercaSemantica(){
+async function ricercaIbrida(){
   const q = $("#qsem").value.trim();
+  const data_riferimento = $("#qsem-data").value;
   const box = document.getElementById("ressem");
   if(!q){ box.innerHTML = ""; return; }
-  box.innerHTML = `<div class="spin">Ricerca semantica…</div>`;
+  box.innerHTML = `<div class="spin">Ricerca in corso…</div>`;
   let data;
-  try{ data = await api("/api/ricerca-semantica?" + new URLSearchParams({q, n: 10}).toString()); }
-  catch(e){ box.innerHTML = `<div class="muted">Ricerca semantica non disponibile: ${esc(e.message)}</div>`; return; }
+  const params = {q, n: 10};
+  if(data_riferimento) params.data_riferimento = data_riferimento;
+  try{ data = await api("/api/ricerca?" + new URLSearchParams(params).toString()); }
+  catch(e){ box.innerHTML = `<div class="muted">Ricerca non disponibile: ${esc(e.message)}</div>`; return; }
   if(!data.risultati || !data.risultati.length){ box.innerHTML = `<div class="muted">Nessun risultato.</div>`; return; }
   box.innerHTML = data.risultati.map(o => (o.tipo_nodo === "principio" ? cardPrincipio(o) : cardObbligo(o))
-    .replace('<div class="hd">', `<div class="hd"><span class="tag" title="punteggio di rilevanza semantica">score ${o.score.toFixed(2)}</span>`)
+    .replace('<div class="hd">', `<div class="hd"><span class="tag" title="punteggio di rilevanza ibrida (WRRF)">score ${o.score.toFixed(3)}</span>`)
   ).join("");
 }
 
@@ -674,10 +918,9 @@ async function searchNow(first){
   f.oggetto_giuridico.forEach(v => qsPrincipi.append("oggetto_giuridico", v));
   const box = document.getElementById("reslist");
   if(!first && box) box.innerHTML = `<div class="spin">Ricerca…</div>`;
-  // Solo faceted + full-text (nessun ranking semantico ancora, vedi docstring in cima al file):
-  // se sono attivi filtri specifici di un solo tipo di nodo, l'altro tipo di ricerca resta comunque
-  // eseguita (i suoi filtri semplicemente non si applicano), cosi' un principio puo' emergere anche
-  // filtrando per categoria soggetto e viceversa.
+  // Faceted + full-text Lucene (ADR-0006): se sono attivi filtri specifici di un solo tipo di
+  // nodo, l'altro tipo di ricerca resta comunque eseguito (i suoi filtri semplicemente non si
+  // applicano), così un principio può emergere anche filtrando per categoria soggetto e viceversa.
   try{
     const [obblighi, principi] = await Promise.all([
       api("/api/obblighi?" + qsObblighi.toString()),
@@ -736,10 +979,12 @@ async function openNodo(tipoNodo, id){
 }
 
 function renderVicini(vicini){
-  return `<div class="panel"><h2>Relazioni tipizzate (grafo)</h2>
+  return `<div class="panel"><h2>Relazioni tipizzate (grafo, multi-hop)</h2>
     ${vicini.length ? vicini.map(v => `
       <div class="card" onclick="openNodo('${v.tipo_nodo}', ${v.tipo_nodo==='principio'?v.principio_id:v.obbligo_id})">
         <div class="hd"><span class="tag">${esc(v.tipo_relazione)}</span>
+          <span class="tag" title="numero di salti dal nodo di partenza">${v.hop} hop</span>
+          <span class="tag ${v.evidence_type==='human-curated'?'ok':v.evidence_type==='textual'?'':'warn'}">${esc(v.evidence_type)}${v.confidence!=null?` ${Math.round(v.confidence*100)}%`:''}</span>
           <span class="tag ${v.tipo_nodo==='principio'?'ok':''}">${v.tipo_nodo}</span>
           <span class="ref">${esc(v.fonte)} — ${esc(v.riferimento)}</span>
           ${v.stato_validazione!=='validato' ? `<span class="tag warn">${esc(v.stato_validazione)}</span>` : ""}</div>
@@ -767,6 +1012,7 @@ function renderDettaglio(){
       <tr><td class="muted" style="padding:4px 0">Severità</td><td>${esc(o.severita||"—")}</td></tr>
       <tr><td class="muted" style="padding:4px 0">Sanzioni</td><td>${esc(o.sanzioni||"—")}</td></tr>
       <tr><td class="muted" style="padding:4px 0">Condizione di applicabilità</td><td>${esc(o.condizione_applicabilita||"—")}</td></tr>
+      <tr><td class="muted" style="padding:4px 0">Vigenza</td><td>${o.data_inizio_vigore||o.data_fine_vigore ? `dal ${esc(o.data_inizio_vigore||"—")} al ${esc(o.data_fine_vigore||"in corso")}` : "—"}</td></tr>
       <tr><td class="muted" style="padding:4px 0">Validato da</td><td>${esc(o.validato_da||"—")} ${o.data_validazione?`(${esc(o.data_validazione)})`:""}</td></tr>
     </table>
     ${renderTestoIntegrale(o.testo_integrale)}
@@ -799,6 +1045,7 @@ function renderDettaglioPrincipio(){
     <table style="width:100%;font-size:13px;border-collapse:collapse">
       <tr><td class="muted" style="width:180px;padding:4px 0">Oggetto giuridico</td><td>${o.oggetti_giuridici.map(esc).join(", ")||"—"}</td></tr>
       <tr><td class="muted" style="padding:4px 0">Condizione di applicabilità</td><td>${esc(o.condizione_applicabilita||"—")}</td></tr>
+      <tr><td class="muted" style="padding:4px 0">Vigenza</td><td>${o.data_inizio_vigore||o.data_fine_vigore ? `dal ${esc(o.data_inizio_vigore||"—")} al ${esc(o.data_fine_vigore||"in corso")}` : "—"}</td></tr>
       <tr><td class="muted" style="padding:4px 0">Validato da</td><td>${esc(o.validato_da||"—")} ${o.data_validazione?`(${esc(o.data_validazione)})`:""}</td></tr>
     </table>
     ${renderTestoIntegrale(o.testo_integrale)}
@@ -826,7 +1073,7 @@ function paintRevisione(){
   $("#view").innerHTML = `<div class="panel">
     <div class="hd" style="justify-content:space-between">
       <h2 style="margin:0">Coda di revisione (${b.length} bozze)</h2>
-      ${b.length ? '<button class="act primary" onclick="validaTutte()">Valida tutte</button>' : ""}
+      ${b.length ? `<button class="act primary" onclick="validaTutte()" ${state.validazioneInCorso?"disabled":""}>Valida tutte</button>` : ""}
     </div>
     ${b.length ? "" : '<div class="muted">Nessuna bozza in attesa di revisione.</div>'}
     ${b.map(o => `
@@ -842,6 +1089,8 @@ function paintRevisione(){
       <div class="grid2">
         <div class="field"><label>Sanzioni</label><input type="text" id="san-${o.obbligo_id}" value="${esc(o.sanzioni||"")}"></div>
         <div class="field"><label>Condizione di applicabilità</label><input type="text" id="cond-${o.obbligo_id}" value="${esc(o.condizione_applicabilita||"")}"></div>
+        <div class="field"><label>Vigore dal</label><input type="date" id="vig-da-${o.obbligo_id}" value="${esc(o.data_inizio_vigore||"")}"></div>
+        <div class="field"><label>Vigore al</label><input type="date" id="vig-a-${o.obbligo_id}" value="${esc(o.data_fine_vigore||"")}"></div>
       </div>
       <div class="field"><label>Soggetti obbligati</label>${catCheckboxes("obbligato", o.obbligo_id, o.soggetti_obbligati)}</div>
       <div class="field"><label>Destinatari</label>${catCheckboxes("destinatario", o.obbligo_id, o.destinatari)}</div>
@@ -867,6 +1116,8 @@ async function valida(id, opts){
     severita: document.getElementById(`sev-${id}`).value || null,
     sanzioni: document.getElementById(`san-${id}`).value || null,
     condizione_applicabilita: document.getElementById(`cond-${id}`).value || null,
+    data_inizio_vigore: document.getElementById(`vig-da-${id}`).value || null,
+    data_fine_vigore: document.getElementById(`vig-a-${id}`).value || null,
     soggetti_obbligati: checkedCats("obbligato", id),
     destinatari: checkedCats("destinatario", id),
     validato_da: "sistema",
@@ -881,12 +1132,16 @@ async function valida(id, opts){
 }
 
 async function validaTutte(){
+  if(state.validazioneInCorso) return;
+  state.validazioneInCorso = true;
   const ids = state.bozze.bozze.map(o => o.obbligo_id);
   const errori = [];
   for(const id of ids){
+    if(!document.getElementById(`bozza-${id}`)) continue; // già rimossa dal DOM (validata/rifiutata altrove)
     try{ await valida(id, {silent:true}); }
     catch(e){ errori.push(`#${id}: ${e.message}`); }
   }
+  state.validazioneInCorso = false;
   await refreshBadges();
   await renderRevisione();
   if(errori.length) showErr(`Alcune bozze non sono state validate — ${errori.join("; ")}`);
@@ -945,10 +1200,6 @@ def main():
     args = ap.parse_args()
 
     import uvicorn
-    print(f"Censimento Obblighi QTSP — http://{args.host}:{args.port}")
-    print(f"  SQLite: {DB_PATH}")
-    ok, msg = qmd_search.sync_qmd()
-    print(f"  qmd sync: {'ok' if ok else 'fallita (' + msg + ')'}")
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
 

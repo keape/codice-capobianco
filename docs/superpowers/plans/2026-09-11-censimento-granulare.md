@@ -1,3 +1,17 @@
+> **Nota 2026-09-16:** lo scaffold `verifica_copertura`/moduli per fonte
+> descritto qui (Task 1-2) non è mai stato eseguito così com'è (nessun
+> `app/seed_data/` esisteva prima di questa data) — l'import granulare
+> eIDAS/eIDAS2 ha scritto i dati direttamente inline in `app/seed.py` con id
+> interi assegnati a mano. Per CAD e DPCM, usare invece
+> `app/seed_data/lib.py` + `docs/procedura-import-granulare.md`: stesso
+> principio (moduli per fonte con verifica di copertura scriptata), ma
+> granularità per capitolo (non per fonte intera, per abilitare
+> l'autoria parallela) e risoluzione simbolica degli id via registro
+> invece di id espliciti nei dict — evita la classe di bug "numerazione
+> globale concordata a priori" osservata nell'import eIDAS. I Task 3-6 di
+> questo piano (procedura di lettura fonte/costruzione indice) restano
+> validi come riferimento di metodo, solo il formato di output cambia.
+
 # Censimento granulare per articolo/comma Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

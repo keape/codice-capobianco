@@ -1,3 +1,12 @@
+> **STORICO — superato dalla migrazione a Neo4j (ADR-0006, eseguita).** Questa spec descriveva
+> l'implementazione via `qmd` (indice vettoriale file-based, `app/qmd_search.py`/`app/export_qmd.py`).
+> La migrazione decisa in ADR-0006 è stata eseguita (`docs/plan-migrazione-neo4j.md`): lo storage è
+> ora Neo4j, con vector index HNSW nativo popolato da `app/embed_neo4j.py` e un endpoint di ricerca
+> ibrida a fusione WRRF (`GET /api/ricerca` in `app/web_ui.py`), sostituendo interamente `qmd`. I file
+> `app/qmd_search.py`, `app/export_qmd.py` e la directory `app/qmd_export/` sono stati rimossi. Questo
+> documento resta solo come riferimento storico della decisione pre-migrazione, non descrive più il
+> comportamento attuale del sistema — vedi `CLAUDE.md` per lo stato corrente.
+
 # Spec: ricerca semantica su compliance-rag via qmd
 
 ## Contesto

@@ -43,6 +43,7 @@ CREATE TABLE fonti (
     id INTEGER PRIMARY KEY,
     nome TEXT NOT NULL,
     url_sorgente TEXT NOT NULL,
+    urn TEXT UNIQUE,
     versione TEXT,
     data_entrata_vigore TEXT,
     stato_id INTEGER NOT NULL REFERENCES stati_fonte(id)
@@ -56,13 +57,16 @@ CREATE TABLE obblighi (
     testo_integrale TEXT,
     tipo_obbligo_id INTEGER NOT NULL REFERENCES tipi_obbligo(id),
     stato_id INTEGER NOT NULL REFERENCES stati_norma(id),
+    data_inizio_vigore TEXT,
+    data_fine_vigore TEXT,
     severita TEXT,
     sanzioni TEXT,
     condizione_applicabilita TEXT,
     stato_validazione TEXT NOT NULL DEFAULT 'bozza'
         CHECK (stato_validazione IN ('bozza', 'validato', 'rifiutato')),
     validato_da TEXT,
-    data_validazione TEXT
+    data_validazione TEXT,
+    CHECK (data_fine_vigore IS NULL OR data_inizio_vigore IS NULL OR data_fine_vigore >= data_inizio_vigore)
 );
 
 CREATE TABLE obbligo_soggetti (
@@ -84,11 +88,14 @@ CREATE TABLE principi (
     testo_integrale TEXT,
     tipo_principio_id INTEGER NOT NULL REFERENCES tipi_principio(id),
     stato_id INTEGER NOT NULL REFERENCES stati_norma(id),
+    data_inizio_vigore TEXT,
+    data_fine_vigore TEXT,
     condizione_applicabilita TEXT,
     stato_validazione TEXT NOT NULL DEFAULT 'bozza'
         CHECK (stato_validazione IN ('bozza', 'validato', 'rifiutato')),
     validato_da TEXT,
-    data_validazione TEXT
+    data_validazione TEXT,
+    CHECK (data_fine_vigore IS NULL OR data_inizio_vigore IS NULL OR data_fine_vigore >= data_inizio_vigore)
 );
 
 CREATE TABLE principio_oggetti (
@@ -100,13 +107,18 @@ CREATE TABLE principio_oggetti (
 -- Relazioni tipizzate tra nodi del grafo (Obbligo o Principio, ADR-0004):
 -- polimorfica tramite discriminante di tipo, senza FK sulle estremità
 -- (integrità verificata a livello applicativo, coerente con ticket 04).
+-- evidence_type/confidence (ADR-0005): metadati di provenienza per arco,
+-- stessa semantica di stato_validazione sui nodi.
 CREATE TABLE relazioni (
     id INTEGER PRIMARY KEY,
     nodo_da_tipo TEXT NOT NULL CHECK (nodo_da_tipo IN ('obbligo', 'principio')),
     nodo_da_id INTEGER NOT NULL,
     nodo_a_tipo TEXT NOT NULL CHECK (nodo_a_tipo IN ('obbligo', 'principio')),
     nodo_a_id INTEGER NOT NULL,
-    tipo_relazione_id INTEGER NOT NULL REFERENCES tipi_relazione(id)
+    tipo_relazione_id INTEGER NOT NULL REFERENCES tipi_relazione(id),
+    evidence_type TEXT NOT NULL DEFAULT 'inferred'
+        CHECK (evidence_type IN ('textual', 'inferred', 'human-curated')),
+    confidence REAL CHECK (confidence IS NULL OR (confidence BETWEEN 0.0 AND 1.0))
 );
 
 -- Aggiunta ticket 05: cambiamenti rilevati dal monitoraggio automatico delle Fonti.
