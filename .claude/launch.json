@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "compliance-rag",
+      "name": "codice-capobianco",
       "runtimeExecutable": "app/.venv/bin/python",
       "runtimeArgs": ["app/web_ui.py"],
       "port": 8010

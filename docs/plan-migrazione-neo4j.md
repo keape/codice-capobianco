@@ -131,7 +131,7 @@ Estende `_vicini_di` (già portato 1:1 in Fase 5) con:
 
 ## Fase 8 — Pulizia
 
-- Rimuovere `app/qmd_search.py`, `app/export_qmd.py`, directory `app/qmd_export/` (generata, verificare se già in `.gitignore`), voce collection `compliance-rag` da `~/.config/qmd/index.yml` (fuori dal repo, ma segnalarlo all'utente — non toccare config utente senza dirlo).
+- Rimuovere `app/qmd_search.py`, `app/export_qmd.py`, directory `app/qmd_export/` (generata, verificare se già in `.gitignore`), voce collection `codice-capobianco` da `~/.config/qmd/index.yml` (fuori dal repo, ma segnalarlo all'utente — non toccare config utente senza dirlo).
 - Rimuovere `docs/qmd-semantic-search-spec.md` o marcarlo esplicitamente come storico/superato (non cancellare cronologia di decisione senza motivo — coerente con come questo stesso repo tratta gli ADR superati altrove: non si cancellano, si sovrascrivono con una nota).
 - Aggiornare `CLAUDE.md`: sezione "SQLite dietro un'interfaccia a grafo" diventa sezione "Neo4j + hybrid retrieval" con lo stato **effettivo** post-migrazione (comandi per avviare Neo4j, dove sta lo schema Cypher, come rilanciare la migrazione/embedding), sezione "Ricerca: faceted + full-text, più ricerca semantica via qmd" va riscritta per descrivere l'endpoint unificato di Fase 6. Sezione "Comandi" aggiornata con `docker compose up -d`, comando di migrazione, comando di embedding.
 - `censimento.db` e `app/seed.py`: decidere con l'utente se `seed.py` viene riscritto per scrivere direttamente su Neo4j (perdendo SQLite come step intermedio) o se resta il seed SQLite + `migrate_to_neo4j.py` come secondo passo sempre necessario per ripartire puliti — non assumere, chiedere.

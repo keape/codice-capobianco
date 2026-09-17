@@ -37,16 +37,16 @@ i file on-demand e può bloccare l'accesso a moduli del venv non ancora
 scaricati localmente.
 
 **Fix:** usare un venv operativo fuori iCloud per eseguire gli script,
-`~/venvs/compliance-rag` (stesse dipendenze di `app/.venv`: fastapi,
+`~/venvs/codice-capobianco` (stesse dipendenze di `app/.venv`: fastapi,
 uvicorn, pydantic, `neo4j==5.28.1`, sentence-transformers). Se non esiste
 ancora sulla macchina in uso:
 
 ```bash
-python3 -m venv ~/venvs/compliance-rag
-~/venvs/compliance-rag/bin/pip install fastapi uvicorn pydantic 'neo4j==5.28.1' sentence-transformers
+python3 -m venv ~/venvs/codice-capobianco
+~/venvs/codice-capobianco/bin/pip install fastapi uvicorn pydantic 'neo4j==5.28.1' sentence-transformers
 ```
 
-Usare `~/venvs/compliance-rag/bin/python` al posto di `app/.venv/bin/python`
+Usare `~/venvs/codice-capobianco/bin/python` al posto di `app/.venv/bin/python`
 per `seed.py`/`web_ui.py`/`embed_neo4j.py`/`migrate_to_neo4j.py` se
 `app/.venv` mostra blocchi anomali. `app/.venv` resta quello canonico
 documentato in CLAUDE.md; il venv fuori iCloud è un fallback operativo, non
@@ -70,7 +70,7 @@ hub op=start name=neo4j-direct application=<path-binario-neo4j> args=[console]
 
 (path esatto del binario e della cartella dati: dipende dall'installazione
 Neo4j Desktop locale — verificare con `computer`/Finder la posizione
-dell'istanza `compliance-rag` prima di lanciare, non indovinare un path).
+dell'istanza `codice-capobianco` prima di lanciare, non indovinare un path).
 
 **Verifica di readiness:** `ready: { port: 7687, timeout: 30 }` sullo start,
 poi una query di prova (`cypher-shell` o driver) prima di procedere con
@@ -99,7 +99,7 @@ contesto del lavoro di dominio e ne gonfia il costo (vedi
 iCloud Drive) aveva ancora `neo4j==6.3.0` installato. Riprodotto live il
 sintomo del punto 1: `import neo4j` si blocca indefinitamente (timeout
 15s, nessun errore, nessun output) usando `app/.venv/bin/python`. Lo
-stesso comando su `~/venvs/compliance-rag` (venv fuori iCloud, pin
+stesso comando su `~/venvs/codice-capobianco` (venv fuori iCloud, pin
 corretto `5.28.1`) risponde in 0.2s.
 
 Tentativo di fix in-place (`app/.venv/bin/pip install neo4j==5.28.1`) con
@@ -123,7 +123,7 @@ in `app/.venv` ora risponde in 0.29s, guardia versione passata.
 detto sia rotto in modo permanente — può essere solo lento per via di
 iCloud. Primo tentativo: `pip install` con **timeout lungo (≥3-4 minuti)**
 prima di considerarlo bloccato e passare al venv di fallback
-`~/venvs/compliance-rag`. Non lanciare altro lavoro nella stessa sessione
+`~/venvs/codice-capobianco`. Non lanciare altro lavoro nella stessa sessione
 mentre si attende, per non confondere lentezza-per-attesa con blocco
 reale. Se anche con timeout lungo non completa, usare il fallback (punto
 2) senza insistere oltre.
