@@ -79,6 +79,12 @@ Ogni relazione porta due metadati di provenienza sull'arco stesso (non sui nodi)
 
 ## Perimetro del pilota
 
-Fonti: **eIDAS** (incluso eIDAS2 dove applicabile), **CAD** e **DPCM 22 febbraio 2013** (regole tecniche FEA/firme elettroniche). Il censimento è concepito per crescere nel tempo: altre fonti (AgID, ETSI, ISO, GDPR, ...) verranno integrate in iterazioni successive, non solo eIDAS/CAD.
+14 Fonti oggi censite, tutte a copertura granulare completa per
+articolo/comma/clausola, raggruppate per categoria (fonti internazionali,
+fonti nazionali, fonti locali, standard tecnici) con dettaglio di import e
+cross-collegamento in `docs/fonti-censite.md` (non duplicato qui per
+evitare che questo file cresca ad ogni import). Il censimento è concepito
+per crescere nel tempo: altre fonti (ISO, GDPR, ...) verranno integrate in
+iterazioni successive.
 
 Contenuto: obblighi applicabili ai QTSP **e** principi/effetti giuridici dichiarativi delle Fonti censite in generale (non solo quelli relativi a strumenti gestiti dai QTSP) — vedi entità Principio sopra e map.md per la cronologia della decisione. Per ciascuna Fonte censita, l'obiettivo è coprire **ogni articolo/comma**, non solo un sottoinsieme selezionato per rilevanza percepita: vedi "Copertura completa" sopra.

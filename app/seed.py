@@ -15,8 +15,11 @@ l'indice completo degli articoli (nessun item mancante o doppio). Il CAD
 docs/procedura-import-granulare.md): import per capitolo via subagent
 paralleli, moduli in app/seed_data/cad/cap0[1-7].py, wiring tramite
 app/seed_data/lib.py (id assegnati da sqlite, non più manuali). Il DPCM
-22/2/2013 (fonte_id 4) resta invece all'estrazione selettiva precedente,
-non ritoccato in questa passata.
+22/2/2013 (fonte_id 4) è stato riestratto granularmente con lo stesso
+criterio il 2026-09-17: import per capitolo via 8 subagent paralleli
+(Titolo I-VI del decreto, artt. 1-63), moduli in app/seed_data/dpcm/cap0[1-8].py,
+sostituisce la precedente estrazione selettiva (che copriva solo 19
+obblighi/4 principi su un soggetto obbligato/effetto giuridico esplicito).
 
 Fonti primarie consultate in sessione (EUR-Lex, 15/9/2026):
 - Testo originale 2014: CELEX 32014R0910 (https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32014R0910)
@@ -69,6 +72,71 @@ from seed_data.cad import (
     cap06 as cad_cap06,
     cap07 as cad_cap07,
     cap08_relazioni_eidas as cad_cap08,
+)
+from seed_data.dpcm import (
+    cap01 as dpcm_cap01,
+    cap02 as dpcm_cap02,
+    cap03 as dpcm_cap03,
+    cap04 as dpcm_cap04,
+    cap05 as dpcm_cap05,
+    cap06 as dpcm_cap06,
+    cap07 as dpcm_cap07,
+    cap08 as dpcm_cap08,
+    cap09_relazioni_cross as dpcm_cap09,
+)
+from seed_data.spid import (
+    cap01 as spid_cap01,
+    cap02 as spid_cap02,
+    cap03 as spid_cap03,
+    cap04_relazioni_cross as spid_cap04,
+)
+from seed_data.spid_modalita_attuative import (
+    cap01 as spidatt_cap01,
+    cap02 as spidatt_cap02,
+    cap03 as spidatt_cap03,
+    cap04 as spidatt_cap04,
+    cap05_relazioni_cross as spidatt_cap05,
+)
+from seed_data.dpcm2021 import cap01 as dpcm2021_cap01
+from seed_data.etsi_319_412_5 import (
+    cap01 as etsi5_cap01,
+    cap02_relazioni_cross as etsi5_cap02_relazioni_cross,
+)
+from seed_data.reg_ue_2025_1566 import cap01 as reg1566_cap01, cap02_relazioni_cross as reg1566_cap02
+from seed_data.etsi_119_461 import (
+    cap01 as etsi461_cap01,
+    cap02 as etsi461_cap02,
+    cap03 as etsi461_cap03,
+    cap04 as etsi461_cap04,
+    cap05 as etsi461_cap05,
+    cap06 as etsi461_cap06,
+    cap07 as etsi461_cap07,
+    cap08 as etsi461_cap08,
+    cap09_relazioni_cross as etsi461_cap09_relazioni_cross,
+)
+from seed_data.etsi_319_401 import (
+    cap01 as etsi401_cap01,
+    cap02 as etsi401_cap02,
+    cap03 as etsi401_cap03,
+    cap04 as etsi401_cap04,
+    cap05 as etsi401_cap05,
+    cap06_relazioni_cross as etsi401_cap06_relazioni_cross,
+)
+from seed_data.etsi_119_431_1 import (
+    cap01 as etsi431_1_cap01,
+    cap02 as etsi431_1_cap02,
+    cap03_relazioni_cross as etsi431_1_cap03_relazioni_cross,
+)
+from seed_data.etsi_119_431_2 import (
+    cap01 as etsi431_2_cap01,
+    cap02 as etsi431_2_cap02,
+    cap03_relazioni_cross as etsi431_2_cap03_relazioni_cross,
+)
+from seed_data.reg_ue_2015_1502 import (
+    cap01 as reg1502_cap01,
+    cap02 as reg1502_cap02,
+    cap03 as reg1502_cap03,
+    cap04_relazioni_cross as reg1502_cap04,
 )
 
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
@@ -175,7 +243,47 @@ def seed():
         (4, "DPCM 22 febbraio 2013 - Regole tecniche per la generazione, apposizione e verifica delle firme elettroniche avanzate, qualificate e digitali",
          "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.consiglio.ministri:decreto:2013-02-22",
          "urn:nir:presidente.consiglio.ministri:decreto:2013-02-22",
-         "testo vigente", "2013-02-22", 1),
+        "testo vigente", "2013-02-22", 1),
+        (5, "DPCM 24 ottobre 2014 - Definizione delle caratteristiche del Sistema Pubblico di Identità Digitale (SPID)",
+         "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.consiglio.ministri:decreto:2014-10-24",
+         "urn:nir:presidente.consiglio.ministri:decreto:2014-10-24",
+         "testo vigente (comprensivo delle modifiche del DPCM 19 ottobre 2021)", "2014-10-24", 1),
+        (6, "DPCM 19 ottobre 2021 - Modifiche al DPCM 24 ottobre 2014 (SPID)",
+         "https://www.agid.gov.it/sites/default/files/repository_files/dpcm_19_ottobre_2021_gu_serie_generale_n._296_del_14-12-2021.pdf",
+         "urn:nir:presidente.consiglio.ministri:decreto:2021-10-19",
+         "atto come pubblicato in GU n.296 del 14-12-2021, efficace dalla pubblicazione", "2021-12-14", 1),
+        (7, "ETSI EN 319 412-5 V2.5.1 (2025-06) - Electronic Signatures and Trust Infrastructures (ESI); Certificate Profiles; Part 5: QCStatements",
+         "https://www.etsi.org/deliver/etsi_en/319400_319499/31941205/02.05.01_60/en_31941205v020501p.pdf",
+         "urn:etsi:en:319412-5:v2.5.1",
+         "V2.5.1 (2025-06), pubblicazione definitiva", "2025-06-12", 1),
+        (8, "Regolamento di esecuzione (UE) 2025/1566 della Commissione - modalità di applicazione dell'art. 24 §1-quater eIDAS2 (norme di riferimento per la verifica dell'identità e degli attributi ai fini del rilascio di certificati qualificati/QEAA)",
+         "https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32025R1566",
+         "urn:lex:eu:regulation:2025:1566",
+         "testo originario (atto come adottato il 29 luglio 2025; si applica a decorrere dal 19 agosto 2027)", "2025-08-19", 1),
+        (9, "ETSI TS 119 461 V2.1.1 (2025-02) - Electronic Signatures and Trust Infrastructures (ESI); Policy and security requirements for trust service components providing identity proofing of trust service subjects",
+         "https://www.etsi.org/deliver/etsi_ts/119400_119499/119461/02.01.01_60/ts_119461v020101p.pdf",
+         "urn:etsi:ts:119461:v2.1.1",
+         "V2.1.1 (2025-02), pubblicazione definitiva (giorno esatto non dichiarato nel documento, solo mese/anno in clausola History)", "2025-02-01", 1),
+        (10, "ETSI EN 319 401 V3.2.1 (2026-01) - Electronic Signatures and Trust Infrastructures (ESI); General Policy Requirements for Trust Service Providers",
+         "https://www.etsi.org/deliver/etsi_en/319400_319499/319401/03.02.01_60/en_319401v030201p.pdf",
+         "urn:etsi:en:319401:v3.2.1",
+         "V3.2.1 (2026-01), pubblicazione definitiva (adottata 5 gennaio 2026)", "2026-01-05", 1),
+        (11, "ETSI TS 119 431-1 V1.3.1 (2024-12) - Electronic Signatures and Trust Infrastructures (ESI); Policy and security requirements for trust service providers; Part 1: TSP services operating a remote QSCD / SCDev",
+         "https://www.etsi.org/deliver/etsi_ts/119400_119499/11943101/01.03.01_60/ts_11943101v010301p.pdf",
+         "urn:etsi:ts:119431-1:v1.3.1",
+         "V1.3.1 (2024-12), pubblicazione definitiva", "2024-12-20", 1),
+        (12, "ETSI TS 119 431-2 V1.2.1 (2023-06) - Electronic Signatures and Infrastructures (ESI); Policy and security requirements for trust service providers; Part 2: TSP service components supporting AdES digital signature creation",
+         "https://www.etsi.org/deliver/etsi_ts/119400_119499/11943102/01.02.01_60/ts_11943102v010201p.pdf",
+         "urn:etsi:ts:119431-2:v1.2.1",
+         "V1.2.1 (2023-06), pubblicazione definitiva", "2023-06-13", 1),
+        (13, "Regolamento AgID recante le modalità attuative per la realizzazione dello SPID (articolo 4, comma 2, DPCM 24 ottobre 2014) - v2.0, come modificato dall'Avviso AgID n.10 del 13/07/2018 e dalla Determinazione AgID n.425/2020 del 01/10/2020",
+         "https://www.agid.gov.it/sites/default/files/repository_files/regolamento_modalita_attuative_spid_2.0.pdf",
+         "urn:agid:regolamento:spid-modalita-attuative:v2.0",
+         "v2.0 (emanata con Determinazione AgID n.189/2016 del 22/07/2016), integrata dall'Avviso n.10/2018 (inapplicabilita' parziale artt.20/23) e dalla Determinazione n.425/2020 (aggiunta comma finale art.8)", "2016-07-22", 1),
+        (14, "Regolamento di esecuzione (UE) 2015/1502 della Commissione - specifiche e procedure tecniche minime sui livelli di garanzia (basso/significativo/elevato) per i mezzi di identificazione elettronica ex art. 8 §3 eIDAS",
+         "https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32015R1502",
+         "urn:lex:eu:regulation:2015:1502",
+         "testo originario (atto come adottato l'8 settembre 2015)", "2015-09-28", 1),
     ])
     # CAD (fonte_id=3) e DPCM (fonte_id=4): estrazione selettiva precedente,
     # invariata nel contenuto in questa passata, solo rinumerata (gli id
@@ -285,25 +393,6 @@ def seed():
         (98, 2, 'art. 45 undecies §1', "Il servizio di archiviazione elettronica qualificato è erogato da un prestatore qualificato che utilizza procedure e tecnologie idonee a garantire durabilità e leggibilità dei dati/documenti elettronici oltre il periodo di validità tecnologica e per tutto il periodo di conservazione legale o contrattuale, preservandone integrità e origine; ne assicura la protezione da perdita e alterazione (salvo cambi di supporto/formato); e consente ai soggetti affidanti autorizzati di ricevere, in modo automatizzato, una relazione — munita di firma o sigillo elettronico qualificato del prestatore — che confermi la presunzione di integrità dei dati dall'inizio della conservazione fino alla consultazione.", '1.I servizi di archiviazione elettronica qualificati soddisfano i requisiti seguenti: a) sono forniti da prestatori di servizi fiduciari qualificati; b) utilizzano procedure e tecnologie in grado di garantire la durabilità e la leggibilità dei dati elettronici e dei documenti elettronici oltre il periodo di validità tecnologica e almeno per tutto il periodo di conservazione legale o contrattuale, preservandone nel contempo l’integrità e l’esattezza dell’origine; c) assicurano che tali dati elettronici e tali documenti elettronici siano conservati in modo tale da essere protetti dal rischio di perdita e alterazione, ad eccezione delle modifiche riguardanti il loro supporto o il loro formato elettronico; d) consentono alle parti autorizzate facenti affidamento sulla certificazione di ricevere una relazione in un modo automatizzato in cui si conferma che i dati elettronici e i documenti elettronici consultati da un archivio elettronico qualificato godono della presunzione di integrità dei dati dall’inizio del periodo di conservazione fino al momento della consultazione. La relazione di cui alla lettera d) del primo comma è fornita in modo affidabile ed efficiente e reca la firma elettronica qualificata o il sigillo elettronico qualificato del prestatore del servizio di archiviazione elettronica qualificato.', 2, 1, 'alta', None, None, 'bozza', None, None),
         (99, 2, 'art. 45 terdecies §1', "Il registro elettronico qualificato è creato e gestito da uno o più prestatori qualificati, i quali ne stabiliscono l'origine dei dati registrati, ne garantiscono l'ordine cronologico sequenziale univoco, e registrano i dati in modo che ogni successiva modifica sia immediatamente individuabile, assicurandone l'integrità nel tempo.", '1.I registri elettronici qualificati soddisfano i requisiti seguenti: a) sono creati e gestiti da uno o più prestatori di servizi fiduciari qualificati; b) stabiliscono l’origine delle registrazioni di dati nel registro; c) garantiscono l’ordine cronologico sequenziale univoco delle registrazioni di dati nel registro; d) registrano i dati in modo tale che sia possibile individuare immediatamente qualsiasi successiva modifica degli stessi, garantendone l’integrità nel tempo.', 2, 1, 'alta', None, None, 'bozza', None, None),
         (100, 2, 'art. 51 §4', "I prestatori di servizi fiduciari qualificati cui è stata assegnata la qualifica ai sensi del regolamento prima del 20 maggio 2024 devono presentare all'organismo di vigilanza, quanto prima e comunque entro il 21 maggio 2026, una relazione di valutazione della conformità che attesti il rispetto dell'art. 24 §§1, 1 bis e 1 ter.", "I prestatori di servizi fiduciari qualificati cui è stata assegnata la qualifica a norma del presente regolamento prima del 20 maggio 2024 presentano all'organismo di vigilanza una relazione di valutazione della conformità che attesti il rispetto dell'articolo 24, paragrafi 1, 1 bis e 1 ter, quanto prima e comunque entro il 21 maggio 2026.", 3, 1, 'media', None, 'Applicabile ai QTSP qualificati prima del 20 maggio 2024; termine ultimo 21 maggio 2026.', 'bozza', None, None),
-        (116, 4, 'art. 3 §4-5', "Il certificatore che eroga un servizio di firma remota custodisce le chiavi private di firma dei titolari su dispositivi sicuri di propria pertinenza, garantendone l'uso esclusivo da parte del titolare tramite un sistema di autenticazione forte, e ne assume la responsabilità della custodia.", "Art. 3. Disposizioni generali. 4. La firma remota di cui all'art. 1, comma 1, lettera q), è generata su un HSM custodito e gestito, sotto la responsabilità, dal certificatore accreditato ovvero dall'organizzazione di appartenenza dei titolari dei certificati che ha richiesto i certificati medesimi ovvero dall'organizzazione che richiede al certificatore di fornire certificati qualificati ad altri soggetti al fine di dematerializzare lo scambio documentale con gli stessi. Il certificatore deve essere in grado, dato un certificato qualificato, di individuare agevolmente il dispositivo afferente la corrispondente chiave privata. 5. Nel caso in cui il dispositivo di cui al comma 4 non sia custodito dal certificatore, egli deve: a) indicare al soggetto che custodisce il dispositivo le procedure operative, gestionali e le misure di sicurezza fisica e logica che tale soggetto è obbligato ad applicare; b) effettuare verifiche periodiche sulla corretta applicazione delle indicazioni di cui alla lettera a), che il soggetto che custodisce il dispositivo ha l'obbligo di consentire ed agevolare; c) redigere i verbali dell'attività di verifica di cui alla lettera b) che potranno essere richiesti in copia dall'Agenzia ai fini dell'attività di cui all'art. 31 del Codice; d) comunicare all'Agenzia il luogo in cui i medesimi dispositivi sono custoditi; e) effettuare ulteriori verifiche su richiesta dell'Agenzia consentendo di partecipare anche ad incaricati dello stesso ente; f) assicurare che il soggetto che custodisce il dispositivo si impegni a consentire le verifiche di cui alle lettere b) ed e).", 2, 1, 'alta', None, None, 'bozza', None, None),
-        (117, 4, 'art. 5 §5', "Il titolare custodisce con diligenza il dispositivo di firma e le informazioni di abilitazione all'uso, e ne richiede l'immediata revoca in caso di smarrimento, sottrazione, compromissione della chiave privata o cessazione dei presupposti per il rilascio del certificato.", "Art. 5. Caratteristiche generali delle chiavi. 5. Non è consentito l'uso di una coppia di chiavi per funzioni diverse da quelle previste per ciascuna tipologia dal comma 4, salvo che, con riferimento esclusivo alle chiavi di cui al medesimo comma 4, lettera b), l'Agenzia non ne autorizzi l'utilizzo per altri scopi.", 4, 1, 'media', None, None, 'bozza', None, None),
-        (118, 4, 'art. 6-13', "Il certificatore genera le coppie di chiavi di certificazione e le chiavi di sottoscrizione dei titolari con dispositivi sicuri conformi ai requisiti di robustezza crittografica e alle modalità operative stabilite dal decreto, garantendo la segretezza della chiave privata durante l'intero processo di generazione, distribuzione e attivazione.", "Art. 6. Generazione delle chiavi. 1. La generazione della coppia di chiavi è effettuata mediante dispositivi e procedure che assicurano, in rapporto allo stato delle conoscenze scientifiche e tecnologiche, l'unicità e un adeguato livello di sicurezza della coppia generata, nonché la segretezza della chiave privata. 2. Il sistema di generazione della coppia di chiavi comunque assicura: a) la rispondenza della coppia ai requisiti imposti dagli algoritmi di generazione e di verifica utilizzati; b) l'utilizzo di algoritmi che consentano l'equiprobabilità di generazione di tutte le coppie possibili; c) l'autenticazione informatica del soggetto che attiva la procedura di generazione.\n\nArt. 7. Modalità di generazione delle chiavi. 1. Le chiavi di cui all'art. 5, comma 4, lettere b) e d) possono essere generate esclusivamente in presenza del responsabile del servizio. 2. Le chiavi di sottoscrizione possono essere generate dal titolare o dal certificatore. 3. La generazione delle chiavi di sottoscrizione effettuata autonomamente dal titolare, avviene all'interno del dispositivo sicuro per la generazione delle firme, che è rilasciato o indicato dal certificatore, con modalità atte ad impedire che la medesima chiave possa essere associata a più certificati. 4. Il certificatore è tenuto ad assicurarsi che il dispositivo sicuro per la generazione della firma elettronica qualificata, da lui fornito o indicato, presenti le caratteristiche e i requisiti di sicurezza di cui all'art. 35 del Codice e agli articoli 11 e 12 del presente decreto e a fornire all'Agenzia gli elementi necessari ai fini delle verifiche e dei controlli di cui all'art. 31 del Codice. 5. Il certificatore è tenuto ad assicurarsi che il dispositivo sicuro per la generazione della firma digitale, da lui fornito o indicato, presenti le caratteristiche e i requisiti di sicurezza di cui all'art. 35 del Codice e agli articoli 11 e 13 del presente decreto e a fornire all'Agenzia gli elementi necessari ai fini delle verifiche e dei controlli di cui all'art. 31 del Codice. 6. Il titolare è tenuto ad utilizzare esclusivamente il dispositivo sicuro per la generazione delle firme fornito dal certificatore, ovvero un dispositivo scelto tra quelli indicati dal certificatore stesso.\n\nArt. 8. Conservazione delle chiavi e dei dati per la creazione della firma elettronica qualificata o digitale. 1. Fatto salvo quanto disposto ai commi 2, 3 e 4, è vietata la duplicazione della chiave privata e dei dispositivi che la contengono. 2. Per fini particolari di sicurezza, è consentito che le chiavi di certificazione vengano esportate, purché ciò avvenga con modalità tali da non ridurre il livello di sicurezza e di riservatezza delle chiavi stesse. 3. Per la firma remota, è consentita l'esportazione sicura delle chiavi private di cui all'art. 5, comma 4, lettera a) presenti su HSM al di fuori del dispositivo stesso, esclusivamente per motivi di ripristino in caso di guasto o di aggiornamento del dispositivo in uso, purché protette con algoritmi crittografici ritenuti adeguati ai fini della certificazione e purché le operazioni di esportazione e importazione delle chiavi siano effettuate mediante funzionalità di sicurezza certificate implementate dai dispositivi sicuri di firma. La conservazione delle chiavi esportate deve avvenire nell'ambiente operativo del dispositivo sicuro di firma, sottoposta a opportune misure di sicurezza di tipo fisico e procedurale che debbono essere descritte, in forma di obiettivi o ipotesi per l'ambiente, nel relativo traguardo di sicurezza. 4. Per la firma remota, è consentita la replicazione in sicurezza delle chiavi private di cui all'art. 5, comma 4, lettera a) presenti su HSM, al fine di realizzare una configurazione ad alta affidabilità del dispositivo sicuro di firma, a condizione che tale configurazione rientri tra quelle sottoposte a certificazione ai sensi degli articoli 12 o 13. L'operazione di replicazione deve prevedere la protezione delle chiavi con algoritmi crittografici ritenuti adeguati ai fini della certificazione ed essere effettuata mediante funzionalità di sicurezza certificate implementate dal dispositivo sicuro di firma. Le chiavi replicate debbono essere conservate all'interno di dispositivi certificati con le stesse caratteristiche di sicurezza e controllati dal dispositivo certificato di origine, collocati nello stesso ambiente operativo o in altro ambiente con equivalente livello di sicurezza. Solo uno dei dispositivi fisici in questa configurazione deve essere abilitato ad effettuare le operazioni di firma. 5. Il titolare della coppia di chiavi: a) assicura la custodia del dispositivo sicuro per la generazione della firma in suo possesso e adotta le misure di sicurezza fornite dal certificatore al fine di adempiere agli obblighi di cui all'art. 32, comma 1, del Codice; b) conserva le informazioni di abilitazione all'uso della chiave privata separatamente dal dispositivo contenente la chiave e segue le indicazioni fornite dal certificatore; c) richiede immediatamente la revoca dei certificati qualificati relativi alle chiavi contenute in dispositivi sicuri per la generazione della firma elettronica qualificata o della firma digitale inutilizzabili o di cui abbia perduto il possesso o il controllo esclusivo; d) salvo quanto previsto dai commi 3 e 4, mantiene in modo esclusivo la conoscenza o la disponibilità di almeno uno dei dati per la creazione della firma elettronica qualificata o digitale; e) richiede immediatamente la revoca dei certificati qualificati relativi alle chiavi contenute in dispositivi sicuri per la generazione della firma elettronica qualificata o della firma digitale qualora abbia il ragionevole dubbio che essi possano essere usati da altri.\n\nArt. 9. Generazione delle chiavi di sottoscrizione al di fuori del dispositivo di firma. 1. Il certificatore, se la certificazione del dispositivo di firma lo consente, può utilizzare un sistema diverso da quello destinato all'uso della chiave privata per la generazione delle chiavi di sottoscrizione. 2. Il certificatore descrive dettagliatamente il sistema di cui al comma 1 nel piano della sicurezza, di cui all'art. 35.\n\nArt. 10. Sicurezza del sistema di generazione delle chiavi diverso dal dispositivo di firma. 1. Se la generazione delle chiavi di sottoscrizione avviene su un sistema di cui all'art. 9, il sistema di generazione assicura: a) l'impossibilità di intercettazione o recupero di qualsiasi informazione, anche temporanea, prodotta durante l'esecuzione della procedura; b) il trasferimento della chiave privata, in condizioni di massima sicurezza, nel dispositivo di firma in cui verrà utilizzata. 2. Il sistema di generazione è isolato, dedicato esclusivamente a questa attività ed adeguatamente protetto. 3. L'accesso al sistema è controllato e ciascun utente è preventivamente identificato per l'accesso fisico e autenticato per l'accesso logico. Ogni sessione di lavoro è registrata nel giornale di controllo. 4. Il sistema è dotato di strumenti di controllo della propria configurazione che consentono di verificare l'autenticità e l'integrità del software installato e l'assenza di programmi non previsti dalla procedura e di dati residuali provenienti dalla generazione di coppie di chiavi precedenti che possano inficiare l'equiprobabilità della generazione di quelle successive.\n\nArt. 11. Dispositivi sicuri e procedure per la generazione delle firme elettroniche qualificate e delle firme digitali. 1. La generazione delle firme elettroniche qualificate e delle firme digitali avviene all'interno di un dispositivo sicuro per la generazione delle firme, in maniera tale che non sia possibile l'intercettazione della chiave privata utilizzata. 2. Il dispositivo sicuro per la generazione della firma elettronica qualificata o della firma digitale deve poter essere attivato esclusivamente dal titolare mediante sistemi di autenticazione ritenuti adeguati, secondo le rispettive competenze, dall'OCSI e dall'Agenzia, prima di procedere alla generazione della firma. 3. L'Agenzia, nell'ambito dell'attività di cui agli articoli 29 e 31 del Codice, valuta l'adeguatezza tecnologica dei sistemi di autenticazione per quanto concerne l'interazione fra il titolare e il dispositivo sicuro per la generazione della firma, tenuto conto del traguardo di sicurezza di cui al DPCM 30 ottobre 2003 e del contesto di utilizzo. 4. La personalizzazione del dispositivo sicuro per la generazione della firma elettronica qualificata o della firma digitale garantisce almeno: a) l'acquisizione da parte del certificatore dei dati identificativi del dispositivo sicuro per la generazione della firma elettronica qualificata o della firma digitale utilizzato e la loro associazione al titolare; b) la registrazione nel dispositivo sicuro per la generazione della firma elettronica qualificata o della firma digitale del certificato qualificato, relativo alle chiavi di sottoscrizione del titolare. 5. La personalizzazione del dispositivo sicuro per la generazione delle firme elettroniche qualificate o digitali può prevedere, per l'utilizzo nelle procedure di firma, la registrazione, nel dispositivo medesimo, del certificato elettronico relativo alla chiave pubblica del certificatore la cui corrispondente privata è stata utilizzata per sottoscrivere il certificato qualificato relativo alle chiavi di sottoscrizione del titolare. 6. La personalizzazione del dispositivo sicuro per la generazione delle firme elettroniche qualificate o digitali è registrata nel giornale di controllo di cui all'art. 36. 7. Il certificatore adotta, nel processo di personalizzazione del dispositivo sicuro per la generazione delle firme elettroniche qualificate e digitali, procedure atte ad identificare il titolare del dispositivo medesimo e dei certificati in esso contenuti. 8. I certificatori che rilasciano certificati qualificati forniscono almeno un sistema che consenta la generazione delle firme elettroniche qualificate e digitali.\n\nArt. 12. Ulteriori requisiti per i dispositivi sicuri per la generazione della firma elettronica qualificata. 1. La certificazione di sicurezza dei dispositivi sicuri per la creazione di una firma elettronica qualificata, anche remota o automatica, prevista dall'art. 35 del Codice è effettuata secondo criteri non inferiori a quelli previsti: a) dal livello EAL 4+ della norma ISO/IEC 15408, in conformità ai profili di protezione indicati nella decisione della Commissione europea 14 luglio 2003 e successive modificazioni; b) dal livello EAL 4+ della norma ISO/IEC 15408, in conformità ai profili di protezione o traguardi di sicurezza giudicati adeguati ai sensi dell'art. 35, commi 5 e 6 del Codice e successive modificazioni.\n\nArt. 13. Ulteriori requisiti per i dispositivi sicuri per la generazione della firma digitale. 1. Salvo quanto disposto al comma 2, la certificazione di sicurezza dei dispositivi sicuri per la creazione di una firma digitale è effettuata ai sensi dell'art. 12. 2. L'organismo di certificazione della sicurezza informatica può individuare ulteriori modalità di verifica della conformità ai requisiti di sicurezza dei dispositivi sicuri per la creazione di una firma digitale remota ai sensi dell'art. 35, commi 1 e 2 del Codice. 3. I certificati qualificati afferenti chiavi private custodite nei dispositivi di cui al comma 2, non devono contenere l'estensione qcStatements id-etsi-qcs-QcSSCD.", 2, 1, 'alta', None, None, 'bozza', None, None),
-        (119, 4, 'art. 15-16', "Il certificatore comunica all'Agenzia per l'Italia digitale le informazioni relative alla propria attività, tra cui l'indirizzo di posta elettronica certificata da utilizzare per le comunicazioni ufficiali con l'Agenzia.", "Art. 15. Informazioni riguardanti i certificatori. 1. I certificatori che rilasciano al pubblico certificati qualificati ai sensi del Codice forniscono all'Agenzia le seguenti informazioni e documenti a loro relativi: a) dati anagrafici ovvero denominazione o ragione sociale; b) residenza ovvero sede legale; c) sedi operative; d) rappresentante legale; e) certificati delle chiavi di certificazione; f) piano per la sicurezza di cui all'art. 35; g) manuale operativo di cui all'art. 40; h) relazione sulla struttura organizzativa; i) copia di una polizza assicurativa a copertura dei rischi dell'attività e dei danni causati a terzi. 2. L'Agenzia rende accessibili, in via telematica, le informazioni di cui al comma 1, lettere a), b), e), g) al fine di rendere pubbliche le informazioni che individuano il certificatore qualificato. Tali informazioni sono utilizzate, da chi le consulta, solo per le finalità consentite dalla legge.\n\nArt. 16. Comunicazione tra certificatore e l'Agenzia. 1. I certificatori che rilasciano al pubblico certificati qualificati comunicano all'Agenzia la casella di posta elettronica certificata da utilizzare per realizzare un sistema di comunicazione attraverso il quale scambiare le informazioni previste dal presente decreto. 2. L'Agenzia rende disponibile sul proprio sito internet l'indirizzo della propria casella di posta elettronica certificata.", 3, 1, 'bassa', None, None, 'bozza', None, None),
-        (120, 4, 'art. 17-19', 'Il certificatore genera e utilizza le proprie chiavi di certificazione con dispositivi sicuri, e genera i certificati qualificati con contenuto conforme a quanto stabilito dal decreto, includendo tutte le informazioni prescritte relative al titolare e al certificatore stesso.', "Art. 17. Generazione e uso delle chiavi del certificatore. 1. La generazione delle chiavi di certificazione avviene in modo conforme a quanto previsto dalle presenti regole tecniche. 2. Per ciascuna chiave di certificazione il certificatore genera un certificato sottoscritto con la chiave privata della coppia cui il certificato si riferisce. 3. I valori contenuti nei singoli campi del certificato delle chiavi di certificazione sono codificati in modo da non generare equivoci relativi al nome, ragione o denominazione sociale del certificatore. 4. La certificazione di sicurezza dei dispositivi sicuri per la creazione di una firma utilizzati per le chiavi di cui all'art. 5, comma 4, lettere b), c) e d), è effettuata secondo criteri non inferiori a quelli previsti: a) dal livello EAL 4+ della norma ISO/IEC 15408 in conformità ai profili di protezione indicati nella decisione della Commissione europea 14 luglio 2003 e successive modificazioni; b) dal livello di certificazione e in conformità ai profili di protezione o traguardi di sicurezza giudicati adeguati dagli organismi di cui all'art. 11, comma 1, lettera b) della Direttiva europea 1999/93/EU. 5. La certificazione di sicurezza di cui al comma 4 può inoltre essere effettuata secondo i criteri previsti dal livello di valutazione E3 e robustezza HIGH dell'ITSEC, o superiori, con un traguardo di sicurezza giudicato adeguato dall'Agenzia nell'ambito dell'attività di cui agli articoli 29 e 31 del Codice.\n\nArt. 18. Generazione dei certificati qualificati. 1. Fermo restando quanto previsto dall'art. 32 del Codice, all'atto dell'emissione del certificato qualificato, il certificatore: a) accerta l'autenticità della richiesta; b) nel caso di chiavi generate dallo stesso certificatore, assicura la consegna al legittimo titolare ovvero, nel caso di chiavi non generate dallo stesso certificatore, verifica il possesso della chiave privata da parte del titolare e il corretto funzionamento della coppia di chiavi. 2. Il certificato qualificato è generato con un sistema conforme a quanto previsto dall'art. 33. 3. Il termine del periodo di validità del certificato qualificato precede di almeno due anni il termine del periodo di validità del certificato delle chiavi di certificazione utilizzato per verificarne l'autenticità. 4. L'emissione dei certificati qualificati è registrata nel giornale di controllo specificando il riferimento temporale relativo alla registrazione. 5. Il certificatore, salvo quanto disposto al comma 6, determina il periodo di validità dei certificati qualificati anche in funzione della robustezza crittografica delle chiavi impiegate. 6. L'Agenzia, ai sensi dell'art. 4, comma 2, determina il periodo massimo di validità del certificato qualificato in funzione degli algoritmi e delle caratteristiche delle chiavi. 7. Il certificato qualificato può contenere l'indicazione che l'utilizzo della chiave privata per la generazione della firma è subordinato alla verifica da parte del certificatore della validità del certificato qualificato e dell'eventuale certificato di attributo. All'attuazione del presente comma si provvede con le modalità stabilite dai provvedimenti di cui all'art. 4, comma 2.\n\nArt. 19. Informazioni contenute nei certificati. 1. Fatto salvo quanto previsto dall'art. 28 del Codice, i certificati qualificati contengono almeno le seguenti ulteriori informazioni: a) Codice identificativo del titolare presso il certificatore; b) tipologia della coppia di chiavi in base all'uso cui sono destinate. 2. Le informazioni personali contenute nel certificato qualificato ai sensi di quanto previsto nell'art. 28 del Codice sono utilizzabili unicamente per identificare il titolare della firma elettronica qualificata o della firma digitale, per verificare la firma del documento informatico, nonché per indicare eventuali qualifiche specifiche del titolare. 3. I valori contenuti nei singoli campi del certificato qualificato sono codificati in modo da non generare equivoci relativi al nome, ragione o denominazione sociale del certificatore. 4. Le informazioni e le qualifiche di cui all'art. 28, comma 3, lettera a) del Codice, codificate secondo le modalità indicate dai provvedimenti di cui all'art. 4, comma 2, del presente decreto, sono inserite dal certificatore su richiesta del titolare: a) nel certificato qualificato senza l'indicazione dell'organizzazione di appartenenza. A tal fine, il titolare del certificato fornisce al certificatore una dichiarazione sostitutiva ai sensi del decreto del Presidente della Repubblica 28 dicembre 2000, n. 445; b) ovvero, nel certificato di attributo o nel certificato qualificato con l'indicazione dell'organizzazione di appartenenza. A tal fine, il titolare del certificato richiede all'organizzazione di appartenenza una autorizzazione all'emissione del certificato, qualificato o di attributo che consegna al certificatore. L'organizzazione, che ha l'obbligo di fornire tale autorizzazione, assume l'impegno di richiedere al certificatore la revoca del certificato qualificato qualora venga a conoscenza della variazione delle informazioni o delle qualifiche contenute nello stesso. Il titolare, nel richiedere l'autorizzazione, ha l'obbligo di comunicare all'organizzazione di appartenenza il certificatore cui intende rivolgersi.", 2, 1, 'alta', None, None, 'bozza', None, None),
-        (121, 4, 'art. 20-31', "Il certificatore revoca o sospende il certificato qualificato su richiesta del titolare, del terzo interessato o d'ufficio nei casi previsti, dandone tempestiva pubblicazione nell'elenco dei certificati revocati e sospesi, secondo le procedure e i termini stabiliti dal decreto.", "Art. 20. Revoca e sospensione del certificato qualificato. 1. Fatto salvo quanto previsto all'art. 36 del Codice, il certificato qualificato è revocato o sospeso dal certificatore, ove quest'ultimo abbia notizia della compromissione della chiave privata o del dispositivo sicuro per la generazione delle firme elettroniche qualificate o digitali. 2. Il certificatore conserva le richieste di revoca e sospensione per lo stesso periodo previsto all'art. 32, comma 3, lettera j) del Codice.\n\nArt. 21. Codice di emergenza. 1. Per ciascun certificato qualificato emesso il certificatore fornisce al titolare almeno un Codice riservato, da utilizzare per richiedere la sospensione del certificato nei casi di emergenza indicati nel manuale operativo di cui all'art. 40 e comunicati al titolare. 2. La richiesta di cui al comma 1 è successivamente confermata utilizzando una delle modalità previste dal certificatore. 3. Il certificatore adotta specifiche misure di sicurezza per assicurare la segretezza del Codice di emergenza.\n\nArt. 22. Revoca dei certificati qualificati relativi a chiavi di sottoscrizione. 1. La revoca del certificato qualificato relativo a chiavi di sottoscrizione viene effettuata dal certificatore mediante l'inserimento del suo Codice identificativo in una delle liste di certificati revocati e sospesi (CRL). 2. Se la revoca avviene a causa della possibile compromissione della chiave privata, il certificatore deve procedere tempestivamente alla pubblicazione dell'aggiornamento della lista di revoca. 3. La revoca dei certificati è annotata nel giornale di controllo con la specificazione della data e dell'ora della pubblicazione della CRL. 4. Il certificatore comunica tempestivamente l'avvenuta revoca al titolare e all'eventuale terzo interessato specificando la data e l'ora a partire dalla quale il certificato qualificato risulta revocato.\n\nArt. 23. Revoca di un certificato qualificato su iniziativa del certificatore. 1. Salvo i casi di motivata urgenza, il certificatore che intende revocare un certificato qualificato ne dà preventiva comunicazione al titolare, specificando i motivi della revoca nonché la data e l'ora a partire dalla quale la revoca è efficace.\n\nArt. 24. Revoca del certificato qualificato su richiesta del titolare. 1. La richiesta di revoca è inoltrata al certificatore munita della sottoscrizione del titolare e con la specificazione della sua decorrenza. 2. Le modalità di inoltro della richiesta sono indicate dal certificatore nel manuale operativo di cui all'art. 40. 3. Il certificatore verifica l'autenticità della richiesta e procede alla revoca entro il termine richiesto. Sono considerate autentiche le richieste inoltrate con le modalità previste dal comma 2. 4. Se il certificatore non ha la possibilità di accertare in tempo utile l'autenticità della richiesta, procede alla sospensione del certificato.\n\nArt. 25. Revoca su richiesta del terzo interessato. 1. La richiesta di revoca da parte del terzo interessato da cui derivano i poteri di firma del titolare è inoltrata al certificatore munita di sottoscrizione e con la specificazione della sua decorrenza. 2. In caso di cessazione o modifica delle qualifiche o del titolo inserite nel certificato su richiesta del terzo interessato, la richiesta di revoca di cui al comma 1 è inoltrata non appena il terzo venga a conoscenza della variazione di stato. 3. Se il certificatore non ha la possibilità di accertare in tempo utile l'autenticità della richiesta, procede alla sospensione del certificato.\n\nArt. 26. Sospensione dei certificati qualificati. 1. La sospensione del certificato qualificato è effettuata dal certificatore mediante l'inserimento del suo Codice identificativo in una delle liste dei certificati revocati e sospesi (CRL).\n\nArt. 27. Sospensione del certificato qualificato su iniziativa del certificatore. 1. Salvo casi d'urgenza che il certificatore è tenuto a motivare contestualmente alla comunicazione conseguente alla sospensione di cui al comma 2, il certificatore che intende sospendere un certificato qualificato ne dà preventiva comunicazione al titolare e all'eventuale terzo interessato specificando i motivi della sospensione e la sua durata. 2. Se la sospensione è causata da una richiesta di revoca motivata dalla possibile compromissione della chiave privata, il certificatore procede tempestivamente alla pubblicazione della sospensione.\n\nArt. 28. Sospensione del certificato qualificato su richiesta del titolare. 1. La richiesta di sospensione del certificato qualificato, con la specificazione della sua durata, è inoltrata al certificatore, secondo le modalità indicate nel manuale operativo approvato dall'Agenzia. 2. Il certificatore verifica l'autenticità della richiesta e procede alla sospensione entro il termine richiesto. Sono considerate autentiche le richieste inoltrate con le modalità previste dal precedente comma 1.\n\nArt. 29. Sospensione su richiesta del terzo interessato. 1. La richiesta di sospensione del certificato qualificato da parte del terzo interessato, da cui derivano i poteri di firma del titolare, è inoltrata al certificatore munita di sottoscrizione e con la specificazione della sua durata. 2. Il certificatore comunica tempestivamente l'avvenuta sospensione al titolare e all'eventuale terzo interessato specificando la data e l'ora a partire dalla quale il certificato qualificato risulta sospeso. 3. Il certificatore indica nel manuale operativo, ai sensi dell'art. 40, comma 3, lettera l), la durata massima del periodo di sospensione e le azioni intraprese al termine dello stesso in assenza di diverse indicazioni da parte del soggetto che ha richiesto la sospensione. 4. In caso di revoca di un certificato qualificato sospeso, la data della stessa decorre dalla data di inizio del periodo di sospensione. 5. La sospensione e la cessazione della stessa sono annotate nel giornale di controllo con l'indicazione della data e dell'ora di esecuzione dell'operazione. 6. La cessazione dello stato di sospensione del certificato, che sarà considerato come mai sospeso, è tempestivamente comunicata al titolare e all'eventuale terzo interessato specificando la data e l'ora a partire dalla quale il certificato ha cambiato stato.\n\nArt. 30. Sostituzione delle chiavi di certificazione. 1. La procedura di sostituzione delle chiavi, generate dal certificatore in conformità all'art. 17, assicura il rispetto del termine di cui all'art. 18, comma 3. 2. I certificati generati a seguito della sostituzione delle chiavi di certificazione sono inviati all'Agenzia.\n\nArt. 31. Revoca dei certificati relativi a chiavi di certificazione. 1. La revoca del certificato relativo ad una coppia di chiavi di certificazione è consentita solo nei seguenti casi: a) compromissione della chiave privata; b) malfunzionamento irrecuperabile del dispositivo sicuro per la generazione delle firme; c) cessazione dell'attività. 2. La revoca è comunicata entro ventiquattro ore all'Agenzia e resa nota a tutti i titolari di certificati qualificati sottoscritti con la chiave privata la cui corrispondente chiave pubblica è contenuta nel certificato revocato. 3. La revoca di certificati di cui al comma 1, pubblicati dall'Agenzia nell'elenco pubblico dei certificatori di cui all'art. 43, è resa nota attraverso il medesimo elenco.", 4, 1, 'media', None, None, 'bozza', None, None),
-        (122, 4, 'art. 32-33', 'Il certificatore adotta misure di sicurezza per i sistemi operativi e i sistemi di generazione dei certificati, proteggendoli da accessi non autorizzati e da alterazioni.', "Art. 32. Requisiti di sicurezza dei sistemi operativi. 1. I sistemi operativi dei sistemi di elaborazione utilizzati nelle attività di certificazione per la generazione delle chiavi, la generazione dei certificati qualificati e la gestione del registro dei certificati qualificati, devono essere stati oggetto di opportune personalizzazioni atte a innalzarne il livello di sicurezza (hardening) a cura del certificatore. 2. Ai sensi dell'art. 31 del Codice, l'Agenzia verifica l'idoneità delle personalizzazioni di cui al comma 1 e indica al certificatore eventuali azioni correttive. 3. Il comma 1 non si applica al sistema operativo dei dispositivi di firma.\n\nArt. 33. Sistema di generazione dei certificati qualificati. 1. La generazione dei certificati qualificati avviene su un sistema utilizzato esclusivamente per la generazione di certificati, situato in locali adeguatamente protetti. 2. L'entrata e l'uscita dai locali protetti è registrata sul giornale di controllo. 3. L'accesso ai sistemi di elaborazione è consentito, limitatamente alle funzioni assegnate, esclusivamente al personale autorizzato, identificato attraverso un'opportuna procedura di riconoscimento da parte del sistema al momento di apertura di ciascuna sessione. 4. L'inizio e la fine di ciascuna sessione sono registrati sul giornale di controllo.", 2, 1, 'alta', None, None, 'bozza', None, None),
-        (123, 4, 'art. 35', "Il certificatore predispone un piano per la sicurezza contenente l'analisi dei rischi, le contromisure adottate, i piani di emergenza e di continuità operativa, aggiornandolo periodicamente.", "Art. 35. Piano per la sicurezza. 1. Il certificatore definisce un piano per la sicurezza nel quale sono contenuti almeno i seguenti elementi: a) struttura generale, modalità operativa e struttura logistica; b) descrizione dell'infrastruttura di sicurezza fisica rilevante ai fini dell'attività di certificatore; c) allocazione dei servizi e degli uffici negli immobili rilevanti ai fini dell'attività di certificatore; d) descrizione delle funzioni del personale e sua allocazione ai fini dell'attività di certificatore; e) attribuzione delle responsabilità; f) algoritmi crittografici o altri sistemi utilizzati; g) descrizione delle procedure utilizzate nell'attività di certificatore; h) descrizione dei dispositivi installati; i) descrizione dei flussi di dati; l) procedura di gestione delle copie di sicurezza dei dati; m) procedura di continuità operativa del servizio di pubblicazione delle liste di revoca e sospensione; n) analisi dei rischi; o) descrizione delle contromisure; p) descrizione delle verifiche e delle ispezioni; q) descrizione delle misure adottate ai sensi degli articoli 32, comma 1, e 47, comma 2; r) procedura di gestione dei disastri; s) descrizione della procedura di cui all'art. 8, comma 3, ponendo in rilievo le modalità di conservazione e protezione dei supporti contenenti le chiavi esportate; t) misure di sicurezza per la protezione dei dispositivi di firma remota, ivi comprese le modalità di custodia; u) limitatamente a quanto previsto all'art. 11, comma 3, modalità con cui è assicurato il controllo esclusivo delle chiavi private custodite sui dispositivi di firma remota; v) le misure procedurali e tecniche applicate per la distruzione dei dispositivi HSM e delle chiavi che contengono in caso di guasto del dispositivo HSM che non consente l'applicazione delle funzionalità di sicurezza certificate implementate dai dispositivi medesimi. 2. Quanto previsto dalle lettere t) e u) del comma 1 può essere oggetto di dichiarazioni separate da parte del certificatore, ad integrazione del piano per la sicurezza. 3. L'Agenzia, a seguito dell'analisi di quanto dichiarato alle lettere t) e u) del comma 1, può imporre al certificatore di inserire nei certificati qualificati afferenti la firma remota limitazioni d'uso e di valore. 4. Il piano per la sicurezza, sottoscritto dal legale rappresentante del certificatore, ovvero dal responsabile della sicurezza da questo delegato, è consegnato all'Agenzia in busta sigillata o cifrato, al fine di garantirne la riservatezza, in base alle indicazioni fornite dall'Agenzia. 5. Il piano per la sicurezza si attiene alle misure di sicurezza previste dal Titolo V della Parte I del decreto legislativo 30 giugno 2003, n. 196.", 1, 1, 'alta', None, None, 'bozza', None, None),
-        (124, 4, 'art. 36', "Il certificatore tiene un giornale di controllo delle operazioni effettuate, conservandone le registrazioni per non meno di vent'anni.", "Art. 36. Giornale di controllo. 1. Il giornale di controllo è costituito dall'insieme delle registrazioni effettuate anche automaticamente dai dispositivi installati presso il certificatore, allorché si verificano le condizioni previste dal presente decreto. 2. Le registrazioni possono essere effettuate indipendentemente anche su supporti distinti e di tipo diverso. 3. A ciascuna registrazione è apposto un riferimento temporale. 4. Il giornale di controllo è tenuto in modo da garantire l'autenticità delle annotazioni e consentire la ricostruzione, con la necessaria accuratezza, di tutti gli eventi rilevanti ai fini della sicurezza. 5. L'integrità del giornale di controllo è verificata con frequenza almeno mensile. 6. Le registrazioni contenute nel giornale di controllo sono conservate per un periodo pari a venti anni, salvo quanto previsto dall'art. 11 del decreto legislativo n. 196 del 2003.", 5, 1, 'media', None, None, 'bozza', None, None),
-        (125, 4, 'art. 37-39', "Il certificatore adotta un sistema di qualità conforme alla norma UNI EN ISO 9000 e assicura che il personale addetto ai servizi di certificazione possieda le competenze, l'esperienza e le qualifiche necessarie.", "Art. 37. Sistema di qualità del certificatore. 1. Entro un anno dall'avvio dell'attività di certificazione, il certificatore dichiara la conformità del proprio sistema di qualità alle norme ISO 9000, successive modifiche o a norme equivalenti. 2. Il manuale della qualità è depositato presso l'Agenzia e reso disponibile presso il certificatore.\n\nArt. 38. Organizzazione del personale addetto al servizio di certificazione. 1. Fatto salvo quanto previsto al comma 3, l'organizzazione del certificatore prevede almeno le seguenti figure professionali: a) responsabile della sicurezza; b) responsabile del servizio di certificazione e validazione temporale; c) responsabile della conduzione tecnica dei sistemi; d) responsabile dei servizi tecnici e logistici; e) responsabile delle verifiche e delle ispezioni (auditing). 2. Non è possibile attribuire al medesimo soggetto più funzioni tra quelle previste dal comma 1. 3. Ferma restando la responsabilità del certificatore, l'organizzazione dello stesso può prevedere che alcune delle suddette responsabilità siano affidate ad altre organizzazioni. In questo caso il responsabile della sicurezza o altro dipendente appositamente designato gestisce i rapporti con tali figure professionali. 4. In nessun caso quanto previsto al comma 3 si applica per le figure professionali di cui al comma 1, lettere a) ed e).\n\nArt. 39. Requisiti di competenza ed esperienza del personale. 1. Il personale cui sono attribuite le funzioni previste dall'art. 38 deve aver maturato una esperienza professionale nelle tecnologie informatiche e delle telecomunicazioni almeno quinquennale. 2. Per ogni aggiornamento apportato al sistema di certificazione è previsto un apposito addestramento.", 1, 1, 'media', None, None, 'bozza', None, None),
-        (126, 4, 'art. 40', "Il certificatore redige e rende pubblico un manuale operativo contenente gli impegni assunti nei confronti degli utenti e le procedure adottate nell'erogazione dei propri servizi.", "Art. 40. Manuale operativo. 1. Il manuale operativo definisce le procedure applicate dal certificatore che rilascia certificati qualificati nello svolgimento della sua attività. 2. Il manuale operativo è depositato presso l'Agenzia e pubblicato a cura del certificatore in modo da essere consultabile per via telematica. 3. Il manuale contiene almeno le seguenti informazioni: a) dati identificativi del certificatore; b) dati identificativi della versione del manuale operativo; c) responsabile del manuale operativo; d) definizione degli obblighi del certificatore, del titolare e dei richiedenti le informazioni per la verifica delle firme; e) definizione delle responsabilità e delle eventuali limitazioni agli indennizzi; f) indirizzo del sito web del certificatore ove sono pubblicate le tariffe; g) modalità di identificazione e registrazione degli utenti; h) modalità di generazione delle chiavi per la creazione e la verifica della firma; i) modalità di emissione dei certificati; l) modalità di inoltro delle richieste e della gestione di sospensione e revoca dei certificati; m) modalità di sostituzione delle chiavi; n) modalità di gestione del registro dei certificati; o) modalità di accesso al registro dei certificati; p) modalità per l'apposizione e la definizione del riferimento temporale; q) modalità di protezione dei dati personali; r) modalità operative per l'utilizzo del sistema di verifica delle firme di cui all'art. 14, comma 1; s) modalità operative per la generazione della firma elettronica qualificata e della firma digitale.", 3, 1, 'bassa', None, None, 'bozza', None, None),
-        (127, 4, 'art. 42', "Il certificatore accreditato osserva gli obblighi specifici previsti per i certificatori accreditati, tra cui il mantenimento nel tempo dei requisiti di accreditamento e l'osservanza delle prescrizioni tecniche e organizzative aggiuntive stabilite dal decreto.", "Art. 42. Obblighi per i certificatori accreditati. 1. Il certificatore accreditato genera un certificato per ciascuna delle chiavi di firma utilizzate dall'Agenzia per la sottoscrizione dell'elenco pubblico dei certificatori, lo pubblica nel proprio registro dei certificati e lo rende accessibile per via telematica al fine di verificare la validità delle chiavi utilizzate dall'Agenzia. Tali informazioni sono utilizzate, da chi le consulta, solo per le finalità consentite dalla legge. 2. Il certificatore accreditato garantisce l'interoperabilità del prodotto di verifica di cui all'art. 14 del presente decreto con i documenti informatici sottoscritti mediante firme elettroniche qualificate e digitali ad opera dell'Agenzia, nell'ambito delle attività di cui all'art. 31 del Codice. 3. Il certificatore accreditato mantiene copia della lista, sottoscritta dall'Agenzia, dei certificati relativi alle chiavi di certificazione di cui all'art. 43, comma 1, lettera e) del presente decreto, che rende accessibile per via telematica per la specifica finalità della verifica delle firme elettroniche qualificate e digitali. 4. I certificatori accreditati, al fine di ottenere e mantenere il riconoscimento di cui all'art. 29, comma 1 del Codice, svolgono la propria attività in conformità con quanto previsto dai provvedimenti emanati dall'Agenzia ai sensi dell'art. 4, comma 2. Fino all'emanazione di tali provvedimenti continua ad applicarsi la deliberazione CNIPA 21 maggio 2009, n. 45, recante regole per il riconoscimento e la verifica del documento informatico e successive modificazioni. 5. I certificatori accreditati, al fine di ottenere e mantenere il riconoscimento di cui all'art. 29, comma 1, del Codice assicurano la valorizzazione dell'estensione qcStatements id-etsi-qcs-QcSSCD esclusivamente nei certificati qualificati la cui corrispondente chiave privata sia custodita nei dispositivi di cui all'art. 12. 6. I sistemi di generazione e verifica delle firme elettroniche qualificate e delle firme digitali, forniti o indicati dal certificatore accreditato ai sensi degli articoli 11, comma 8 e 14, comma 1, non devono consentire a quest'ultimo di conoscere gli atti o fatti rappresentati nel documento informatico oggetto del processo di sottoscrizione o verifica. 7. Al fine dell'attività di cui all'art. 31 del Codice, il certificatore deve consegnare all'Agenzia un esemplare dei dispositivi di firma elettronica qualificata e di firma digitale forniti ai titolari. Il primo periodo non si applica in relazione ai dispositivi di firma HSM. 8. Al fine dell'attività di cui all'art. 31 del Codice, il certificatore deve consegnare all'Agenzia copia delle applicazioni di generazione e verifica delle firme elettroniche qualificate o delle firme digitali fornite ai titolari per uso personale. 9. Al fine del mantenimento dell'accreditamento di cui all'art. 29 del Codice, il certificatore è obbligato a partecipare alle sessioni di test di interoperabilità indicate dall'Agenzia. 10. I certificatori rendono disponibile all'Agenzia un servizio che consenta, ai fini dell'art. 34, comma 4, di conoscere se, per un determinato codice fiscale, sia stato emesso un certificato qualificato e, in caso affermativo, la sua scadenza. L'Agenzia, sentite le associazioni di categoria e il Garante per la protezione dei dati personali, indica in un proprio provvedimento le caratteristiche del servizio, le modalità e i vincoli per la sua fruizione.", 1, 1, 'media', None, None, 'bozza', None, None),
-        (128, 4, 'art. 44-46', 'Il certificatore accreditato che emette certificati per strumenti di identificazione elettronica equiparati alla firma elettronica avanzata rende disponibili gli strumenti necessari alla verifica della firma generata con tali strumenti.', "Art. 44. Rappresentazione del documento informatico. 1. Il certificatore indica nel manuale operativo i formati del documento informatico e le modalità operative a cui il titolare deve attenersi per evitare le conseguenze previste dall'art. 4, comma 3.\n\nArt. 45. Limitazioni d'uso. 1. Il certificatore, su richiesta del titolare, del terzo interessato o dell'Agenzia, è tenuto a inserire nel certificato qualificato eventuali limitazioni d'uso. 2. La modalità di rappresentazione dei limiti d'uso e di valore di cui all'art. 28, comma 3, del Codice è definita dall'Agenzia con uno dei provvedimenti di cui all'art. 4, comma 2. 3. Il certificatore è tenuto ad indicare, in lingua italiana e lingua inglese, la limitazione d'uso dei certificati utilizzati per la verifica delle firme di cui all'art. 35, comma 3, del Codice.\n\nArt. 46. Verifica delle marche temporali. 1. I certificatori accreditati forniscono ovvero indicano almeno un sistema, conforme al successivo comma 2, che consenta di effettuare la verifica delle marche temporali. 2. L'Agenzia con i provvedimenti di cui all'art. 4, comma 2, stabilisce le regole di interoperabilità per la verifica della marca temporale, anche associata al documento informatico cui si riferisce.", 2, 1, 'media', None, None, 'bozza', None, None),
-        (129, 4, 'art. 53', "Il gestore del sistema di validazione temporale conserva in un apposito archivio digitale non modificabile tutte le marche temporali emesse, per un periodo non inferiore a vent'anni.", "Art. 53. Registrazione delle marche generate. 1. Tutte le marche temporali emesse da un sistema di validazione sono conservate in un apposito archivio digitale non modificabile per un periodo non inferiore a venti anni ovvero, su richiesta dell'interessato, per un periodo maggiore, alle condizioni previste dal certificatore. 2. La marca temporale è valida per il periodo di conservazione, stabilito o concordato con il certificatore, di cui al comma 1.", 5, 1, 'media', None, None, 'bozza', None, None),
-        (133, 4, 'art. 56', "Le soluzioni di firma elettronica avanzata garantiscono: l'identificazione del firmatario; la connessione univoca della firma al firmatario; il controllo esclusivo del firmatario sul sistema di generazione della firma (inclusi eventuali dati biometrici); la possibilità di verificare che il documento non abbia subito modifiche dopo la firma; la possibilità per il firmatario di ottenere evidenza di quanto sottoscritto; l'individuazione del soggetto erogante (art. 55, comma 2, lettera a); l'assenza di elementi nell'oggetto della sottoscrizione atti a modificare atti, fatti o dati rappresentati; la connessione univoca della firma al documento sottoscritto. La firma generata in violazione di una o più di queste caratteristiche (escluso il requisito di individuazione del soggetto erogante) non soddisfa i requisiti per l'equivalenza giuridica con la firma autografa previsti dagli artt. 20, comma 1-bis, e 21, comma 2, del CAD.", "Art. 56. Caratteristiche delle soluzioni di firma elettronica avanzata. 1. Le soluzioni di firma elettronica avanzata garantiscono: a) l'identificazione del firmatario del documento; b) la connessione univoca della firma al firmatario; c) il controllo esclusivo del firmatario del sistema di generazione della firma, ivi inclusi i dati biometrici eventualmente utilizzati per la generazione della firma medesima; d) la possibilità di verificare che il documento informatico sottoscritto non abbia subito modifiche dopo l'apposizione della firma; e) la possibilità per il firmatario di ottenere evidenza di quanto sottoscritto; f) l'individuazione del soggetto di cui all'art. 55, comma 2, lettera a); g) l'assenza di qualunque elemento nell'oggetto della sottoscrizione atto a modificarne gli atti, fatti o dati nello stesso rappresentati; h) la connessione univoca della firma al documento sottoscritto. 2. La firma elettronica avanzata generata in violazione di quanto disposto da una o più disposizioni di cui alle lettere a), b), c), d), e), g), h) del comma 1, non soddisfa i requisiti previsti dagli articoli 20, comma 1-bis, e 21, comma 2, del Codice.", 2, 1, 'alta', None, "i commi 1 e 2 non si applicano alle soluzioni di cui all'art. 61, commi 1 e 2 (PEC e CIE/CNS/documenti equiparati usati verso la PA), a cui si applicano le norme vigenti in materia (art. 57, comma 6, per rinvio)", 'bozza', None, None),
-        (134, 4, 'art. 57 c.1', "Il soggetto erogante (art. 55, comma 2, lettera a) deve: identificare con certezza l'utente tramite un documento di riconoscimento valido; informarlo sui termini e condizioni d'uso del servizio, comprese eventuali limitazioni; subordinare l'attivazione del servizio alla sottoscrizione di una dichiarazione di accettazione; conservare per almeno vent'anni copia del documento di riconoscimento e della dichiarazione, e ogni informazione atta a dimostrare l'ottemperanza ai requisiti tecnici dell'art. 56, comma 1, garantendone disponibilità, integrità, leggibilità e autenticità; fornire gratuitamente al firmatario, su richiesta, copia della dichiarazione e delle informazioni conservate; rendere note e pubblicare sul proprio sito le modalità per tale richiesta; rendere note e pubblicare sul proprio sito le caratteristiche del sistema realizzato e delle tecnologie utilizzate atte a garantire i requisiti dell'art. 56, comma 1; assicurare, ove possibile, un servizio di revoca del consenso e un servizio di assistenza.", "Art. 57. Obblighi a carico dei soggetti che erogano soluzioni di firma elettronica avanzata. 1. I soggetti di cui all'art. 55, comma 2, lettera a) devono: a) identificare in modo certo l'utente tramite un valido documento di riconoscimento, informarlo in merito agli esatti termini e condizioni relative all'uso del servizio, compresa ogni eventuale limitazione dell'uso, subordinare l'attivazione del servizio alla sottoscrizione di una dichiarazione di accettazione delle condizioni del servizio da parte dell'utente; b) conservare per almeno venti anni copia del documento di riconoscimento e la dichiarazione di cui alla lettera a) ed ogni altra informazione atta a dimostrare l'ottemperanza a quanto previsto all'art. 56, comma 1, garantendone la disponibilità, integrità, leggibilità e autenticità; c) fornire liberamente e gratuitamente copia della dichiarazione e le informazioni di cui alla lettera b) al firmatario, su richiesta di questo; d) rendere note le modalità con cui effettuare la richiesta di cui al punto c), pubblicandole anche sul proprio sito internet; e) rendere note le caratteristiche del sistema realizzato atte a garantire quanto prescritto dall'art. 56, comma 1; f) specificare le caratteristiche delle tecnologie utilizzate e come queste consentono di ottemperare a quanto prescritto; g) pubblicare le caratteristiche di cui alle lettere e) ed f) sul proprio sito internet; h) assicurare, ove possibile, la disponibilità di un servizio di revoca del consenso all'utilizzo della soluzione di firma elettronica avanzata e un servizio di assistenza. 5. Nell'ambito delle pubbliche amministrazioni e in quello sanitario limitatamente alla categoria di utenti rappresentata dai cittadini fruitori di prestazioni sanitarie, la dichiarazione di accettazione delle condizioni del servizio prevista al comma 1, lettera a) può essere fornita oralmente dall'utente al funzionario pubblico o all'esercente la professione sanitaria, il quale la raccoglie in un documento informatico che sottoscrive con firma elettronica qualificata o firma digitale. 6. I commi 1 e 2 non si applicano alle soluzioni di cui all'art. 61, commi 1 e 2, alle quali si applicano le norme vigenti in materia.", 3, 1, 'media', None, "comma 5: nell'ambito delle PA e in quello sanitario (utenti fruitori di prestazioni sanitarie), la dichiarazione di accettazione può essere raccolta oralmente e sottoscritta dal funzionario/esercente con firma qualificata o digitale, in luogo della sottoscrizione diretta dell'utente; comma 6: non si applica alle soluzioni di cui all'art. 61, commi 1 e 2", 'bozza', None, None),
-        (135, 4, 'art. 57 c.2', 'Il soggetto erogante (art. 55, comma 2, lettera a) si dota di una copertura assicurativa per la responsabilità civile, rilasciata da una società di assicurazione abilitata nel campo dei rischi industriali, non inferiore a cinquecentomila euro, a tutela dei titolari della firma elettronica avanzata e dei terzi da eventuali danni causati da soluzioni tecniche inadeguate; le modalità scelte per ottemperare vanno rese note e pubblicate sul proprio sito.', "Art. 57, comma 2-3. 2. Al fine di proteggere i titolari della firma elettronica avanzata e i terzi da eventuali danni cagionati da inadeguate soluzioni tecniche, i soggetti di cui all'art. 55, comma 2, lettera a), si dotano di una copertura assicurativa per la responsabilità civile rilasciata da una società di assicurazione abilitata ad esercitare nel campo dei rischi industriali per un ammontare non inferiore ad euro cinquecentomila. 3. Le modalità scelte per ottemperare a quanto disposto al comma 2 devono essere rese note ai soggetti interessati, pubblicandole anche sul proprio sito internet.", 1, 1, 'alta', None, 'non si applica alle persone giuridiche pubbliche che erogano soluzioni di FEA per conto di pubbliche amministrazioni (art. 57, comma 4)', 'bozza', None, None),
-        (131, 4, 'art. 58', 'I soggetti realizzatori (art. 55, comma 2, lettera b) che offrono una soluzione di firma elettronica avanzata alle pubbliche amministrazioni possiedono la certificazione di conformità del proprio sistema di gestione della sicurezza delle informazioni alla norma ISO/IEC 27001, rilasciata da un terzo indipendente autorizzato; essi (o le società che li controllano) possiedono altresì la certificazione di conformità del proprio sistema di qualità alla norma ISO 9001 o norme equivalenti. In alternativa alla certificazione ISO/IEC 27001, possono far certificare la propria soluzione secondo la norma ISO/IEC 15408, livello EAL1 o superiore, da un terzo indipendente autorizzato.', "Art. 58. Soggetti che realizzano soluzioni di firma elettronica avanzata a favore di terzi. 1. I soggetti di cui all'art. 55, comma 2, lettera b) che offrono una soluzione di firma elettronica avanzata alle pubbliche amministrazioni, devono essere in possesso della certificazione di conformità del proprio sistema di gestione per la sicurezza delle informazioni ad essi relative, alla norma ISO/IEC 27001, rilasciata da un terzo indipendente a tal fine autorizzato secondo le norme vigenti in materia. 2. I soggetti di cui all'art. 55, comma 2, lettera b) che offrono soluzioni di firma elettronica avanzata alle pubbliche amministrazioni, ovvero le società che li controllano, devono essere in possesso della certificazione di conformità del proprio sistema di qualità alla norma ISO 9001 e successive modifiche o a norme equivalenti. 3. I commi 1 e 2 non si applicano alle persone giuridiche private partecipate, in tutto o in parte, dalla pubblica amministrazione qualora realizzino per la stessa soluzioni di firma elettronica avanzata. 4. I commi 1 e 2 del presente articolo non si applicano alle persone giuridiche pubbliche che rendono disponibili soluzioni di firma elettronica avanzata a pubbliche amministrazioni. 5. I soggetti di cui all'art. 55, comma 2, lettera b), al fine di dare evidenza del grado di conformità della soluzione di firma elettronica avanzata a quanto previsto dalle presenti regole tecniche, possono far certificare la propria soluzione secondo la norma ISO/IEC 15408, livello EAL 1 o superiore, da un terzo indipendente a tal fine autorizzato secondo le norme vigenti in materia.", 1, 1, 'media', None, 'commi 1-2 non si applicabili alle persone giuridiche private partecipate dalla PA che realizzano la soluzione per la PA stessa (c.3), né alle persone giuridiche pubbliche che rendono disponibili soluzioni di FEA a PA (c.4)', 'bozza', None, None),
-        (132, 4, 'art. 59', 'In via facoltativa, il soggetto erogante (art. 55, comma 2, lettera a) può far certificare da un terzo indipendente autorizzato: la conformità del proprio sistema di gestione per la sicurezza delle informazioni a supporto della soluzione di FEA alla norma ISO/IEC 27001; e/o, su base volontaria, la conformità della soluzione alla norma ISO/IEC 15408, livello EAL1 o superiore.', "Art. 59. Affidabilità delle soluzioni di firma elettronica avanzata. 1. I soggetti di cui all'art. 55, comma 2, lettera a), al fine di dare evidenza del grado di conformità alla norma ISO/IEC 27001 del proprio sistema di gestione per la sicurezza delle informazioni a supporto della soluzione di firma elettronica avanzata proposta, possono richiederne la certificazione ad una terza parte indipendente autorizzata allo scopo secondo le norme vigenti in materia. 2. I soggetti di cui all'art. 55, comma 2, lettera a), al fine di dare evidenza del grado di conformità della soluzione di firma elettronica avanzata a quanto previsto dalle presenti regole tecniche, su base volontaria, possono far certificare la propria soluzione secondo la norma ISO/IEC 15408, livello EAL 1 o superiore da un terzo indipendente a tal fine autorizzato secondo le norme vigenti in materia.", 1, 1, 'bassa', None, 'certificazione facoltativa ("possono"), non un obbligo in senso stretto: il soggetto erogante sceglie volontariamente se richiederla', 'bozza', None, None),
     ]
     many("obblighi", ["id", "fonte_id", "riferimento", "testo", "testo_integrale", "tipo_obbligo_id", "stato_id", "severita", "sanzioni", "condizione_applicabilita", "stato_validazione", "validato_da", "data_validazione"], obblighi)
 
@@ -410,35 +499,6 @@ def seed():
         (98, 1, 'obbligato'),
         (99, 1, 'obbligato'),
         (100, 1, 'obbligato'),
-        (116, 1, 'obbligato'),
-        (116, 2, 'destinatario'),
-        (117, 2, 'obbligato'),
-        (117, 1, 'destinatario'),
-        (118, 1, 'obbligato'),
-        (119, 1, 'obbligato'),
-        (120, 1, 'obbligato'),
-        (120, 2, 'destinatario'),
-        (121, 1, 'obbligato'),
-        (121, 2, 'destinatario'),
-        (122, 1, 'obbligato'),
-        (123, 1, 'obbligato'),
-        (124, 1, 'obbligato'),
-        (125, 1, 'obbligato'),
-        (126, 1, 'obbligato'),
-        (126, 2, 'destinatario'),
-        (126, 4, 'destinatario'),
-        (127, 1, 'obbligato'),
-        (128, 1, 'obbligato'),
-        (128, 4, 'destinatario'),
-        (129, 1, 'obbligato'),
-        (133, 1, 'obbligato'),
-        (134, 1, 'obbligato'),
-        (134, 2, 'destinatario'),
-        (135, 1, 'obbligato'),
-        (135, 2, 'destinatario'),
-        (135, 4, 'destinatario'),
-        (131, 1, 'obbligato'),
-        (132, 1, 'obbligato'),
     ]
     many("obbligo_soggetti", ["obbligo_id", "categoria_soggetto_id", "ruolo"], obbligo_soggetti)
 
@@ -761,10 +821,6 @@ def seed():
         (311, 1, 'art. 52 §2', "Il regolamento si applica dal 1° luglio 2016, salvo eccezioni: a) un elenco di disposizioni specifiche (tra cui artt. 47 e 48) si applica già dal 17 settembre 2014; b) altre disposizioni (artt. 7-12, in parte) si applicano dalla data di applicazione degli atti di esecuzione di cui agli artt. 8 §3 e 12 §8; c) l'art. 6 si applica decorsi tre anni dalla data di applicazione di detti atti di esecuzione.", "Il presente regolamento si applica a decorrere dal 1 o luglio 2016, a eccezione delle seguenti disposizioni: a) articolo 8, paragrafo 3, articolo 9, paragrafo 5, articolo 12, paragrafi da 2 a 9, articolo 17, paragrafo 8, articolo 19, paragrafo 4, articolo 20, paragrafo 4, articolo 21, paragrafo 4, articolo 22, paragrafo 5, articolo 23, paragrafo 3, articolo 24, paragrafo 5, articolo 27, paragrafi 4 e 5, articolo 28, paragrafo 6, articolo 29, paragrafo 2, articolo 30, paragrafi 3 e 4, articolo 31, paragrafo 3, articolo 32, paragrafo 3, articolo 33, paragrafo 2, articolo 34, paragrafo 2, articolo 37, paragrafi 4 e 5, articolo 38, paragrafo 6, articolo 42, paragrafo 2, articolo 44, paragrafo 2, articolo 45, paragrafo 2, articolo 47 e articolo 48, che si applicano dal 17 settembre 2014; b) l'articolo 7, l'articolo 8, paragrafi 1 e 2, gli articoli 9, 10, 11 e l'articolo 12, paragrafo 1, si applicano a decorrere dalla data di applicazione degli atti di esecuzione di cui all'articolo 8, paragrafo 3, e all'articolo 12, paragrafo 8; c) l'articolo 6 si applica a decorrere da tre anni dalla data di applicazione degli atti di esecuzione di cui all'articolo 8, paragrafo 3, e all'articolo 12, paragrafo 8.", 6, 1, 'Regola generale 1° luglio 2016, con tre regimi di applicazione differita elencati alle lettere a), b), c).', 'bozza', None, None),
         (312, 1, 'art. 52 §3', "Quando un regime di identificazione elettronica notificato figura nell'elenco pubblicato dalla Commissione ai sensi dell'art. 9 prima della data di cui al §2 lettera c), il riconoscimento dei relativi mezzi di identificazione elettronica ai sensi dell'art. 6 avviene non oltre 12 mesi dalla pubblicazione del regime, comunque non prima della data di cui al §2 lettera c).", "Quando il regime di identificazione elettronica notificato è compreso nell'elenco pubblicato dalla Commissione ai sensi dell'articolo 9 prima della data di cui al paragrafo 2, lettera c), del presente articolo, il riconoscimento dei mezzi di identificazione elettronica in virtù di tale regime ai sensi dell'articolo 6 ha luogo non oltre 12 mesi dopo la pubblicazione di detto regime ma non prima della data di cui al paragrafo 2, lettera c), del presente articolo.", 5, 1, None, 'bozza', None, None),
         (313, 1, 'art. 52 §4', "In deroga al §2 lettera c), uno Stato membro può decidere di riconoscere anticipatamente, dalla data di pubblicazione degli atti di esecuzione di cui agli artt. 8 §3 e 12 §8, i mezzi di identificazione elettronica notificati ai sensi dell'art. 9 §1 da un altro Stato membro; lo Stato membro interessato ne informa la Commissione, che rende pubblica l'informazione.", "Nonostante il paragrafo 2, lettera c), del presente articolo, uno Stato membro può decidere che i mezzi di identificazione elettronica a norma del regime di identificazione elettronica notificato ai sensi dell'articolo 9, paragrafo 1, da un altro Stato membro, siano riconosciuti nel primo Stato membro a decorrere dalla data di pubblicazione degli atti di esecuzione di cui agli articoli 8, paragrafo 3, e 12, paragrafo 8. Gli Stati membri interessati ne informano la Commissione. La Commissione rende pubbliche tali informazioni.", 5, 1, None, 'bozza', None, None),
-        (325, 4, 'art. 41', 'I riferimenti temporali contenuti nei documenti informatici sottoscritti con firma elettronica qualificata o digitale, o attestati da una marca temporale, sono opponibili ai terzi.', "Art. 41. Riferimenti temporali opponibili ai terzi. 1. I riferimenti temporali realizzati dai certificatori accreditati in conformità con quanto disposto dal titolo IV sono opponibili ai terzi ai sensi dell'art. 20, comma 3, del Codice. 2. I riferimenti temporali apposti sul giornale di controllo da un certificatore accreditato, secondo quanto indicato nel proprio manuale operativo, sono opponibili ai terzi ai sensi dell'art. 20, comma 3, del Codice. 3. L'ora assegnata ai riferimenti temporali di cui al comma 2 del presente articolo, deve corrispondere alla scala di tempo UTC(IEN), di cui al decreto del Ministro dell'industria, del commercio e dell'artigianato 30 novembre 1993, n. 591, con una differenza non superiore ad un minuto primo. 4. Costituiscono inoltre validazione temporale: a) il riferimento temporale contenuto nella segnatura di protocollo di cui all'art. 9 del decreto del Presidente del Consiglio dei Ministri, 31 ottobre 2000, pubblicato nella Gazzetta Ufficiale 21 novembre 2000, n. 272; b) il riferimento temporale ottenuto attraverso la procedura di conservazione dei documenti in conformità alle norme vigenti, ad opera di un pubblico ufficiale o di una pubblica amministrazione; c) il riferimento temporale ottenuto attraverso l'utilizzo di posta elettronica certificata ai sensi dell'art. 48 del Codice; d) il riferimento temporale ottenuto attraverso l'utilizzo della marcatura postale elettronica ai sensi dell'art. 14, comma 1, punto 1.4 della Convenzione postale universale, come modificata dalle decisioni adottate dal XXIII Congresso dell'Unione postale universale, recepite dal Regolamento di esecuzione emanato con il decreto del Presidente della Repubblica 12 gennaio 2007, n. 18.", 3, 1, None, 'bozza', None, None),
-        (326, 4, 'art. 34 §4', 'Chiunque ha diritto di conoscere se a proprio nome sia stato rilasciato un certificato qualificato.', "Art. 34. Accesso del pubblico ai certificati. 4. Chiunque ha diritto di conoscere se a proprio nome sia stato rilasciato un certificato qualificato. Le modalità per ottenere l'informazione di cui al primo periodo sono definite con il provvedimento di cui all'art. 42, comma 10, del presente decreto.", 5, 1, None, 'bozza', None, None),
-        (327, 4, 'art. 62', 'Le firme elettroniche qualificate e digitali restano valide anche se il relativo certificato qualificato del sottoscrittore è scaduto, revocato o sospeso, purché a esse sia associabile un riferimento temporale opponibile ai terzi che collochi la generazione della firma in un momento precedente alla scadenza, revoca o sospensione del certificato.', 'Art. 62. Valore delle firme elettroniche qualificate e digitali nel tempo. 1. Le firme elettroniche qualificate e digitali, ancorché sia scaduto, revocato o sospeso il relativo certificato qualificato del sottoscrittore, sono valide se alle stesse è associabile un riferimento temporale opponibile ai terzi che collochi la generazione di dette firme rispettivamente in un momento precedente alla scadenza, revoca o sospensione del suddetto certificato.', 4, 1, None, 'bozza', None, None),
-        (328, 4, 'art. 55', 'L\'art. 55 apre il Titolo V (Firma elettronica avanzata) definendo il quadro soggettivo: la realizzazione di soluzioni di FEA è libera e non richiede autorizzazione preventiva (c.1); i soggetti coinvolti si distinguono in "soggetti eroganti" (art. 55 c.2 lett. a: chi utilizza la soluzione di FEA nei rapporti con terzi per fini istituzionali, societari o commerciali, realizzandola in proprio o affidandosi a un soggetto realizzatore) e "soggetti realizzatori" (art. 55 c.2 lett. b: chi realizza soluzioni di FEA come oggetto della propria attività d\'impresa, a favore dei soggetti eroganti). Questa distinzione è richiamata da tutti gli obblighi successivi del Titolo V (artt. 56-59): non impone di per sé un comportamento, ma definisce i soggetti a cui gli obblighi si applicano — per questo è modellata come Principio e non come Obbligo.', "Art. 55. Disposizioni generali. 1. La realizzazione di soluzioni di firma elettronica avanzata è libera e non è soggetta ad alcuna autorizzazione preventiva. 2. I soggetti che erogano o realizzano soluzioni di firma elettronica avanzata si distinguono in: a) coloro che erogano soluzioni di firma elettronica avanzata al fine di utilizzarle nei rapporti intrattenuti con soggetti terzi per motivi istituzionali, societari o commerciali, realizzandole in proprio o anche avvalendosi di soluzioni realizzate dai soggetti di cui alla lettera b); b) coloro che, quale oggetto dell'attività di impresa, realizzano soluzioni di firma elettronica avanzata a favore dei soggetti di cui alla lettera a).", 5, 1, 'definisce i soggetti ("eroganti" e "realizzatori") a cui si applicano gli obblighi degli artt. 56-59; il censimento non modella ancora questa distinzione nella tabella categorie_soggetto, che resta centrata sulla tassonomia eIDAS/QTSP (limite noto, da valutare in una futura iterazione)', 'bozza', None, None),
     ]
     many("principi", ["id", "fonte_id", "riferimento", "testo", "testo_integrale", "tipo_principio_id", "stato_id", "condizione_applicabilita", "stato_validazione", "validato_da", "data_validazione"], principi)
 
@@ -999,10 +1055,6 @@ def seed():
         (309, 6),
         (312, 10),
         (313, 10),
-        (325, 8),
-        (326, 3),
-        (327, 3),
-        (328, 2),
     ]
     many("principio_oggetti", ["principio_id", "oggetto_giuridico_id"], principio_oggetti)
 
@@ -1111,11 +1163,6 @@ def seed():
         (98, 'principio', 305, 'principio', 306, 1, 'textual', None),
         (99, 'principio', 307, 'principio', 308, 1, 'textual', None),
         (100, 'principio', 303, 'principio', 304, 7, 'textual', None),
-        (102, 'principio', 328, 'obbligo', 133, 8, 'textual', None),
-        (103, 'principio', 328, 'obbligo', 134, 8, 'textual', None),
-        (104, 'principio', 328, 'obbligo', 135, 8, 'textual', None),
-        (105, 'principio', 328, 'obbligo', 131, 8, 'textual', None),
-        (106, 'principio', 328, 'obbligo', 132, 8, 'textual', None),
     ]
     many("relazioni", ["id", "nodo_da_tipo", "nodo_da_id", "nodo_a_tipo", "nodo_a_id", "tipo_relazione_id", "evidence_type", "confidence"], relazioni)
 
@@ -1136,16 +1183,297 @@ def seed():
         cad_cursor, fonte_id=3, capitoli=cad_capitoli, lookup=cad_lookup, registro=cad_registro,
     )
 
-    # Relazione cross-fonte preesistente nella numerazione manuale (id 101: DPCM
-    # art. 20-31 "attua" CAD art. 36 §1, revoca/sospensione certificato qualificato),
-    # persa con la rimozione del blocco CAD inline — ricostruita qui contro il nuovo
-    # riferimento granulare (art. 36 c.1 lett.a, primo caso di revoca elencato).
-    cad_cursor.execute(
-        """INSERT INTO relazioni
-           (nodo_da_tipo, nodo_da_id, nodo_a_tipo, nodo_a_id, tipo_relazione_id, evidence_type, confidence)
-           VALUES ('obbligo', 121, 'obbligo', ?, 6, 'textual', NULL)""",
-        (cad_registro[("obbligo", 3, "art. 36 c.1 lett.a")],),
+    # --- DPCM 22/2/2013 (fonte_id=4): import granulare a copertura completa (ADR-0007) ---
+    # Sostituisce il blocco inline selettivo precedente (rimosso in questa passata,
+    # 2026-09-17). Moduli per capitolo in app/seed_data/dpcm/cap0[1-8].py (Titolo I-VI
+    # del decreto, artt. 1-63), ciascuno scritto da un subagent dedicato e verificato
+    # con verifica_copertura; id assegnati da sqlite (non manuali), risolti tramite lo
+    # stesso registro (tipo, fonte_id, riferimento) -> id già popolato da eIDAS/eIDAS2/CAD
+    # sopra. Fase 6 (ADR-0009, 2026-09-17): collegamento cross-fonte a posteriori
+    # DPCM -> CAD/eIDAS/eIDAS2 via grep+KNN+classificazione LLM, modulo "capitolo
+    # virtuale" app/seed_data/dpcm/cap09_relazioni_cross.py (105 relazioni),
+    # agganciato in coda alla lista capitoli come da procedura.
+    dpcm_cursor = conn.cursor()
+    dpcm_capitoli = [dpcm_cap01, dpcm_cap02, dpcm_cap03, dpcm_cap04, dpcm_cap05, dpcm_cap06, dpcm_cap07, dpcm_cap08, dpcm_cap09]
+    seed_lib.inserisci_capitoli(
+        dpcm_cursor, fonte_id=4, capitoli=dpcm_capitoli, lookup=cad_lookup, registro=cad_registro,
     )
+
+    # --- SPID (fonte_id=5): DPCM 24/10/2014, import granulare a copertura completa (ADR-0007) ---
+    # 3 capitoli via subagent paralleli (artt. 1-6, 7-12, 13-17), moduli in
+    # app/seed_data/spid/cap0[1-3].py, id assegnati da sqlite (non manuali),
+    # risolti tramite lo stesso registro (tipo, fonte_id, riferimento) -> id già
+    # popolato da eIDAS/eIDAS2/CAD/DPCM 22-2-2013 sopra. Fase 6 (ADR-0009):
+    # collegamento cross-fonte a posteriori SPID -> eIDAS/eIDAS2/CAD/DPCM
+    # 22-2-2013, modulo "capitolo virtuale" app/seed_data/spid/cap04_relazioni_cross.py,
+    # agganciato in coda alla lista capitoli come da procedura.
+    spid_cursor = conn.cursor()
+    spid_capitoli = [spid_cap01, spid_cap02, spid_cap03, spid_cap04]
+    seed_lib.inserisci_capitoli(
+        spid_cursor, fonte_id=5, capitoli=spid_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- DPCM 19/10/2021 (fonte_id=6): novella al DPCM 24/10/2014/SPID, import
+    # granulare a copertura completa (ADR-0007). Decreto di sole 5 disposizioni
+    # di modifica, un solo capitolo (nessuna suddivisione per subagent
+    # necessaria), modulo app/seed_data/dpcm2021/cap01.py. Relazioni cross-fonte
+    # (ADR-0009) verso Fonte 5 costruite direttamente in fase di estrazione (non
+    # differite: il decreto esiste solo in funzione della fonte che modifica);
+    # verificato zero citazioni dirette a eIDAS/eIDAS2/CAD/DPCM 22-2-2013 nel
+    # testo ufficiale (esito riportato, non fase saltata). In corrispondenza di
+    # questo import sono stati corretti anche ~9 nodi Fonte 5 (art. 7 c.9,
+    # art. 10 c.3/c.4, art. 12) che riportavano per errore il testo previgente
+    # 2014 nonostante l'etichetta della Fonte 5 dichiarasse gia' il testo
+    # vigente post-2021 (vedi docstring app/seed_data/spid/cap02.py).
+    dpcm2021_cursor = conn.cursor()
+    seed_lib.inserisci_capitoli(
+        dpcm2021_cursor, fonte_id=6, capitoli=[dpcm2021_cap01], lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI EN 319 412-5 V2.5.1 (fonte_id=7): import granulare a copertura
+    # completa (ADR-0007, adattato a uno standard tecnico ETSI: un nodo per
+    # clausola/requisito numerato invece che per articolo/comma). Documento
+    # breve (21 pagine), un solo capitolo (nessuna suddivisione per subagent
+    # necessaria), modulo app/seed_data/etsi_319_412_5/cap01.py. Fase 6
+    # (ADR-0009, 2026-09-21): collegamento cross-fonte a posteriori verso
+    # eIDAS/eIDAS2 (mapping Annex A verso gli Allegati I/III/IV, citazione
+    # esplicita dell'art. 24 eIDAS2 nella clausola 4.3.5) e verso il DPCM
+    # 22/2/2013 (citazione testuale esplicita dell'OID id-etsi-qcs-QcSSCD
+    # negli artt. 13 c.3 e 42 c.5 del DPCM), modulo "capitolo virtuale"
+    # app/seed_data/etsi_319_412_5/cap02_relazioni_cross.py (5 relazioni),
+    # agganciato in coda alla lista capitoli come da procedura. Verificato
+    # zero citazioni dirette di CAD, SPID/DPCM 24-10-2014 e DPCM 19-10-2021
+    # (esito riportato, non fase saltata — vedi docstring del modulo).
+    etsi5_cursor = conn.cursor()
+    etsi5_capitoli = [etsi5_cap01, etsi5_cap02_relazioni_cross]
+    seed_lib.inserisci_capitoli(
+        etsi5_cursor, fonte_id=7, capitoli=etsi5_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- Regolamento di esecuzione (UE) 2025/1566 (fonte_id=8): import
+    # granulare a copertura completa (ADR-0007). Atto breve (2 articoli + un
+    # allegato di 6 punti), un solo capitolo (nessuna suddivisione per
+    # subagent necessaria, stesso criterio di Fonte 6/Fonte 7). Modulo
+    # app/seed_data/reg_ue_2025_1566/cap01.py, con 3 relazioni native verso
+    # eIDAS2 (art. 24 §1-quater/§2(i)/§5, citazione testuale esplicita nel
+    # preambolo/articolato). Fase 6 (ADR-0009, 2026-09-21): pipeline completa
+    # grep+KNN+classificazione LLM eseguita nella sessione principale — zero
+    # citazioni dirette e zero coppie KNN sopra soglia verso CAD/DPCM
+    # 22-2-2013/SPID/DPCM 19-10-2021/ETSI EN 319 412-5; 116 coppie candidate
+    # KNN verso eIDAS/eIDAS2, di cui solo 3 confermate dal classificatore
+    # (le altre erano rumore lessicale, incluso un falso positivo a score
+    # 1.0 correttamente scartato — due clausole di "entrata in vigore"
+    # testualmente identiche ma senza relazione giuridica reale), modulo
+    # "capitolo virtuale" app/seed_data/reg_ue_2025_1566/cap02_relazioni_cross.py
+    # (esito riportato per intero nel suo docstring, non fase saltata).
+    reg1566_cursor = conn.cursor()
+    reg1566_capitoli = [reg1566_cap01, reg1566_cap02]
+    seed_lib.inserisci_capitoli(
+        reg1566_cursor, fonte_id=8, capitoli=reg1566_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI TS 119 461 V2.1.1 (fonte_id=9): import granulare a copertura
+    # completa (ADR-0007, standard tecnico ETSI a clausole/requisiti numerati,
+    # stesso criterio di ETSI EN 319 412-5/Fonte 7). Documento esteso (81
+    # pagine): 8 capitoli via subagent paralleli, moduli in
+    # app/seed_data/etsi_119_461/cap0[1-8].py (cap01 clausole 1-3 Scope/
+    # References/Definitions; cap02 clausole 4-5 General concepts/Operational
+    # risk assessment; cap03 clausole 6-7 Policies and practices/Service
+    # management and operation; cap04 clausole 8.1-8.2 Initiation/Attribute
+    # and evidence collection; cap05 clausola 8.3 Attribute and evidence
+    # validation; cap06 clausole 8.4-8.5 Binding to applicant/Issuing of
+    # proof; cap07 clausola 9 Use cases; cap08 Annex A-D e History). 435 item
+    # di indice, copertura verificata senza mancanti né doppioni; 50 relazioni
+    # interne (specifica/richiama) tra capitoli, risolte tramite lo stesso
+    # registro condiviso (nessun coordinamento richiesto tra subagent, id di
+    # requisito univoci nel testo ufficiale). Fase 6 (ADR-0009, 2026-09-21):
+    # collegamento cross-fonte eseguito nella sessione principale — grep
+    # bidirezionale (zero citazioni dirette di CAD/DPCM/SPID/ETSI 412-5/Reg.
+    # 1566 nel testo ETSI 119 461; citazione esplicita e puntuale inversa di
+    # Reg. UE 2025/1566 verso ETSI 119 461, Allegato C clausola C.3, con 6
+    # punti di adeguamento) + KNN vettoriale (soglia 0.80, top-3/nodo) +
+    # classificazione LLM su shortlist di 530 coppie (45 batch paralleli),
+    # modulo "capitolo virtuale" app/seed_data/etsi_119_461/cap09_relazioni_cross.py
+    # (113 relazioni: 10 evidence_type "textual" da citazione esplicita, 103
+    # "inferred" da classificazione LLM validata anti-allucinazione),
+    # agganciato in coda alla lista capitoli come da procedura.
+    etsi461_cursor = conn.cursor()
+    etsi461_capitoli = [
+        etsi461_cap01, etsi461_cap02, etsi461_cap03, etsi461_cap04,
+        etsi461_cap05, etsi461_cap06, etsi461_cap07, etsi461_cap08,
+        etsi461_cap09_relazioni_cross,
+    ]
+    seed_lib.inserisci_capitoli(
+        etsi461_cursor, fonte_id=9, capitoli=etsi461_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI EN 319 401 V3.2.1 (fonte_id=10): import granulare a copertura
+    # completa (ADR-0007, standard tecnico ETSI a clausole/requisiti numerati,
+    # stesso criterio di ETSI EN 319 412-5/Fonte 7 ed ETSI TS 119 461/Fonte 9).
+    # Documento di 55 pagine: 5 capitoli via subagent paralleli, moduli in
+    # app/seed_data/etsi_319_401/cap0[1-5].py (cap01 clausole 1-4 Scope/
+    # References/Definitions/Overview; cap02 clausole 5-6 Risk Management/
+    # Policies and practices; cap03 clausole 7.1-7.5 Internal organization..
+    # Cryptographic controls; cap04 clausole 7.6-7.9 Physical security..
+    # Vulnerabilities and Incident management; cap05 clausole 7.10-7.14
+    # Collection of evidence..Supply chain, Annex A-D informativi esclusi dal
+    # perimetro di copertura perché tabelle di corrispondenza senza contenuto
+    # normativo autonomo). 326 item di indice (11+34+84+123+74), copertura
+    # verificata senza mancanti né doppioni per ciascun capitolo; nessuna
+    # relazione interna tra capitoli nel dispatch parallelo (RELAZIONI = [] in
+    # tutti e 5 i moduli cap01-05, per vincolo di dispatch parallelo). Fase 6
+    # (ADR-0009) eseguita nella sessione principale dopo il seed: grep
+    # bidirezionale (13 citazioni esplicite puntuali verso eIDAS/eIDAS2, tra cui
+    # la tabella ufficiale Annex B "Mapping ... with eIDAS Regulation") + KNN
+    # vettoriale (soglia 0.80, top-3/nodo, 525 coppie su 210 nodi) +
+    # classificazione LLM su shortlist (21 batch paralleli, 11 relazioni
+    # proposte, tutte validate) -> modulo "capitolo virtuale"
+    # app/seed_data/etsi_319_401/cap06_relazioni_cross.py (26 relazioni: 15
+    # evidence_type "textual", 11 "inferred"), agganciato in coda alla lista
+    # capitoli come da procedura.
+    etsi401_cursor = conn.cursor()
+    etsi401_capitoli = [
+        etsi401_cap01, etsi401_cap02, etsi401_cap03, etsi401_cap04, etsi401_cap05,
+        etsi401_cap06_relazioni_cross,
+    ]
+    seed_lib.inserisci_capitoli(
+        etsi401_cursor, fonte_id=10, capitoli=etsi401_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI TS 119 431-1 V1.3.1 (fonte_id=11): import granulare a copertura
+    # completa (ADR-0007, standard tecnico ETSI a clausole/requisiti numerati,
+    # stesso criterio di ETSI EN 319 412-5/Fonte 7, ETSI TS 119 461/Fonte 9,
+    # ETSI EN 319 401/Fonte 10). Documento di 31 pagine: 2 capitoli via
+    # subagent paralleli, moduli in app/seed_data/etsi_119_431_1/cap0[1-2].py
+    # (cap01 clausole 1-6: Scope/References/Definizioni/General concepts/
+    # General provisions/Trust Service Providers practice; cap02 clausola 7
+    # + Annex A normativo EUSPv2 + Annex B/C informativi, Annex D "Change
+    # history" escluso come paratesto editoriale). 159 item di indice (121+38),
+    # copertura verificata senza mancanti né doppioni; 23 relazioni interne
+    # (5 in cap01, 18 in cap02 verso cap01, verificate leggendo il testo
+    # ufficiale assegnato all'altro capitolo prima di crearle). Trattata come
+    # Fonte autonoma e indipendente da ETSI TS 119 431-2 su richiesta esplicita
+    # dell'utente (2026-09-22), pur essendo le due Parti dello stesso
+    # deliverable multi-parte ETSI. Fase 6 (ADR-0009) eseguita nella sessione
+    # principale dopo il seed iniziale: vedi modulo "capitolo virtuale"
+    # app/seed_data/etsi_119_431_1/cap03_relazioni_cross.py, agganciato in
+    # coda alla lista capitoli.
+    etsi431_1_cursor = conn.cursor()
+    etsi431_1_capitoli = [etsi431_1_cap01, etsi431_1_cap02]
+    seed_lib.inserisci_capitoli(
+        etsi431_1_cursor, fonte_id=11, capitoli=etsi431_1_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI TS 119 431-2 V1.2.1 (fonte_id=12): import granulare a copertura
+    # completa (ADR-0007), stesso criterio delle altre fonti ETSI. Documento
+    # di 26 pagine: 2 capitoli via subagent paralleli, moduli in
+    # app/seed_data/etsi_119_431_2/cap0[1-2].py (cap01 clausole 1-6: Scope/
+    # References/Definizioni/General concepts/Risk assessment/Policies and
+    # practices; cap02 clausole 7-9 + Annex A informativo + Annex B normativo
+    # + Annex C informativo, Annex D "Change history" escluso come paratesto
+    # editoriale). 95 item di indice (30+65), copertura verificata senza
+    # mancanti né doppioni; 41 relazioni interne (0 in cap01, 40 in cap02, 1
+    # cross-capitolo cap02->cap01 verificata leggendo il modulo cap01
+    # effettivamente scritto). Trattata come Fonte autonoma e indipendente da
+    # ETSI TS 119 431-1 su richiesta esplicita dell'utente (2026-09-22). Fase
+    # 6 (ADR-0009) eseguita nella sessione principale dopo il seed iniziale:
+    # vedi modulo "capitolo virtuale"
+    # app/seed_data/etsi_119_431_2/cap03_relazioni_cross.py, agganciato in
+    # coda alla lista capitoli.
+    etsi431_2_cursor = conn.cursor()
+    etsi431_2_capitoli = [etsi431_2_cap01, etsi431_2_cap02]
+    seed_lib.inserisci_capitoli(
+        etsi431_2_cursor, fonte_id=12, capitoli=etsi431_2_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- Fase 6 (ADR-0009) per ETSI TS 119 431-1/2: relazioni cross-fonte,
+    # inserite SOLO ora che entrambe le fonti (11 e 12, che si citano a
+    # vicenda) sono gia' presenti nel registro simbolico. Vedi i docstring
+    # dei due moduli per il dettaglio completo della pipeline (grep+KNN+
+    # classificazione LLM+validazione) eseguita nella sessione principale.
+    etsi431_1_cross_cursor = conn.cursor()
+    seed_lib.inserisci_capitoli(
+        etsi431_1_cross_cursor, fonte_id=11, capitoli=[etsi431_1_cap03_relazioni_cross],
+        lookup=cad_lookup, registro=cad_registro,
+    )
+    etsi431_2_cross_cursor = conn.cursor()
+    seed_lib.inserisci_capitoli(
+        etsi431_2_cross_cursor, fonte_id=12, capitoli=[etsi431_2_cap03_relazioni_cross],
+        lookup=cad_lookup, registro=cad_registro,
+    )
+    # --- Regolamento AgID modalità attuative SPID (fonte_id=13): import
+    # granulare a copertura completa (ADR-0007). 39 pagine, 4 capitoli via
+    # subagent paralleli in app/seed_data/spid_modalita_attuative/cap0[1-4].py
+    # (cap01: CAPO I artt.1-4 + CAPO II artt.5-14; cap02: Sezione IV artt.15-18
+    # + CAPO III artt.19-24; cap03: CAPO IV artt.25-29 + Sezione V artt.30/
+    # 30-bis/31; cap04: Appendici A-D, modellate come Principi "definitorio").
+    # Testo consolidato con Avviso AgID n.10/2018 (deroga parziale artt.20/23,
+    # modellata come nodo Principio dedicato con relazioni "deroga a") e
+    # Determinazione AgID n.425/2020 (paragrafo aggiunto in fondo all'art.8,
+    # incluso verbatim nel testo_integrale).
+    spidatt_cursor = conn.cursor()
+    spidatt_capitoli = [spidatt_cap01, spidatt_cap02, spidatt_cap03, spidatt_cap04]
+    seed_lib.inserisci_capitoli(
+        spidatt_cursor, fonte_id=13, capitoli=spidatt_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- Fase 6 (ADR-0009) per il Regolamento modalità attuative SPID:
+    # collegamento cross-fonte verso le 12 Fonti già censite. Pipeline
+    # grep+risoluzione riferimenti (zero token LLM, nessun candidato KNN
+    # aggiuntivo con score utile) eseguita nella sessione principale, vedi
+    # docstring completo in app/seed_data/spid_modalita_attuative/cap05_relazioni_cross.py.
+    # Esito: 21 relazioni verso DPCM 24/10/2014 (fonte_id=5, 17) e CAD
+    # (fonte_id=3, 4); zero verso eIDAS/eIDAS2/DPCM 22-2-2013/DPCM 19-10-2021/
+    # ETSI/Regolamento 2025/1566 (nessuna citazione esplicita risolvibile nel
+    # testo di questa fonte verso quelle 7 Fonti), riportato esplicitamente
+    # come esito verificato (non come fase saltata).
+    spidatt_cross_cursor = conn.cursor()
+    seed_lib.inserisci_capitoli(
+        spidatt_cross_cursor, fonte_id=13, capitoli=[spidatt_cap05],
+        lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- Regolamento di esecuzione (UE) 2015/1502 (fonte_id=14): import
+    # granulare a copertura completa (ADR-0007). Specifiche/procedure
+    # tecniche minime sui livelli di garanzia (basso/significativo/elevato)
+    # per i mezzi di identificazione elettronica ex art. 8 §3 eIDAS. 3
+    # capitoli via subagent paralleli in
+    # app/seed_data/reg_ue_2015_1502/cap0[1-3].py (cap01: artt.1-2 +
+    # allegato punto 1 "definizioni" + punto 2.1 "Registrazione"; cap02:
+    # allegato punti 2.2 "Gestione dei mezzi" e 2.3 "Autenticazione"; cap03:
+    # allegato punto 2.4 "Gestione e organizzazione"). 29 nodi totali (18
+    # obblighi, 11 principi), soggetto obbligato sempre categoria
+    # "QTSP/gestore" per convenzione di sessione (coerente col trattamento
+    # già riservato al "gestore dell'identità digitale" nelle Fonti 5/13).
+    reg1502_cursor = conn.cursor()
+    reg1502_capitoli = [reg1502_cap01, reg1502_cap02, reg1502_cap03]
+    seed_lib.inserisci_capitoli(
+        reg1502_cursor, fonte_id=14, capitoli=reg1502_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- Fase 6 (ADR-0009) per il Regolamento di esecuzione (UE) 2015/1502:
+    # collegamento cross-fonte verso le 13 Fonti già censite. Pipeline
+    # grep+KNN(idxEmbeddingObbligo/idxEmbeddingPrincipio, soglia 0.80)+
+    # classificazione LLM su shortlist (704 candidati -> 51 proposte grezze
+    # -> 7 relazioni finali dopo validazione critica) eseguita nella sessione
+    # principale, vedi docstring completo in
+    # app/seed_data/reg_ue_2015_1502/cap04_relazioni_cross.py. Esito: 2
+    # relazioni native mancanti verso eIDAS2 (fonte_id=2, "attua"/"specifica"
+    # su "art. 8 §3", omesse per errore nel modulo cap01.py originario), 2
+    # verso DPCM 19/10/2021 (fonte_id=6, "richiama", citazione testuale
+    # esplicita con numeri di paragrafo), 1 verso Regolamento AgID modalità
+    # attuative SPID (fonte_id=13, "richiama", citazione testuale esplicita
+    # nell'Avviso AgID n.10/2018), 2 verso standard ETSI (fonte_id=9 e
+    # fonte_id=10, "si sovrappone a", sovrapposizione concettuale specifica);
+    # zero verso CAD/DPCM 22-2-2013/SPID (DPCM 24-10-2014)/ETSI EN 319 412-5/
+    # Regolamento (UE) 2025/1566/ETSI TS 119 431-1/ETSI TS 119 431-2,
+    # riportato esplicitamente come esito verificato (non come fase saltata).
+    reg1502_cross_cursor = conn.cursor()
+    seed_lib.inserisci_capitoli(
+        reg1502_cross_cursor, fonte_id=14, capitoli=[reg1502_cap04],
+        lookup=cad_lookup, registro=cad_registro,
+    )
+
 
     # --- monitoraggio: modifiche rilevate (rilevanti ai fini eIDAS2) --------
     modifiche = [
@@ -1166,9 +1494,9 @@ def seed():
 
     embed()
 
-    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli)
-    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli)
-    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013).")
+    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi5_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_1_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_2_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli)
+    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi5_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_1_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_2_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli)
+    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412-5, Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431-1, ETSI TS 119 431-2, Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502).")
 
 
 if __name__ == "__main__":

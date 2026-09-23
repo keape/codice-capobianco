@@ -91,11 +91,15 @@ seed_lib.inserisci_capitoli(cursor, fonte_id=3, capitoli=[cap01, cap02, cap03],
                              lookup=lookup, registro=registro)
 ```
 
-`inserisci_capitoli` esegue `verifica_copertura` automaticamente
-sull'indice aggregato di tutti i capitoli **prima** di inserire qualunque
-riga — se fallisce (item mancante o doppio), lo script si ferma con
-l'elenco esatto, senza bisogno che l'agente rilegga e confronti a mano 600
-voci di indice.
+`inserisci_capitoli` esegue `verifica_copertura` e
+`verifica_completezza_testo_integrale` automaticamente sull'indice/sulle
+righe aggregate di tutti i capitoli **prima** di inserire qualunque riga —
+se `verifica_copertura` fallisce (item mancante o doppio) o se
+`verifica_completezza_testo_integrale` fallisce (un `testo_integrale`
+contiene un marcatore di elisione `...`/`…`/`[...]`, segno di
+troncamento in estrazione — vedi ADR-0010), lo script si ferma con
+l'elenco esatto, senza bisogno che l'agente rilegga e confronti a mano
+centinaia di righe o di caratteri.
 
 ### 5. Seed e verifica finale
 
@@ -106,6 +110,14 @@ app/.venv/bin/python app/seed.py
 Stessa procedura di verifica finale già in uso per eIDAS (conteggi
 SQLite-in-memory/Neo4j combacianti, `stato_validazione='bozza'` su tutte le
 nuove righe, coda di revisione UI).
+
+Controllo aggiuntivo, riusabile anche fuori da un seed (es. dopo una
+correzione manuale via Cypher, o come audit periodico su fonti già
+seedate prima dell'introduzione della guardia in ADR-0010):
+
+```bash
+app/.venv/bin/python app/tools/verifica_troncamento.py [--fonte-id N]
+```
 
 ### 6. Collegamento cross-fonte a posteriori (opzionale, fonte già importata)
 
@@ -125,3 +137,18 @@ Output: un modulo "capitolo virtuale" (`RIGHE_OBBLIGHI`/`RIGHE_PRINCIPI`/
 `nodo_a`/`nodo_da` a fonte esplicita — vedi `app/seed_data/cad/cap08_relazioni_eidas.py`
 per un esempio completo), agganciato in coda alla lista `capitoli` passata
 a `inserisci_capitoli` nel wiring di `seed.py`.
+
+### 7. Aggiornamento di `docs/fonti-censite.md` (obbligatorio, non opzionale)
+
+Ultimo passo di ogni import, eseguito solo dopo che il passo 6 ha un esito
+verificato (anche "zero relazioni trovate" è un esito valido, purché
+riportato esplicitamente). Aggiungere la Fonte appena importata alla
+categoria corretta (fonti internazionali / fonti nazionali / fonti locali /
+standard tecnici) in `docs/fonti-censite.md`, con `fonte_id`, moduli
+`app/seed_data/<fonte>/` coinvolti, conteggio nodi/relazioni interne e esito
+del collegamento cross-fonte — stesso livello di dettaglio delle voci già
+presenti. Non aggiungere l'elenco delle Fonti a `CLAUDE.md`: quel file
+rimanda a `docs/fonti-censite.md` apposta per non crescere ad ogni import.
+Un import non è completo finché questo passo non è stato eseguito, sullo
+stesso principio del passo 6 (un nodo/una fonte non collegata o non
+documentata è un'isola, anche se tecnicamente presente nel grafo).

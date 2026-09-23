@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Progetto
 
-Censimento strutturato degli obblighi normativi applicabili ai servizi fiduciari qualificati (QTSP): eIDAS/eIDAS2, CAD, DPCM 22/2/2013. Progetto separato da `RAG-QTSP/sgsi-rag` (RAG documentale generico su SGSI/ISO27001, punta sulla base documentale SharePoint aziendale per individuare gap di conformità rispetto a un framework come ISO 27001), affiancato ad esso ma indipendente: `codice-capobianco` non fa gap analysis e non legge SharePoint, è un censimento normativo strutturato a grafo (obblighi/principi con relazioni tipizzate esplicite), non un motore di ricerca documentale generico.
+Censimento strutturato degli obblighi normativi applicabili ai servizi fiduciari qualificati (QTSP): eIDAS/eIDAS2 e i regolamenti UE collegati, CAD, DPCM e regolamenti AgID nazionali, standard tecnici ETSI — elenco completo e categorizzato in `docs/fonti-censite.md`. Progetto separato da `RAG-QTSP/sgsi-rag` (RAG documentale generico su SGSI/ISO27001, punta sulla base documentale SharePoint aziendale per individuare gap di conformità rispetto a un framework come ISO 27001), affiancato ad esso ma indipendente: `codice-capobianco` non fa gap analysis e non legge SharePoint, è un censimento normativo strutturato a grafo (obblighi/principi con relazioni tipizzate esplicite), non un motore di ricerca documentale generico.
 
 ## Comandi
 
@@ -129,6 +129,23 @@ ADR-0008 (17/09) ha portato la tassonomia da 12 a 14 tipi di relazione: `deroga 
 
 ADR-0009 (16/09) risponde al fatto che l'import granulare per capitolo (subagent paralleli, vedi sotto) produce sottografi isolati per fonte — i subagent erano istruiti a non tentare relazioni cross-fonte durante l'import per evitare errori di merge parallelo. Pipeline a 3 stadi per collegare fonti già presenti nel grafo, pensata per essere riusabile su qualunque coppia: (1) generazione candidati **a zero token LLM** — grep testuale sul testo ufficiale grezzo per citazioni esplicite + KNN sull'indice vettoriale HNSW già popolato, soglia di score configurabile; (2) classificazione LLM **solo sullo shortlist** risultante, via chiamate `completion()` dirette in batch eseguite in parallelo con `wait()` (non subagent — l'overhead di dispatch supera il beneficio su shortlist già piccoli), output vincolato a schema JSON, prompt esplicitamente conservativo; (3) validazione (soglia `confidence`, verifica che ogni `riferimento` proposto esista davvero in Neo4j) e inserimento come "capitolo virtuale" con solo `RELAZIONI` valorizzato, stesso meccanismo di `app/seed_data/lib.py`. Applicata a CAD↔eIDAS/eIDAS2 (53 relazioni inserite); DPCM↔eIDAS/eIDAS2 resta fuori scope finché non richiesto esplicitamente.
 
-### Stato copertura per fonte (aggiornato 2026-09-17)
+### Stato copertura per fonte
 
-eIDAS/eIDAS2 e CAD importati con copertura granulare completa per articolo (ADR-0007) e collegati tra loro (ADR-0009). DPCM 22/2/2013 ancora da importare con lo stesso criterio granulare — oggi presente nel censimento solo nella forma storica pre-ADR-0007 (solo disposizioni con soggetto obbligato/effetto giuridico esplicito). Procedura di riferimento per il prossimo import: `docs/procedura-import-granulare.md`; problemi infrastrutturali noti: `docs/runbook-neo4j-import.md`.
+Elenco completo delle Fonti censite, raggruppate per categoria (fonti
+internazionali, fonti nazionali, fonti locali, standard tecnici) con stato
+di import e cross-collegamento per ciascuna: `docs/fonti-censite.md`.
+Tenuto in un file separato da `CLAUDE.md` apposta perché cresce ad ogni
+import — non aggiungere qui l'elenco delle singole Fonti, aggiornare
+`docs/fonti-censite.md`. Procedura di riferimento per import futuri:
+`docs/procedura-import-granulare.md`; problemi infrastrutturali noti:
+`docs/runbook-neo4j-import.md`.
+
+**Nota di stato repo**: al 2026-09-23 l'import delle 8 Fonti più recenti
+(codice in `app/seed_data/`, wiring in `app/seed.py`, guardia
+`verifica_completezza_testo_integrale` in `app/seed_data/lib.py`,
+`docs/fonti-censite.md`, questo aggiornamento a `CLAUDE.md`/`CONTEXT.md`)
+risulta scritto su disco ma **non ancora committato** — commit previsto in
+sessione separata. Prima del prossimo import, verificare `git status` su
+questi path.
+
+

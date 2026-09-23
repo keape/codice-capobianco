@@ -49,6 +49,7 @@ Un modulo capitolo (`app/seed_data/<fonte>/cap0N.py`) espone:
 """
 
 import json
+import re
 from pathlib import Path
 
 APP_DIR = Path(__file__).parent.parent
@@ -74,6 +75,52 @@ def verifica_copertura(indice: list[str], mappatura: dict[str, list[str]]) -> No
             messaggio.append(f"item coperti da più righe: {doppi}")
         raise ValueError("verifica_copertura fallita — " + "; ".join(messaggio))
 
+
+_MARKER_TRONCAMENTO = ("…", "...", "[...]", "[…]")
+_OMISSIS_NORMATTIVA = re.compile(r"\(\(\s*\.{3}\s*\)\)")
+_ASN1_EXTENSIBILITY = re.compile(r"\|\s*\.\.\.\s*[\)\}]")
+
+
+def _senza_omissis_legittimi(testo: str) -> str:
+    """Rimuove le convenzioni note in cui `...`/`((...))` sono contenuto
+    normativo/tecnico autentico e non un'elisione introdotta in estrazione:
+    - Normattiva `((...))`: testo soppresso da una modifica legislativa,
+      riportato letteralmente così nel testo ufficiale italiano consolidato;
+    - marcatore di estensibilità ASN.1 (`| ...)` / `| ...}`, ITU-T X.680):
+      sintassi normativa reale nelle dichiarazioni QC-STATEMENT/SEQUENCE,
+      non un'abbreviazione del modello."""
+    testo = _OMISSIS_NORMATTIVA.sub("", testo)
+    testo = _ASN1_EXTENSIBILITY.sub("", testo)
+    return testo
+
+
+def verifica_completezza_testo_integrale(capitoli: list) -> None:
+    """Solleva ValueError se una riga (Obbligo o Principio) di `capitoli` porta
+    in `testo_integrale` un marcatore di elisione (`…`, `...`, `[...]`) —
+    segno che l'estrazione ha troncato il testo normativo invece di
+    riportarlo per intero, in violazione di ADR-0007/ADR-0010 (copertura
+    completa vale anche all'interno di una singola riga, non solo tra
+    articoli). Un testo ufficiale verbatim non contiene mai questi
+    marcatori (salvo la convenzione Normattiva `((...))`, esclusa a monte —
+    vedi `_senza_omissis_legittimi`): se compaiono, sono stati introdotti dal
+    modello in fase di estrazione al posto di una porzione di testo reale.
+
+    Chiamata da `inserisci_capitoli` prima di qualunque INSERT, sullo stesso
+    modello di `verifica_copertura` — blocca l'intero seed, non solo la riga
+    incriminata, perché un troncamento non segnalato non deve mai finire nel
+    grafo nemmeno per una singola riga."""
+    trovati: list[str] = []
+    for modulo in capitoli:
+        for riga in list(modulo.RIGHE_OBBLIGHI) + list(modulo.RIGHE_PRINCIPI):
+            testo_integrale = _senza_omissis_legittimi(riga.get("testo_integrale") or "")
+            if any(marker in testo_integrale for marker in _MARKER_TRONCAMENTO):
+                trovati.append(riga["riferimento"])
+    if trovati:
+        raise ValueError(
+            "verifica_completezza_testo_integrale fallita — testo_integrale "
+            f"troncato (marcatore di elisione) per: {trovati}. Recuperare il "
+            "testo verbatim completo dalla fonte ufficiale, mai abbreviare."
+        )
 
 def nome_a_id(conn, tabella: str, id_col: str = "id", nome_col: str = "nome") -> dict[str, int]:
     """Costruisce un lookup nome->id leggendo dal DB in-memory già popolato da
@@ -123,6 +170,7 @@ def inserisci_capitoli(cursor, fonte_id: int, capitoli: list, lookup: dict, regi
         indice_totale += modulo.INDICE_ARTICOLI_LOCALE
         mappatura_totale.update(modulo.MAPPATURA_LOCALE)
     verifica_copertura(indice_totale, mappatura_totale)
+    verifica_completezza_testo_integrale(capitoli)
 
     for modulo in capitoli:
         for riga in modulo.RIGHE_OBBLIGHI:
