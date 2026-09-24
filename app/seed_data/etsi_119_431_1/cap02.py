@@ -35,12 +35,12 @@ Annex A (normative) "Specific requirements related to Regulation (EU)
 2024/1183" — requisiti del profilo EUSPv2:
 - A.1 "SSASP as a Qualified TSP": la sola frase introduttiva (scopo
   dell'annesso) diventa un Principio "scopo/ambito di applicazione",
-  riferimento "A.1". Il requisito numerato associato, OVR-A.1-01, è
+  riferimento "Parte 1: A.1". Il requisito numerato associato, OVR-A.1-01, è
   "Void." (segnaposto di redazione per un requisito rimosso in
   un'edizione precedente) -> ESCLUSO dall'indice, stesso trattamento già
   riservato ad ogni altro "Void." puntuale nelle fonti precedenti.
 - A.2 "Policy name and identification": pura prosa (OID EUSPv2), nessun
-  requisito numerato -> Principio "definitorio", riferimento "A.2".
+  requisito numerato -> Principio "definitorio", riferimento "Parte 1: A.2".
 - A.3 "General requirements" (OVR-A.3-01/02/03), A.4 "Signing key
   generation" (GEN-A.4-01/02), A.5 "Signature activation" (SIG-A.5-01..09),
   A.6 "Signature activation data management" (SIG-A.6-01..05, 06A, 07,
@@ -67,7 +67,7 @@ Annex B (informative) "Regulation and EU SSAS policy mapping":
   Annex A e su due requisiti di clausola 6.3.3 (cap01). Per istruzione
   esplicita del batch, NESSUN nodo duplicato per riga della tabella (il
   contenuto è già coperto dai nodi dei requisiti citati, presenti in questo
-  stesso capitolo) -> UN SOLO Principio "altro", riferimento "B.2",
+  stesso capitolo) -> UN SOLO Principio "altro", riferimento "Parte 1: B.2",
   `testo_integrale` = intera Tabella B.3 verbatim (nessuna riga omessa,
   ADR-0010). Le uniche relazioni interne create dal nodo B.2 sono le due
   citazioni esplicite e verificate verso requisiti del CAPITOLO 1
@@ -79,8 +79,8 @@ Annex B (informative) "Regulation and EU SSAS policy mapping":
   discoverable senza bisogno di un arco dedicato dalla riga di mapping.
   NOTA testuale (non un arco): la tabella riporta due riferimenti con
   probabile errata di redazione del documento ETSI stesso — "GEN-A.3-03"
-  (il requisito realmente esistente con quel contenuto è "OVR-A.3-03") e
-  "SIG-A.7-01" (il requisito realmente esistente è "LNK-A.7-01", coerente
+  (il requisito realmente esistente con quel contenuto è "Parte 1: OVR-A.3-03") e
+  "SIG-A.7-01" (il requisito realmente esistente è "Parte 1: LNK-A.7-01", coerente
   con la rubrica "eID means linking"); riportati verbatim così come scritti
   nella tabella ufficiale (mai "corretti" nel testo_integrale), ma non usati
   come target di una relazione per non inventare un riferimento che non
@@ -93,7 +93,7 @@ Annex C (informative) "Scope of remote signing standards": diversamente da
 Annex D (vedi sotto), il batch assegna esplicitamente Annex C a questo
 capitolo senza marcarlo come escluso — per ADR-0007 ("mai omettere la
 clausola") viene quindi creato un Principio "altro" minimale, riferimento
-"C.1": il contenuto testuale disponibile si limita al rinvio alla Figura
+"Parte 1: C.1": il contenuto testuale disponibile si limita al rinvio alla Figura
 C.1 (il contenuto grafico della figura non è estratto come testo nel file
 assegnato, quindi non riproducibile in `testo_integrale` oltre alla didascalia
 letterale).
@@ -136,7 +136,7 @@ esplicita e univoca verso un riferimento di quella fonte.
 
 RIGHE_OBBLIGHI = [
     {
-        "riferimento": "OVR-7-01",
+        "riferimento": "Parte 1: OVR-7-01",
         "testo": "Quando si costruisce una Signature Policy (SP) a partire dai requisiti definiti nel presente documento, la policy deve incorporare, o restringere ulteriormente, tutti i requisiti individuati nelle clausole 5 e 6.",
         "testo_integrale": "OVR-7-01 [CONDITIONAL]: When building a SP from requirements defined in the present document, the policy shall incorporate, or further constrain, all the requirements identified in clauses 5 and 6.",
         "tipo_obbligo": "organizzativo",
@@ -145,7 +145,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria Signature Policy (SP) a partire dai requisiti del presente documento, invece di seguire direttamente uno dei profili LSP/NSP/EUSPv2 già definiti.",
     },
     {
-        "riferimento": "OVR-7-02",
+        "riferimento": "Parte 1: OVR-7-02",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, la policy deve identificare ogni scostamento (variance) che intende applicare.",
         "testo_integrale": "OVR-7-02 [CONDITIONAL]: When building a SP from requirements defined in the present document, the policy shall identify any variances it chooses to apply.",
         "tipo_obbligo": "organizzativo",
@@ -154,7 +154,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-7-03",
+        "riferimento": "Parte 1: OVR-7-03",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, i sottoscrittori devono essere informati, nell'ambito dell'attuazione dei termini e condizioni, del modo in cui la policy specifica si aggiunge o restringe ulteriormente i requisiti della policy definita nel presente documento.",
         "testo_integrale": "OVR-7-03 [CONDITIONAL]: When building a SP from requirements defined in the present document, subscribers shall be informed, as part of implementing the terms and conditions, of the ways in which the specific policy adds to or further constrains the requirements of the policy as defined in the present document.",
         "tipo_obbligo": "informativo/trasparenza",
@@ -166,7 +166,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-7-04",
+        "riferimento": "Parte 1: OVR-7-04",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, deve esistere un organismo (es. una policy management authority) con autorità e responsabilità finale per la definizione e l'approvazione della policy.",
         "testo_integrale": "OVR-7-04 [CONDITIONAL]: When building a SP from requirements defined in the present document, there shall be a body (e.g. a policy management authority) with final authority and responsibility for specifying and approving the policy.",
         "tipo_obbligo": "organizzativo",
@@ -175,7 +175,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-7-05",
+        "riferimento": "Parte 1: OVR-7-05",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, dovrebbe essere condotta una valutazione del rischio per valutare i requisiti di business e determinare i requisiti di sicurezza da includere nella policy per la comunità e l'ambito di applicabilità dichiarati.",
         "testo_integrale": "OVR-7-05 [CONDITIONAL]: When building a SP from requirements defined in the present document, a risk assessment should be carried out to evaluate business requirements and determine the security requirements to be included in the policy for the stated community and applicability.",
         "tipo_obbligo": "organizzativo",
@@ -184,7 +184,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-7-06",
+        "riferimento": "Parte 1: OVR-7-06",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, la policy dovrebbe essere approvata e modificata secondo un processo di revisione definito, incluse le responsabilità per il suo mantenimento.",
         "testo_integrale": "OVR-7-06 [CONDITIONAL]: When building a SP from requirements defined in the present document, the policy should be approved and modified in accordance with a defined review process, including responsibilities for maintaining the policy.",
         "tipo_obbligo": "organizzativo",
@@ -193,7 +193,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-7-07",
+        "riferimento": "Parte 1: OVR-7-07",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, dovrebbe esistere un processo di revisione definito per assicurare che la policy sia supportata dalle dichiarazioni delle pratiche (practice statement).",
         "testo_integrale": "OVR-7-07 [CONDITIONAL]: When building a SP from requirements defined in the present document, a defined review process should exist to ensure that the policy is supported by the practices statements.",
         "tipo_obbligo": "organizzativo",
@@ -202,7 +202,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-7-08",
+        "riferimento": "Parte 1: OVR-7-08",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, il TSP dovrebbe rendere disponibili alla propria comunità di utenti le policy che supporta.",
         "testo_integrale": "OVR-7-08 [CONDITIONAL]: When building a SP from requirements defined in the present document, the TSP should make available the policies supported by the TSP to its user community.",
         "tipo_obbligo": "informativo/trasparenza",
@@ -214,7 +214,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-7-09",
+        "riferimento": "Parte 1: OVR-7-09",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, le revisioni delle policy supportate dal TSP dovrebbero essere rese disponibili ai sottoscrittori.",
         "testo_integrale": "OVR-7-09 [CONDITIONAL]: When building a SP from requirements defined in the present document, revisions to policies supported by the TSP should be made available to subscribers.",
         "tipo_obbligo": "informativo/trasparenza",
@@ -226,7 +226,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-7-10",
+        "riferimento": "Parte 1: OVR-7-10",
         "testo": "Quando si costruisce una SP a partire dai requisiti del presente documento, deve essere ottenuto un identificatore di oggetto univoco (OID o URI) per la policy.",
         "testo_integrale": "OVR-7-10 [CONDITIONAL]: When building a SP from requirements defined in the present document, a unique object identifier shall be obtained for the policy (e.g. OID or URI).",
         "tipo_obbligo": "organizzativo",
@@ -235,7 +235,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo quando un TSP costruisce una propria SP a partire dai requisiti del presente documento.",
     },
     {
-        "riferimento": "OVR-A.3-01",
+        "riferimento": "Parte 1: OVR-A.3-01",
         "testo": "Per il profilo EUSPv2, si applicano tutti i requisiti specificati per il profilo NSP (Normalized SSAS Policy).",
         "testo_integrale": "OVR-A.3-01 [EUSPv2]: All requirements specified for [NSP] shall apply.",
         "tipo_obbligo": "organizzativo",
@@ -243,7 +243,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-A.3-02",
+        "riferimento": "Parte 1: OVR-A.3-02",
         "testo": "La dichiarazione delle pratiche (practice statement) del TSP deve includere il riferimento alla certificazione del QSCD impiegato rispetto ai requisiti del Regolamento (EU) 2024/1183 che modifica il Regolamento (EU) n. 910/2014, allegato II. Nota: la Decisione di esecuzione (EU) 2016/650 definisce gli standard per la valutazione di sicurezza dei dispositivi qualificati di creazione di firma/sigillo ai sensi degli articoli 30(3) e 39(2) del Regolamento (EU) n. 910/2014, ma è stata pubblicata prima di EN 419241-1 ed EN 419241-2, che non sono presi in considerazione.",
         "testo_integrale": "OVR-A.3-02 [EUSPv2]: The TSP's practice statement shall include the reference to the certification that the QSCD employed against the requirements of Regulation (EU) 2024/1183 [i.11] amending Regulation (EU) No 910/2014 [i.1], annex II. NOTE: CID (EU) 2016/650 [i.12] lays down standards for the security assessment of qualified signature and seal creation devices pursuant to Articles 30(3) and 39(2) of Regulation (EU) No 910/2014. However, it was published before the publication of EN 419241-1 [3] and EN 419241-2 [4] which are not taken into account.",
         "tipo_obbligo": "informativo/trasparenza",
@@ -251,7 +251,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-A.3-03",
+        "riferimento": "Parte 1: OVR-A.3-03",
         "testo": "Il SSASP deve rispettare ogni requisito individuato nel rapporto di certificazione del dispositivo qualificato di creazione di firma elettronica remoto.",
         "testo_integrale": "OVR-A.3-03 [EUSPv2]: The SSASP shall comply with any requirements identified in the certification report of the specific remote qualified electronic signature creation device.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -259,7 +259,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "GEN-A.4-01",
+        "riferimento": "Parte 1: GEN-A.4-01",
         "testo": "La chiave di firma del firmatario deve essere generata in un QSCD.",
         "testo_integrale": "GEN-A.4-01 [EUSPv2]: Signer's signing key shall be generated in a QSCD.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -268,7 +268,7 @@ RIGHE_OBBLIGHI = [
         "oggetti_giuridici": ["dispositivo qualificato di creazione di firma elettronica"],
     },
     {
-        "riferimento": "GEN-A.4-02",
+        "riferimento": "Parte 1: GEN-A.4-02",
         "testo": "Il QSCD deve essere utilizzato nella configurazione descritta nella documentazione di guida alla certificazione applicabile, o in una configurazione equivalente che raggiunga il medesimo obiettivo di sicurezza.",
         "testo_integrale": "GEN-A.4-02 [EUSPv2]: The QSCD shall be operated in its configuration as described in the appropriate certification guidance documentation or in an equivalent configuration which achieves the same security objective.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -277,7 +277,7 @@ RIGHE_OBBLIGHI = [
         "oggetti_giuridici": ["dispositivo qualificato di creazione di firma elettronica"],
     },
     {
-        "riferimento": "SIG-A.5-01",
+        "riferimento": "Parte 1: SIG-A.5-01",
         "testo": "La chiave di firma del firmatario deve essere utilizzata in un QSCD.",
         "testo_integrale": "SIG-A.5-01 [EUSPv2]: Signer's signing key shall be used in a QSCD.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -286,7 +286,7 @@ RIGHE_OBBLIGHI = [
         "oggetti_giuridici": ["dispositivo qualificato di creazione di firma elettronica"],
     },
     {
-        "riferimento": "SIG-A.5-02",
+        "riferimento": "Parte 1: SIG-A.5-02",
         "testo": "Il QSCD deve essere utilizzato nella configurazione descritta nella documentazione di guida alla certificazione applicabile, o in una configurazione equivalente che raggiunga il medesimo obiettivo di sicurezza.",
         "testo_integrale": "SIG-A.5-02 [EUSPv2]: The QSCD shall be operated in its configuration as described in the appropriate certification guidance documentation or in an equivalent configuration which achieves the same security objective.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -295,7 +295,7 @@ RIGHE_OBBLIGHI = [
         "oggetti_giuridici": ["dispositivo qualificato di creazione di firma elettronica"],
     },
     {
-        "riferimento": "SIG-A.5-03",
+        "riferimento": "Parte 1: SIG-A.5-03",
         "testo": "Si applica la clausola SRA_SAP.1.3 di EN 419241-1, relativa alla robustezza crittografica.",
         "testo_integrale": "SIG-A.5-03 [EUSPv2]: Clause SRA_SAP.1.3 of EN 419241-1 [3], specifying cryptographic strength, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -303,7 +303,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.5-04",
+        "riferimento": "Parte 1: SIG-A.5-04",
         "testo": "Si applica la clausola SRA_SAP.1.4 di EN 419241-1, relativa alla mitigazione delle minacce.",
         "testo_integrale": "SIG-A.5-04 [EUSPv2]: Clause SRA_SAP.1.4 of EN 419241-1 [3], specifying threats mitigation, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -311,7 +311,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.5-05",
+        "riferimento": "Parte 1: SIG-A.5-05",
         "testo": "Si applica la clausola SRA_SAP.1.5 di EN 419241-1, relativa alla protezione dell'ambiente.",
         "testo_integrale": "SIG-A.5-05 [EUSPv2]: Clause SRA_SAP.1.5 of EN 419241-1 [3], specifying environment protection, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -319,7 +319,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.5-06",
+        "riferimento": "Parte 1: SIG-A.5-06",
         "testo": "Si applica la clausola SRA_SAP.1.6 di EN 419241-1, relativa alla protezione dalla manomissione.",
         "testo_integrale": "SIG-A.5-06 [EUSPv2]: Clause SRA_SAP.1.6 of EN 419241-1 [3], specifying protection against tampering, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -327,7 +327,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.5-07",
+        "riferimento": "Parte 1: SIG-A.5-07",
         "testo": "Si applica la clausola SRA_SAP.1.7 di EN 419241-1, relativa alla protezione dall'attaccante.",
         "testo_integrale": "SIG-A.5-07 [EUSPv2]: Clause SRA_SAP.1.7 of EN 419241-1 [3], specifying protection against attacker, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -335,7 +335,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.5-08",
+        "riferimento": "Parte 1: SIG-A.5-08",
         "testo": "Il SAM (Signature Activation Module) dovrebbe essere certificato conforme a EN 419241-2.",
         "testo_integrale": "SIG-A.5-08 [EUSPv2]: The SAM should be certified to be conformant to EN 419241-2 [4].",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -343,7 +343,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.5-09",
+        "riferimento": "Parte 1: SIG-A.5-09",
         "testo": "Se l'autenticazione è collegata direttamente all'identità, la sessione di firma deve terminare al più tardi 30 minuti dopo la fine del processo di verifica dell'identità.",
         "testo_integrale": "SIG-A.5-09 [EUSPv2] [CONDITIONAL]: In case the authentication is linked directly to the identity, the signature session shall end at most 30 minutes after the end of the identity verification process.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -352,7 +352,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo se l'autenticazione del firmatario è collegata direttamente all'identità (invece che a un mezzo di eID).",
     },
     {
-        "riferimento": "SIG-A.6-01",
+        "riferimento": "Parte 1: SIG-A.6-01",
         "testo": "Si applica la clausola SRA_SAP.2.1 di EN 419241-1, relativa al formato dei dati di attivazione della firma (SAD).",
         "testo_integrale": "SIG-A.6-01 [EUSPv2]: Clause SRA_SAP.2.1 of EN 419241-1 [3], specifying signature activation data format, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -360,7 +360,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.6-02",
+        "riferimento": "Parte 1: SIG-A.6-02",
         "testo": "Si applica la clausola SRA_SAP.2.2 di EN 419241-1, relativa alla raccolta e generazione dei dati di attivazione della firma (SAD).",
         "testo_integrale": "SIG-A.6-02 [EUSPv2]: Clause SRA_SAP.2.2 of EN 419241-1 [3], specifying signature activation data collection and generation, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -368,7 +368,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.6-03",
+        "riferimento": "Parte 1: SIG-A.6-03",
         "testo": "Si applica la clausola SRA_SAP.2.3 di EN 419241-1, relativa ai parametri dei dati di attivazione della firma (SAD).",
         "testo_integrale": "SIG-A.6-03 [EUSPv2]: Clause SRA_SAP.2.3 of EN 419241-1 [3], specifying signature activation data parameters, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -376,7 +376,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.6-04",
+        "riferimento": "Parte 1: SIG-A.6-04",
         "testo": "Si applica la clausola SRA_SAP.2.4 di EN 419241-1, relativa all'uso dei dati di attivazione della firma (SAD).",
         "testo_integrale": "SIG-A.6-04 [EUSPv2]: Clause SRA_SAP.2.4 of EN 419241-1 [3], specifying signature activation data usage, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -384,7 +384,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.6-05",
+        "riferimento": "Parte 1: SIG-A.6-05",
         "testo": "Si applica la clausola SRA_SAP.2.5 di EN 419241-1, relativa alla destinazione dei dati di attivazione della firma (SAD).",
         "testo_integrale": "SIG-A.6-05 [EUSPv2]: Clause SRA_SAP.2.5 of EN 419241-1 [3], specifying signature activation data destination, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -392,7 +392,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.6-06A",
+        "riferimento": "Parte 1: SIG-A.6-06A",
         "testo": "Si applica la clausola SRA_SAP.2.6 di EN 419241-1, relativa alla raccolta e protezione dei dati di attivazione della firma (SAD).",
         "testo_integrale": "SIG-A.6-06A [EUSPv2]: Clause SRA_SAP.2.6 of EN 419241-1 [3], specifying signature activation data collection and protection, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -400,7 +400,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "SIG-A.6-07",
+        "riferimento": "Parte 1: SIG-A.6-07",
         "testo": "Se il firmatario è una persona fisica, si applica la clausola SRA_SAP.2.7 di EN 419241-1, relativa alla trasmissione dei dati di attivazione della firma (SAD) sotto controllo esclusivo (sole control).",
         "testo_integrale": "SIG-A.6-07 [EUSPv2] [CONDITIONAL]: If the signer is a natural person, clause SRA_SAP.2.7 of EN 419241-1 [3], specifying signature activation data submission under sole control, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -409,7 +409,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo se il firmatario è una persona fisica.",
     },
     {
-        "riferimento": "SIG-A.6-07A",
+        "riferimento": "Parte 1: SIG-A.6-07A",
         "testo": 'Se il firmatario è una persona giuridica, si applica la clausola SRA_SAP.2.7 di EN 419241-1 relativa alla trasmissione dei dati di attivazione della firma (SAD), con il termine "controllo esclusivo" (sole control) sostituito da "controllo" (control).',
         "testo_integrale": 'SIG-A.6-07A [EUSPv2] [CONDITIONAL]: If the signer is a legal person, clause SRA_SAP.2.7 of EN 419241-1 [3], specifying signature activation data submission shall apply where "sole control" is replaced by "control".',
         "tipo_obbligo": "tecnico/sicurezza",
@@ -418,7 +418,7 @@ RIGHE_OBBLIGHI = [
         "condizione_applicabilita": "Si applica solo se il firmatario è una persona giuridica.",
     },
     {
-        "riferimento": "SIG-A.6-08",
+        "riferimento": "Parte 1: SIG-A.6-08",
         "testo": "Si applica la clausola SRA_SAP.2.8 di EN 419241-1, relativa alla protezione dei dati di attivazione della firma (SAD) dopo l'attivazione.",
         "testo_integrale": "SIG-A.6-08 [EUSPv2]: Clause SRA_SAP.2.8 of EN 419241-1 [3], specifying signature activation data protection after activation, shall apply.",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -426,7 +426,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "LNK-A.7-01",
+        "riferimento": "Parte 1: LNK-A.7-01",
         "testo": "L'identity proofing del firmatario deve soddisfare i requisiti del livello Extended di Level of Identity Proofing (LoIP), come definito in ETSI TS 119 461.",
         "testo_integrale": "LNK-A.7-01 [EUSPv2]: The identity proofing of the signer shall fulfil the requirements of extended Level of Identity Proofing (LoIP) as defined in ETSI TS 119 461 [6].",
         "tipo_obbligo": "tecnico/sicurezza",
@@ -437,7 +437,7 @@ RIGHE_OBBLIGHI = [
 
 RIGHE_PRINCIPI = [
     {
-        "riferimento": "A.1",
+        "riferimento": "Parte 1: A.1",
         "testo": "Il presente annesso specifica i requisiti di policy e sicurezza generalmente applicabili a un TSP qualificato che gestisce un QSCD da remoto.",
         "testo_integrale": "The present annex specifies generally applicable policy and security requirements for a Qualified TSP managing a remote QSCD.",
         "tipo_principio": "scopo/ambito di applicazione",
@@ -448,7 +448,7 @@ RIGHE_PRINCIPI = [
         ],
     },
     {
-        "riferimento": "A.2",
+        "riferimento": "Parte 1: A.2",
         "testo": "I SSASP conformi al presente documento possono dichiarare conformità tramite lo specifico OID di trust service policy EUSPv2 (EU SSAS Policy): itu-t(0) identified-organization(4) etsi(0) SIGNATURE CREATION SERVICE-policies(19431) ops(1) policy-identifiers(1) eu-remote-qscd-v2(4).",
         "testo_integrale": "SSASPs following the present document can claim conformance to the present document via the following specific trust service policy OID: EUSPv2: EU SSAS Policy. itu-t(0) identified-organization(4) etsi(0) SIGNATURE CREATION SERVICE-policies(19431) ops (1) policy-identifiers(1) eu-remote-qscd-v2 (4)",
         "tipo_principio": "definitorio",
@@ -459,7 +459,7 @@ RIGHE_PRINCIPI = [
         ],
     },
     {
-        "riferimento": "B.2",
+        "riferimento": "Parte 1: B.2",
         "testo": (
             "La Tabella B.3 individua come gli obiettivi dei controlli di sicurezza e le altre parti della policy "
             "EU SSAS (EUSPv2) definita nel presente documento indirizzino i requisiti del TSP che gestisce un QSCD "
@@ -541,7 +541,7 @@ RIGHE_PRINCIPI = [
         ],
     },
     {
-        "riferimento": "C.1",
+        "riferimento": "Parte 1: C.1",
         "testo": (
             "Una figura (Figura C.1) illustra i diversi standard applicabili ai differenti componenti di un "
             "servizio di creazione di firma da remoto. L'annesso non contiene, nel testo estratto, ulteriore "
@@ -559,32 +559,32 @@ RIGHE_PRINCIPI = [
 ]
 
 INDICE_ARTICOLI_LOCALE = [
-    "OVR-7-01", "OVR-7-02", "OVR-7-03", "OVR-7-04", "OVR-7-05",
-    "OVR-7-06", "OVR-7-07", "OVR-7-08", "OVR-7-09", "OVR-7-10",
-    "A.1", "A.2",
-    "OVR-A.3-01", "OVR-A.3-02", "OVR-A.3-03",
-    "GEN-A.4-01", "GEN-A.4-02",
-    "SIG-A.5-01", "SIG-A.5-02", "SIG-A.5-03", "SIG-A.5-04", "SIG-A.5-05",
-    "SIG-A.5-06", "SIG-A.5-07", "SIG-A.5-08", "SIG-A.5-09",
-    "SIG-A.6-01", "SIG-A.6-02", "SIG-A.6-03", "SIG-A.6-04", "SIG-A.6-05",
-    "SIG-A.6-06A", "SIG-A.6-07", "SIG-A.6-07A", "SIG-A.6-08",
-    "LNK-A.7-01",
-    "B.2",
-    "C.1",
+    "Parte 1: OVR-7-01", "Parte 1: OVR-7-02", "Parte 1: OVR-7-03", "Parte 1: OVR-7-04", "Parte 1: OVR-7-05",
+    "Parte 1: OVR-7-06", "Parte 1: OVR-7-07", "Parte 1: OVR-7-08", "Parte 1: OVR-7-09", "Parte 1: OVR-7-10",
+    "Parte 1: A.1", "Parte 1: A.2",
+    "Parte 1: OVR-A.3-01", "Parte 1: OVR-A.3-02", "Parte 1: OVR-A.3-03",
+    "Parte 1: GEN-A.4-01", "Parte 1: GEN-A.4-02",
+    "Parte 1: SIG-A.5-01", "Parte 1: SIG-A.5-02", "Parte 1: SIG-A.5-03", "Parte 1: SIG-A.5-04", "Parte 1: SIG-A.5-05",
+    "Parte 1: SIG-A.5-06", "Parte 1: SIG-A.5-07", "Parte 1: SIG-A.5-08", "Parte 1: SIG-A.5-09",
+    "Parte 1: SIG-A.6-01", "Parte 1: SIG-A.6-02", "Parte 1: SIG-A.6-03", "Parte 1: SIG-A.6-04", "Parte 1: SIG-A.6-05",
+    "Parte 1: SIG-A.6-06A", "Parte 1: SIG-A.6-07", "Parte 1: SIG-A.6-07A", "Parte 1: SIG-A.6-08",
+    "Parte 1: LNK-A.7-01",
+    "Parte 1: B.2",
+    "Parte 1: C.1",
 ]
 
 MAPPATURA_LOCALE = {rif: [rif] for rif in INDICE_ARTICOLI_LOCALE}
 
 _REQUISITI_NSP_CAP01 = [
-    "GEN-6.2.1-02", "GEN-6.2.1-02A",
-    "LNK-6.2.2-02A", "LNK-6.2.2-02B", "LNK-6.2.2-02C", "LNK-6.2.2-02D", "LNK-6.2.2-02E",
-    "LNK-6.2.2-08", "LNK-6.2.2-08A", "LNK-6.2.2-09",
-    "SIG-6.3.1-05", "SIG-6.3.1-06", "SIG-6.3.1-07", "SIG-6.3.1-15", "SIG-6.3.1-16",
+    "Parte 1: GEN-6.2.1-02", "Parte 1: GEN-6.2.1-02A",
+    "Parte 1: LNK-6.2.2-02A", "Parte 1: LNK-6.2.2-02B", "Parte 1: LNK-6.2.2-02C", "Parte 1: LNK-6.2.2-02D", "Parte 1: LNK-6.2.2-02E",
+    "Parte 1: LNK-6.2.2-08", "Parte 1: LNK-6.2.2-08A", "Parte 1: LNK-6.2.2-09",
+    "Parte 1: SIG-6.3.1-05", "Parte 1: SIG-6.3.1-06", "Parte 1: SIG-6.3.1-07", "Parte 1: SIG-6.3.1-15", "Parte 1: SIG-6.3.1-16",
 ]
 
 RELAZIONI: list[dict] = [
     {
-        "nodo_da": ("obbligo", None, "OVR-A.3-01"),
+        "nodo_da": ("obbligo", None, "Parte 1: OVR-A.3-01"),
         "nodo_a": ("obbligo", None, rif_nsp),
         "tipo_relazione": "richiede come precondizione",
         "evidence_type": "textual",
@@ -593,22 +593,22 @@ RELAZIONI: list[dict] = [
     for rif_nsp in _REQUISITI_NSP_CAP01
 ] + [
     {
-        "nodo_da": ("obbligo", None, "SIG-A.5-09"),
-        "nodo_a": ("obbligo", None, "SIG-6.3.1-14"),
+        "nodo_da": ("obbligo", None, "Parte 1: SIG-A.5-09"),
+        "nodo_a": ("obbligo", None, "Parte 1: SIG-6.3.1-14"),
         "tipo_relazione": "specifica",
         "evidence_type": "inferred",
         "confidence": 0.75,
     },
     {
-        "nodo_da": ("principio", None, "B.2"),
-        "nodo_a": ("obbligo", None, "GEN-6.3.3-02"),
+        "nodo_da": ("principio", None, "Parte 1: B.2"),
+        "nodo_a": ("obbligo", None, "Parte 1: GEN-6.3.3-02"),
         "tipo_relazione": "richiama",
         "evidence_type": "textual",
         "confidence": None,
     },
     {
-        "nodo_da": ("principio", None, "B.2"),
-        "nodo_a": ("obbligo", None, "GEN-6.3.3-04"),
+        "nodo_da": ("principio", None, "Parte 1: B.2"),
+        "nodo_a": ("obbligo", None, "Parte 1: GEN-6.3.3-04"),
         "tipo_relazione": "richiama",
         "evidence_type": "textual",
         "confidence": None,

@@ -61,35 +61,35 @@ MAPPATURA_LOCALE: dict[str, list[str]] = {}
 
 RELAZIONI = [
     {
-        "nodo_da": ("principio", None, "Annex A.1 (mapping con Allegato I Reg. 910/2014)"),
+        "nodo_da": ("principio", None, "Parte 5: Annex A.1 (mapping con Allegato I Reg. 910/2014)"),
         "nodo_a": ("obbligo", 1, "art. 28 §1"),
         "tipo_relazione": "attua",
         "evidence_type": "textual",
         "confidence": 0.9,
     },
     {
-        "nodo_da": ("principio", None, "Annex A.2 (mapping con Allegato III Reg. 910/2014)"),
+        "nodo_da": ("principio", None, "Parte 5: Annex A.2 (mapping con Allegato III Reg. 910/2014)"),
         "nodo_a": ("obbligo", 1, "art. 38 §1"),
         "tipo_relazione": "attua",
         "evidence_type": "textual",
         "confidence": 0.9,
     },
     {
-        "nodo_da": ("principio", None, "Annex A.3 (mapping con Allegato IV Reg. 910/2014)"),
+        "nodo_da": ("principio", None, "Parte 5: Annex A.3 (mapping con Allegato IV Reg. 910/2014)"),
         "nodo_a": ("obbligo", 2, "art. 45 §1 (vigente, eIDAS2)"),
         "tipo_relazione": "attua",
         "evidence_type": "textual",
         "confidence": 0.9,
     },
     {
-        "nodo_da": ("principio", None, "QCS-4.3.5-01"),
+        "nodo_da": ("principio", None, "Parte 5: QCS-4.3.5-01"),
         "nodo_a": ("obbligo", 2, "art. 24 §1-bis (nuovo, eIDAS2 — metodi di verifica dell'identità)"),
         "tipo_relazione": "richiama",
         "evidence_type": "textual",
         "confidence": 0.75,
     },
     {
-        "nodo_da": ("principio", None, "clausola 4.3.5.3 (metodi di identificazione eIDAS successivi a eIDAS2)"),
+        "nodo_da": ("principio", None, "Parte 5: clausola 4.3.5.3 (metodi di identificazione eIDAS successivi a eIDAS2)"),
         "nodo_a": ("obbligo", 2, "art. 24 §1-bis (nuovo, eIDAS2 — metodi di verifica dell'identità)"),
         "tipo_relazione": "richiama",
         "evidence_type": "textual",
@@ -97,14 +97,14 @@ RELAZIONI = [
     },
     {
         "nodo_da": ("obbligo", 4, "art. 13 c.3"),
-        "nodo_a": ("principio", None, "clausola 4.2.2"),
+        "nodo_a": ("principio", None, "Parte 5: clausola 4.2.2"),
         "tipo_relazione": "richiama",
         "evidence_type": "textual",
         "confidence": 0.9,
     },
     {
         "nodo_da": ("obbligo", 4, "art. 42 c.5"),
-        "nodo_a": ("principio", None, "clausola 4.2.2"),
+        "nodo_a": ("principio", None, "Parte 5: clausola 4.2.2"),
         "tipo_relazione": "richiama",
         "evidence_type": "textual",
         "confidence": 0.9,

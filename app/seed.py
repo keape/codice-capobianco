@@ -98,9 +98,14 @@ from seed_data.spid_modalita_attuative import (
     cap05_relazioni_cross as spidatt_cap05,
 )
 from seed_data.dpcm2021 import cap01 as dpcm2021_cap01
-from seed_data.etsi_319_412_5 import (
-    cap01 as etsi5_cap01,
-    cap02_relazioni_cross as etsi5_cap02_relazioni_cross,
+from seed_data.etsi_319_412 import (
+    parte1 as etsi412_parte1,
+    parte2 as etsi412_parte2,
+    parte3 as etsi412_parte3,
+    parte4 as etsi412_parte4,
+    parte5 as etsi412_parte5,
+    parte6_relazioni_cross as etsi412_parte6_relazioni_cross,
+    parte7_relazioni_cross as etsi412_parte7_relazioni_cross,
 )
 from seed_data.reg_ue_2025_1566 import cap01 as reg1566_cap01, cap02_relazioni_cross as reg1566_cap02
 from seed_data.etsi_119_461 import (
@@ -137,6 +142,43 @@ from seed_data.reg_ue_2015_1502 import (
     cap02 as reg1502_cap02,
     cap03 as reg1502_cap03,
     cap04_relazioni_cross as reg1502_cap04,
+)
+from seed_data.agid_reg_tec_cert_qual import (
+    cap01 as agidcert_cap01,
+    cap02 as agidcert_cap02,
+    cap03 as agidcert_cap03,
+    cap04_relazioni_cross as agidcert_cap04,
+)
+from seed_data.codice_civile import cap01 as ccivile_cap01
+from seed_data.etsi_319_411_1 import (
+    cap01 as etsi411_1_cap01,
+    cap02 as etsi411_1_cap02,
+    cap03 as etsi411_1_cap03,
+    cap04 as etsi411_1_cap04,
+    cap05 as etsi411_1_cap05,
+    cap06_relazioni_cross as etsi411_1_cap06_relazioni_cross,
+)
+from seed_data.etsi_319_411_2 import (
+    cap01 as etsi411_2_cap01,
+    cap02 as etsi411_2_cap02,
+    cap03 as etsi411_2_cap03,
+    cap04_relazioni_cross as etsi411_2_cap04_relazioni_cross,
+)
+from seed_data.etsi_319_421 import (
+    cap01 as etsi421_cap01,
+    cap02 as etsi421_cap02,
+    cap03 as etsi421_cap03,
+    cap04 as etsi421_cap04,
+    cap05 as etsi421_cap05,
+    cap06 as etsi421_cap06,
+    cap07_relazioni_cross as etsi421_cap07,
+)
+from seed_data.etsi_319_422 import (
+    cap01 as etsi422_cap01,
+    cap02 as etsi422_cap02,
+    cap03 as etsi422_cap03,
+    cap04 as etsi422_cap04,
+    cap05_relazioni_cross as etsi422_cap05,
 )
 
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
@@ -252,10 +294,10 @@ def seed():
          "https://www.agid.gov.it/sites/default/files/repository_files/dpcm_19_ottobre_2021_gu_serie_generale_n._296_del_14-12-2021.pdf",
          "urn:nir:presidente.consiglio.ministri:decreto:2021-10-19",
          "atto come pubblicato in GU n.296 del 14-12-2021, efficace dalla pubblicazione", "2021-12-14", 1),
-        (7, "ETSI EN 319 412-5 V2.5.1 (2025-06) - Electronic Signatures and Trust Infrastructures (ESI); Certificate Profiles; Part 5: QCStatements",
-         "https://www.etsi.org/deliver/etsi_en/319400_319499/31941205/02.05.01_60/en_31941205v020501p.pdf",
-         "urn:etsi:en:319412-5:v2.5.1",
-         "V2.5.1 (2025-06), pubblicazione definitiva", "2025-06-12", 1),
+        (7, "ETSI EN 319 412 - Electronic Signatures and Trust Infrastructures (ESI); Certificate Profiles (deliverable multi-parte: Parte 1 Overview and common data structures, Parte 2 Certificate profile for natural persons, Parte 3 Certificate profile for legal persons, Parte 4 Certificate profile for web site certificates, Parte 5 QCStatements). Trattata come Fonte unica su richiesta esplicita dell'utente (2026-09-23) - vedi nota di modellazione in docs/fonti-censite.md",
+         "https://www.etsi.org/deliver/etsi_en/319400_319499/31941201/01.07.01_60/en_31941201v010701p.pdf",
+         "urn:etsi:en:319412:multipart",
+         "Parte 1 V1.7.1 (2026-05); Parte 2 V2.5.1 (2026-08); Parte 3 V1.4.1 (2026-07); Parte 4 V1.4.1 (2025-06); Parte 5 V2.5.1 (2025-06) - versioni indipendenti per parte, dettaglio completo in docs/fonti-censite.md", "2025-06-12", 1),
         (8, "Regolamento di esecuzione (UE) 2025/1566 della Commissione - modalità di applicazione dell'art. 24 §1-quater eIDAS2 (norme di riferimento per la verifica dell'identità e degli attributi ai fini del rilascio di certificati qualificati/QEAA)",
          "https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32025R1566",
          "urn:lex:eu:regulation:2025:1566",
@@ -268,14 +310,10 @@ def seed():
          "https://www.etsi.org/deliver/etsi_en/319400_319499/319401/03.02.01_60/en_319401v030201p.pdf",
          "urn:etsi:en:319401:v3.2.1",
          "V3.2.1 (2026-01), pubblicazione definitiva (adottata 5 gennaio 2026)", "2026-01-05", 1),
-        (11, "ETSI TS 119 431-1 V1.3.1 (2024-12) - Electronic Signatures and Trust Infrastructures (ESI); Policy and security requirements for trust service providers; Part 1: TSP services operating a remote QSCD / SCDev",
+        (11, "ETSI TS 119 431 - Electronic Signatures and Trust Infrastructures (ESI); Policy and security requirements for trust service providers (deliverable multi-parte: Parte 1 TSP services operating a remote QSCD/SCDev, Parte 2 TSP service components supporting AdES digital signature creation). Trattata come Fonte unica (correzione 2026-09-23 dell'incoerenza rispetto al trattamento iniziale come due Fonti separate, su richiesta esplicita dell'utente) - vedi nota di modellazione in docs/fonti-censite.md",
          "https://www.etsi.org/deliver/etsi_ts/119400_119499/11943101/01.03.01_60/ts_11943101v010301p.pdf",
-         "urn:etsi:ts:119431-1:v1.3.1",
-         "V1.3.1 (2024-12), pubblicazione definitiva", "2024-12-20", 1),
-        (12, "ETSI TS 119 431-2 V1.2.1 (2023-06) - Electronic Signatures and Infrastructures (ESI); Policy and security requirements for trust service providers; Part 2: TSP service components supporting AdES digital signature creation",
-         "https://www.etsi.org/deliver/etsi_ts/119400_119499/11943102/01.02.01_60/ts_11943102v010201p.pdf",
-         "urn:etsi:ts:119431-2:v1.2.1",
-         "V1.2.1 (2023-06), pubblicazione definitiva", "2023-06-13", 1),
+         "urn:etsi:ts:119431:multipart",
+         "Parte 1 V1.3.1 (2024-12); Parte 2 V1.2.1 (2023-06) - versioni indipendenti per parte, dettaglio completo in docs/fonti-censite.md", "2023-06-13", 1),
         (13, "Regolamento AgID recante le modalità attuative per la realizzazione dello SPID (articolo 4, comma 2, DPCM 24 ottobre 2014) - v2.0, come modificato dall'Avviso AgID n.10 del 13/07/2018 e dalla Determinazione AgID n.425/2020 del 01/10/2020",
          "https://www.agid.gov.it/sites/default/files/repository_files/regolamento_modalita_attuative_spid_2.0.pdf",
          "urn:agid:regolamento:spid-modalita-attuative:v2.0",
@@ -284,6 +322,30 @@ def seed():
          "https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32015R1502",
          "urn:lex:eu:regulation:2015:1502",
          "testo originario (atto come adottato l'8 settembre 2015)", "2015-09-28", 1),
+        (15, "Regole Tecniche e Raccomandazioni afferenti la generazione di certificati elettronici qualificati, firme e sigilli elettronici qualificati e validazioni temporali elettroniche qualificate - AgID, 13 febbraio 2020 (regole tecniche ex art. 71 CAD)",
+         "https://docs.italia.it/media/pdf/lg-certificati-qualificati-docs/1.1/lg-certificati-qualificati-docs.pdf",
+         "urn:agid:regole-tecniche:certificati-qualificati:2020-02-13",
+         "testo originario (emanato il 13 febbraio 2020, sostituisce/abroga la Deliberazione CNIPA n.45/2009)", "2020-02-13", 1),
+        (16, "Codice Civile (R.D. 16 marzo 1942, n. 262)",
+         "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:regio.decreto:1942-03-16;262!vig=",
+         "urn:nir:stato:regio.decreto:1942-03-16;262",
+         "importazione selettiva: solo i 6 articoli espressamente citati dalle "
+         "Fonti gia' censite (art. 1350, 2702, 2703, 2712, 2714, 2715) - non "
+         "copertura granulare completa, deroga esplicita ad ADR-0007 concordata "
+         "con l'utente il 2026-09-23 (vedi app/seed_data/codice_civile/cap01.py)",
+         "1942-04-21", 1),
+        (17, "ETSI EN 319 411 - Electronic Signatures and Trust Infrastructures (ESI); Policy and security requirements for Trust Service Providers issuing certificates (deliverable multi-parte: Parte 1 General requirements, Parte 2 Requirements for trust service providers issuing EU qualified certificates). Trattata come Fonte unica (correzione 2026-09-23 dell'incoerenza rispetto al trattamento iniziale come due Fonti separate, su richiesta esplicita dell'utente) - vedi nota di modellazione in docs/fonti-censite.md",
+         "https://www.etsi.org/deliver/etsi_en/319400_319499/31941101/01.05.01_60/en_31941101v010501p.pdf",
+         "urn:etsi:en:319411:multipart",
+         "Parte 1 V1.5.1 (2025-04); Parte 2 V2.6.1 (2025-06) - versioni indipendenti per parte, dettaglio completo in docs/fonti-censite.md", "2025-04-07", 1),
+        (18, "ETSI EN 319 421 V1.3.1 (2025-07) - Electronic Signatures and Trust Infrastructures (ESI); Policy and Security Requirements for Trust Service Providers issuing Time-Stamps",
+         "https://www.etsi.org/deliver/etsi_en/319400_319499/319421/01.03.01_60/en_319421v010301p.pdf",
+         "urn:etsi:en:319421:v1.3.1",
+         "V1.3.1 (2025-07), pubblicazione definitiva (versione approvata con voto V 20250722)", "2025-07-31", 1),
+        (19, "ETSI EN 319 422 V1.1.1 (2016-03) - Electronic Signatures and Infrastructures (ESI); Time-stamping protocol and time-stamp token profiles",
+         "https://www.etsi.org/deliver/etsi_en/319400_319499/319422/01.01.01_60/en_319422v010101p.pdf",
+         "urn:etsi:en:319422:v1.1.1",
+         "V1.1.1 (2016-03), pubblicazione definitiva (adozione 22 febbraio 2016; pubblicato in precedenza come ETSI TS 101 861 e come ETSI TS 119 422)", "2016-03-31", 1),
     ])
     # CAD (fonte_id=3) e DPCM (fonte_id=4): estrazione selettiva precedente,
     # invariata nel contenuto in questa passata, solo rinumerata (gli id
@@ -1230,24 +1292,36 @@ def seed():
         dpcm2021_cursor, fonte_id=6, capitoli=[dpcm2021_cap01], lookup=cad_lookup, registro=cad_registro,
     )
 
-    # --- ETSI EN 319 412-5 V2.5.1 (fonte_id=7): import granulare a copertura
-    # completa (ADR-0007, adattato a uno standard tecnico ETSI: un nodo per
-    # clausola/requisito numerato invece che per articolo/comma). Documento
-    # breve (21 pagine), un solo capitolo (nessuna suddivisione per subagent
-    # necessaria), modulo app/seed_data/etsi_319_412_5/cap01.py. Fase 6
-    # (ADR-0009, 2026-09-21): collegamento cross-fonte a posteriori verso
-    # eIDAS/eIDAS2 (mapping Annex A verso gli Allegati I/III/IV, citazione
-    # esplicita dell'art. 24 eIDAS2 nella clausola 4.3.5) e verso il DPCM
-    # 22/2/2013 (citazione testuale esplicita dell'OID id-etsi-qcs-QcSSCD
-    # negli artt. 13 c.3 e 42 c.5 del DPCM), modulo "capitolo virtuale"
-    # app/seed_data/etsi_319_412_5/cap02_relazioni_cross.py (5 relazioni),
-    # agganciato in coda alla lista capitoli come da procedura. Verificato
-    # zero citazioni dirette di CAD, SPID/DPCM 24-10-2014 e DPCM 19-10-2021
-    # (esito riportato, non fase saltata — vedi docstring del modulo).
-    etsi5_cursor = conn.cursor()
-    etsi5_capitoli = [etsi5_cap01, etsi5_cap02_relazioni_cross]
+    # --- ETSI EN 319 412 (fonte_id=7): trattata come Fonte unica multi-parte
+    # su richiesta esplicita dell'utente (2026-09-23), in deroga al criterio
+    # applicato a ETSI TS 119 431-1/-2 ed ETSI EN 319 411-1/-2 (Fonti separate
+    # per ciascuna Parte) — vedi nota di modellazione in docs/fonti-censite.md.
+    # Import originario 2026-09-21 copriva solo la Parte 5 (QCStatements,
+    # allora fonte_id=7 "ETSI EN 319 412-5", modulo cap01.py in una directory
+    # dedicata etsi_319_412_5/). Consolidamento 2026-09-23: directory
+    # rinominata app/seed_data/etsi_319_412/, cap01.py/cap02_relazioni_cross.py
+    # rinominati parte5.py/parte6_relazioni_cross.py, retrofit dei 31 nodi e
+    # delle relazioni cross-fonte esistenti (in questo modulo e nei moduli di
+    # Fonte 9/17/18/15 che referenziano fonte_id=7) con prefisso "Parte 5: "
+    # sul riferimento per disambiguare dalle Parti 1-4 aggiunte in questa
+    # stessa passata (numerazione di clausola non unica tra le 5 Parti dello
+    # stesso deliverable ETSI). Parti 1-4 importate granularmente (ADR-0007,
+    # adattato a standard tecnico ETSI: un nodo per clausola/requisito
+    # numerato) via 4 subagent paralleli (documenti brevi, 10-18 pagine
+    # ciascuno), moduli app/seed_data/etsi_319_412/parte[1-4].py, stesso
+    # prefisso "Parte N: " sul riferimento. Fase 6 (ADR-0009) per le Parti
+    # 1-4 in app/seed_data/etsi_319_412/parte7_relazioni_cross.py: alcune
+    # relazioni puntano a ETSI EN 319 411-1/2 (fonte_id=17/18), inserite piu'
+    # avanti nello script — chiamata separata a inserisci_capitoli per
+    # fonte_id=7 dopo il wiring di quelle due fonti (stesso pattern gia'
+    # usato per le relazioni cross di ETSI EN 319 411-1/2 stesse).
+    etsi412_cursor = conn.cursor()
+    etsi412_capitoli = [
+        etsi412_parte1, etsi412_parte2, etsi412_parte3, etsi412_parte4,
+        etsi412_parte5, etsi412_parte6_relazioni_cross,
+    ]
     seed_lib.inserisci_capitoli(
-        etsi5_cursor, fonte_id=7, capitoli=etsi5_capitoli, lookup=cad_lookup, registro=cad_registro,
+        etsi412_cursor, fonte_id=7, capitoli=etsi412_capitoli, lookup=cad_lookup, registro=cad_registro,
     )
 
     # --- Regolamento di esecuzione (UE) 2025/1566 (fonte_id=8): import
@@ -1340,66 +1414,36 @@ def seed():
         etsi401_cursor, fonte_id=10, capitoli=etsi401_capitoli, lookup=cad_lookup, registro=cad_registro,
     )
 
-    # --- ETSI TS 119 431-1 V1.3.1 (fonte_id=11): import granulare a copertura
-    # completa (ADR-0007, standard tecnico ETSI a clausole/requisiti numerati,
-    # stesso criterio di ETSI EN 319 412-5/Fonte 7, ETSI TS 119 461/Fonte 9,
-    # ETSI EN 319 401/Fonte 10). Documento di 31 pagine: 2 capitoli via
-    # subagent paralleli, moduli in app/seed_data/etsi_119_431_1/cap0[1-2].py
-    # (cap01 clausole 1-6: Scope/References/Definizioni/General concepts/
-    # General provisions/Trust Service Providers practice; cap02 clausola 7
-    # + Annex A normativo EUSPv2 + Annex B/C informativi, Annex D "Change
-    # history" escluso come paratesto editoriale). 159 item di indice (121+38),
-    # copertura verificata senza mancanti né doppioni; 23 relazioni interne
-    # (5 in cap01, 18 in cap02 verso cap01, verificate leggendo il testo
-    # ufficiale assegnato all'altro capitolo prima di crearle). Trattata come
-    # Fonte autonoma e indipendente da ETSI TS 119 431-2 su richiesta esplicita
-    # dell'utente (2026-09-22), pur essendo le due Parti dello stesso
-    # deliverable multi-parte ETSI. Fase 6 (ADR-0009) eseguita nella sessione
-    # principale dopo il seed iniziale: vedi modulo "capitolo virtuale"
-    # app/seed_data/etsi_119_431_1/cap03_relazioni_cross.py, agganciato in
-    # coda alla lista capitoli.
-    etsi431_1_cursor = conn.cursor()
-    etsi431_1_capitoli = [etsi431_1_cap01, etsi431_1_cap02]
+    # --- ETSI TS 119 431 (fonte_id=11): trattata come Fonte unica multi-parte
+    # (correzione 2026-09-23 dell'incoerenza rispetto al trattamento iniziale
+    # come due Fonti separate — vedi nota di modellazione in
+    # docs/fonti-censite.md). Import originario 2026-09-22: Parte 1 (TSP
+    # services operating a remote QSCD/SCDev, allora fonte_id=11 "ETSI TS 119
+    # 431-1", 31 pagine, 2 capitoli via subagent paralleli, moduli in
+    # app/seed_data/etsi_119_431_1/cap0[1-2].py, 159 item di indice, 23
+    # relazioni interne) e Parte 2 (TSP service components supporting AdES
+    # digital signature creation, allora fonte_id=12 "ETSI TS 119 431-2", 26
+    # pagine, 2 capitoli in app/seed_data/etsi_119_431_2/cap0[1-2].py, 95 item
+    # di indice, 41 relazioni interne) importate come Fonti separate su
+    # richiesta esplicita dell'utente. Consolidamento 2026-09-23: ogni
+    # `riferimento` (righe, INDICE_ARTICOLI_LOCALE, incluso l'elenco ausiliario
+    # `_REQUISITI_NSP_CAP01` in cap02.py che referenzia obblighi di cap01.py)
+    # porta ora il prefisso "Parte 1: "/"Parte 2: " per disambiguare la
+    # numerazione di clausola non unica tra le due Parti. Le relazioni cross
+    # fra le due Parti (originariamente cross-fonte 11<->12, Fase 6, ADR-0009,
+    # moduli app/seed_data/etsi_119_431_[12]/cap03_relazioni_cross.py) restano
+    # con `fonte_id` esplicito (non convertite a `None`, per minimizzare il
+    # diff) ma ora entrambe puntano a fonte_id=11 col prefisso di parte
+    # corretto; le relazioni verso fonti esterne (ETSI EN 319 401/Fonte 10,
+    # eIDAS/eIDAS2, CAD) restano invariate nella struttura, solo col prefisso
+    # di parte aggiunto al riferimento del lato Fonte 11.
+    etsi431_cursor = conn.cursor()
+    etsi431_capitoli = [
+        etsi431_1_cap01, etsi431_1_cap02, etsi431_2_cap01, etsi431_2_cap02,
+        etsi431_1_cap03_relazioni_cross, etsi431_2_cap03_relazioni_cross,
+    ]
     seed_lib.inserisci_capitoli(
-        etsi431_1_cursor, fonte_id=11, capitoli=etsi431_1_capitoli, lookup=cad_lookup, registro=cad_registro,
-    )
-
-    # --- ETSI TS 119 431-2 V1.2.1 (fonte_id=12): import granulare a copertura
-    # completa (ADR-0007), stesso criterio delle altre fonti ETSI. Documento
-    # di 26 pagine: 2 capitoli via subagent paralleli, moduli in
-    # app/seed_data/etsi_119_431_2/cap0[1-2].py (cap01 clausole 1-6: Scope/
-    # References/Definizioni/General concepts/Risk assessment/Policies and
-    # practices; cap02 clausole 7-9 + Annex A informativo + Annex B normativo
-    # + Annex C informativo, Annex D "Change history" escluso come paratesto
-    # editoriale). 95 item di indice (30+65), copertura verificata senza
-    # mancanti né doppioni; 41 relazioni interne (0 in cap01, 40 in cap02, 1
-    # cross-capitolo cap02->cap01 verificata leggendo il modulo cap01
-    # effettivamente scritto). Trattata come Fonte autonoma e indipendente da
-    # ETSI TS 119 431-1 su richiesta esplicita dell'utente (2026-09-22). Fase
-    # 6 (ADR-0009) eseguita nella sessione principale dopo il seed iniziale:
-    # vedi modulo "capitolo virtuale"
-    # app/seed_data/etsi_119_431_2/cap03_relazioni_cross.py, agganciato in
-    # coda alla lista capitoli.
-    etsi431_2_cursor = conn.cursor()
-    etsi431_2_capitoli = [etsi431_2_cap01, etsi431_2_cap02]
-    seed_lib.inserisci_capitoli(
-        etsi431_2_cursor, fonte_id=12, capitoli=etsi431_2_capitoli, lookup=cad_lookup, registro=cad_registro,
-    )
-
-    # --- Fase 6 (ADR-0009) per ETSI TS 119 431-1/2: relazioni cross-fonte,
-    # inserite SOLO ora che entrambe le fonti (11 e 12, che si citano a
-    # vicenda) sono gia' presenti nel registro simbolico. Vedi i docstring
-    # dei due moduli per il dettaglio completo della pipeline (grep+KNN+
-    # classificazione LLM+validazione) eseguita nella sessione principale.
-    etsi431_1_cross_cursor = conn.cursor()
-    seed_lib.inserisci_capitoli(
-        etsi431_1_cross_cursor, fonte_id=11, capitoli=[etsi431_1_cap03_relazioni_cross],
-        lookup=cad_lookup, registro=cad_registro,
-    )
-    etsi431_2_cross_cursor = conn.cursor()
-    seed_lib.inserisci_capitoli(
-        etsi431_2_cross_cursor, fonte_id=12, capitoli=[etsi431_2_cap03_relazioni_cross],
-        lookup=cad_lookup, registro=cad_registro,
+        etsi431_cursor, fonte_id=11, capitoli=etsi431_capitoli, lookup=cad_lookup, registro=cad_registro,
     )
     # --- Regolamento AgID modalità attuative SPID (fonte_id=13): import
     # granulare a copertura completa (ADR-0007). 39 pagine, 4 capitoli via
@@ -1474,6 +1518,150 @@ def seed():
         lookup=cad_lookup, registro=cad_registro,
     )
 
+    # --- Regole Tecniche e Raccomandazioni AgID 13/2/2020, ex art. 71 CAD
+    # (fonte_id=15): import granulare a copertura completa (ADR-0007).
+    # Documento breve (21 pagine nominali, ~10 di contenuto normativo):
+    # estrazione diretta in sessione principale (nessun subagent, nessuno
+    # split_source.py - dimensione compatibile con un solo contesto), 3
+    # capitoli in app/seed_data/agid_reg_tec_cert_qual/cap0[1-3].py (cap01:
+    # Definizioni + Scopo e ambito di applicazione + Obblighi; cap02:
+    # Raccomandazioni, 4.1-4.4; cap03: Convalida di firme/sigilli + Norme
+    # transitorie e abrogazioni). 49 nodi totali (38 obblighi, 11 principi).
+    # Le "raccomandazioni" del capitolo 4/par.5 comma 2 sono modellate come
+    # Obbligo nel nostro schema pur non essendo "obblighi" in senso stretto
+    # nel testo originale (nota di modellazione completa in cap02.py).
+    agidcert_cursor = conn.cursor()
+    agidcert_capitoli = [agidcert_cap01, agidcert_cap02, agidcert_cap03]
+    seed_lib.inserisci_capitoli(
+        agidcert_cursor, fonte_id=15, capitoli=agidcert_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- Fase 6 (ADR-0009) per le Regole Tecniche AgID 13/2/2020: esito in
+    # app/seed_data/agid_reg_tec_cert_qual/cap04_relazioni_cross.py (vedi
+    # docstring per la pipeline grep+KNN+LLM eseguita).
+    agidcert_cross_cursor = conn.cursor()
+    seed_lib.inserisci_capitoli(
+        agidcert_cross_cursor, fonte_id=15, capitoli=[agidcert_cap04],
+        lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- Codice Civile (fonte_id=16): import selettivo, non granulare
+    # (deroga esplicita ad ADR-0007, vedi docstring app/seed_data/codice_civile/
+    # cap01.py) - solo i 6 articoli espressamente citati da CAD/DPCM
+    # 22/2/2013 gia' censiti. Le relazioni "richiama"/"modifica" verso
+    # CAD/DPCM sono native nello stesso modulo (direzione invertita rispetto
+    # al caso tipico ADR-0009: qui e' la Fonte gia' censita a citare quella
+    # nuova), non differite a un modulo cross separato.
+    ccivile_cursor = conn.cursor()
+    ccivile_capitoli = [ccivile_cap01]
+    seed_lib.inserisci_capitoli(
+        ccivile_cursor, fonte_id=16, capitoli=ccivile_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI EN 319 411 (fonte_id=17): trattata come Fonte unica multi-parte
+    # (correzione 2026-09-23 dell'incoerenza rispetto al trattamento iniziale
+    # come due Fonti separate — vedi nota di modellazione in
+    # docs/fonti-censite.md). Import originario 2026-09-23: Parte 1 (General
+    # requirements, allora fonte_id=17 "ETSI EN 319 411-1", 60 pagine, 5
+    # capitoli via subagent paralleli in app/seed_data/etsi_319_411_1/cap0[1-5].py,
+    # 377 item di indice, nessuna relazione interna) e Parte 2 (Requirements
+    # for trust service providers issuing EU qualified certificates,
+    # costruita sopra la Parte 1, allora fonte_id=18 "ETSI EN 319 411-2", 33
+    # pagine, 3 capitoli in app/seed_data/etsi_319_411_2/cap0[1-3].py, 173
+    # item di indice, nessuna relazione interna) importate come Fonti
+    # separate su richiesta esplicita dell'utente. Consolidamento 2026-09-23:
+    # ogni `riferimento` porta ora il prefisso "Parte 1: "/"Parte 2: " per
+    # disambiguare la numerazione di clausola non unica tra le due Parti. Fase
+    # 6 (ADR-0009), esito originario: 192 relazioni da Parte 1 (verso DPCM
+    # 22/2/2013, ETSI EN 319 412 Parte 5, TS 119 461, EN 319 401, ETSI TS 119
+    # 431 Parte 1/2, Reg. (UE) 2015/1502, Regole Tecniche AgID certificati
+    # qualificati, EN 319 411 Parte 2; zero verso eIDAS/eIDAS2/CAD/SPID/DPCM
+    # 19-10-2021/Reg. (UE) 2025/1566/Reg. AgID modalita' attuative SPID/
+    # Codice Civile) + 128 relazioni da Parte 2 (verso eIDAS2, ETSI EN 319 412
+    # Parte 5, Reg. (UE) 2025/1566, TS 119 461, EN 319 401, ETSI TS 119 431
+    # Parte 1, Regole Tecniche AgID certificati qualificati, EN 319 411 Parte
+    # 1; zero verso eIDAS/CAD/DPCM 22-2-2013/SPID/DPCM 19-10-2021/ETSI TS 119
+    # 431 Parte 2/Reg. AgID modalita' attuative SPID/Reg. (UE) 2015/1502/
+    # Codice Civile) — le relazioni fra le due Parti stesse (originariamente
+    # cross-fonte 17<->18) sono ora relazioni interne alla stessa Fonte 17,
+    # col prefisso di parte corretto sul lato che ha cambiato fonte_id (18->17);
+    # quelle verso ETSI TS 119 431 (fonte_id=11, anch'essa consolidata da due
+    # Fonti in una in questa stessa passata) portano ora il prefisso di parte
+    # corretto sul lato Fonte 11 invece del vecchio fonte_id=12. Deve essere
+    # wired DOPO ETSI TS 119 431 (fonte_id=11) sopra, i cui nodi sono
+    # referenziati dalle relazioni cross-fonte di questo blocco.
+    etsi411_cursor = conn.cursor()
+    etsi411_capitoli = [
+        etsi411_1_cap01, etsi411_1_cap02, etsi411_1_cap03, etsi411_1_cap04, etsi411_1_cap05,
+        etsi411_2_cap01, etsi411_2_cap02, etsi411_2_cap03,
+        etsi411_1_cap06_relazioni_cross, etsi411_2_cap04_relazioni_cross,
+    ]
+    seed_lib.inserisci_capitoli(
+        etsi411_cursor, fonte_id=17, capitoli=etsi411_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI EN 319 412 (fonte_id=7), Fase 6 per le Parti 1-4: chiamata
+    # separata (deve seguire il wiring di ETSI EN 319 411/fonte_id=17 sopra,
+    # i cui nodi sono referenziati dalle relazioni cross-fonte di questo modulo).
+    etsi412_cross_cursor = conn.cursor()
+    seed_lib.inserisci_capitoli(
+        etsi412_cross_cursor, fonte_id=7, capitoli=[etsi412_parte7_relazioni_cross],
+        lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI EN 319 421 (fonte_id=18): Electronic Signatures and Trust
+    # Infrastructures (ESI); Policy and Security Requirements for Trust
+    # Service Providers issuing Time-Stamps, V1.3.1 (2025-07). Fonte unica
+    # (documento non multi-parte). Import granulare ADR-0007 via subagent
+    # paralleli per capitolo: 6 moduli in app/seed_data/etsi_319_421/cap0[1-6].py
+    # (cap01 clausole 1-4; cap02 clausole 5-6; cap03 clausola 7.1-7.6.7;
+    # cap04 clausola 7.7-7.16; cap05 clausola 8; cap06 annex informative A-H).
+    # Ogni `riferimento` e' il requirement id del testo ufficiale (OVR-/TIS-)
+    # oppure "clausola X.Y (Title)" per le clausole di cornice prive di
+    # requisito numerato; clausola 2 (References) e clausola 3.2 (Symbols,
+    # "Void.") sono fuori perimetro (bibliografia/paratesto), History escluso.
+    # Fase 6 (ADR-0009) nel modulo cap07_relazioni_cross.py, agganciato in coda
+    # alla stessa lista: 227 relazioni cross-fonte validate (165 richiama, 61 si
+    # sovrappone a, 1 specifica) verso eIDAS/eIDAS2, DPCM 22/2/2013, ETSI TS 119
+    # 461, ETSI EN 319 401, ETSI TS 119 431 ed ETSI EN 319 411, tutte risolte
+    # via registro (i nodi controparte sono tutti inseriti dalle chiamate
+    # precedenti in seed.py). Deve restare dopo il wiring di ETSI EN 319 411
+    # (fonte_id=17), i cui nodi sono referenziati da TIS-8.1-01/02.
+    etsi421_cursor = conn.cursor()
+    etsi421_capitoli = [
+        etsi421_cap01, etsi421_cap02, etsi421_cap03,
+        etsi421_cap04, etsi421_cap05, etsi421_cap06,
+        etsi421_cap07,
+    ]
+    seed_lib.inserisci_capitoli(
+        etsi421_cursor, fonte_id=18, capitoli=etsi421_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI EN 319 422 (fonte_id=19): Electronic Signatures and Trust
+    # Infrastructures (ESI); Time-stamping protocol and time-stamp token
+    # profiles, V1.1.1 (2016-03). Fonte unica (documento non multi-parte, non
+    # suddiviso in Parti). Import granulare ADR-0007 via subagent paralleli per
+    # capitolo: 4 moduli in app/seed_data/etsi_319_422/cap0[1-4].py (cap01
+    # clausole 1-3; cap02 clausole 4-5; cap03 clausole 6-8; cap04 clausola 9 +
+    # Annexes A-C normative). Non usa requirement id numerati come 319 401/319
+    # 421: il riferimento e' "clausola X.Y (Titolo)" per ogni sottoclasse
+    # numerata con contenuto proprio (es. "clausola 4.1.1 (Core requirement)")
+    # e "Annex X (Titolo)" per gli allegati; le intestazioni di puro
+    # raggruppamento (clausole 2, 3, 4, 4.1, 4.2, 5, 5.1, 5.2, 6, 9) e la
+    # clausola 2 (References, bibliografia) non generano nodo. Fase 6 (ADR-0009)
+    # nel modulo cap05_relazioni_cross.py, agganciato in coda alla stessa lista.
+    # Deve restare dopo il wiring di ETSI EN 319 421 (fonte_id=18), ETSI EN 319
+    # 412 (fonte_id=7), ETSI EN 319 401 (fonte_id=10) ed eIDAS/eIDAS2, i cui
+    # nodi sono referenziati dalle sue clausole.
+    etsi422_cursor = conn.cursor()
+    etsi422_capitoli = [
+        etsi422_cap01, etsi422_cap02, etsi422_cap03, etsi422_cap04,
+        etsi422_cap05,
+    ]
+    seed_lib.inserisci_capitoli(
+        etsi422_cursor, fonte_id=19, capitoli=etsi422_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
 
     # --- monitoraggio: modifiche rilevate (rilevanti ai fini eIDAS2) --------
     modifiche = [
@@ -1494,9 +1682,9 @@ def seed():
 
     embed()
 
-    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi5_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_1_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_2_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli)
-    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi5_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_1_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_2_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli)
-    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412-5, Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431-1, ETSI TS 119 431-2, Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502).")
+    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in agidcert_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in ccivile_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi411_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi421_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi422_capitoli)
+    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in agidcert_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in ccivile_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi411_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi421_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi422_capitoli)
+    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412 [5 Parti], Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 [2 Parti], Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile [import selettivo], ETSI EN 319 411 [2 Parti], ETSI EN 319 421, ETSI EN 319 422).")
 
 
 if __name__ == "__main__":

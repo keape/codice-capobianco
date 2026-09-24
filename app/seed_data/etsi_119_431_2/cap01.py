@@ -25,7 +25,7 @@ standard tecnico ETSI a clausole/sottoclausole con requisiti numerati
 articoli/commi di un atto legislativo:
 
 - Clausola 1 (Scope) -> 1 Principio "scopo/ambito di applicazione",
-  riferimento "clausola 1 (Scope)". Testo integrale riportato per intero
+  riferimento "Parte 2: clausola 1 (Scope)". Testo integrale riportato per intero
   (perimetro del documento: SCASC come componente di servizio TSP che
   implementa un'applicazione di creazione di firma AdES; nessuna
   restrizione sul tipo di TSP; NOTE 1-4 mantenute perché precisano
@@ -56,7 +56,7 @@ articoli/commi di un atto legislativo:
   SSASC, SSASP, TSA, URI), riportate per intero e nell'ordine del testo
   ufficiale.
 - Clausola 3.4 (Notations) -> 1 Principio "definitorio", riferimento
-  "clausola 3.4 (Notations)". NODO CRUCIALE per l'intero documento e per il
+  "Parte 2: clausola 3.4 (Notations)". NODO CRUCIALE per l'intero documento e per il
   capitolo 2 (clausole 7-9): riporta la legenda COMPLETA e verbatim del
   formato identificativo dei requisiti (<3 lettere identificanti
   l'elemento di servizio>-<numero di clausola>-<numero progressivo a 2
@@ -69,7 +69,7 @@ articoli/commi di un atto legislativo:
   (inserimento a fine clausola, inserimento intermedio con lettera
   suffissa, "VOID" per requisito eliminato, lettera suffissa per requisito
   modificato) - regola che spiega direttamente perché nel testo di questo
-  stesso capitolo compaiono id come "OVR-6.2-03A".
+  stesso capitolo compaiono id come "Parte 2: OVR-6.2-03A".
 - Clausola 4.1 (General policy requirements concepts) -> 1 Principio
   "scopo/ambito di applicazione", riferimento "clausola 4.1 (General policy
   requirements concepts)". Dichiara che il documento è strutturato in linea
@@ -182,7 +182,7 @@ principale, ADR-0009).
 
 RIGHE_OBBLIGHI = [
     {
-        "riferimento": "OVR-5-01",
+        "riferimento": "Parte 2: OVR-5-01",
         "testo": (
             "Si applicano i requisiti specificati in ETSI EN 319 401, clausola 5 (valutazione del rischio)."
         ),
@@ -194,7 +194,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.1-01",
+        "riferimento": "Parte 2: OVR-6.1-01",
         "testo": (
             "Si applicano i requisiti specificati in ETSI EN 319 401, clausola 6.1 (trust service practice "
             "statement); si applicano inoltre i requisiti particolari seguenti (OVR-6.1-02 - OVR-6.1-06)."
@@ -208,7 +208,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.1-02",
+        "riferimento": "Parte 2: OVR-6.1-02",
         "testo": (
             "[CONDITIONAL] Quando il SCASC supporta l'inclusione di marche temporali (time-stamp token) "
             "nella firma digitale AdES, la SCASC practice statement deve elencare quali TSA (Time-Stamping "
@@ -227,7 +227,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.1-03",
+        "riferimento": "Parte 2: OVR-6.1-03",
         "testo": "La SCASC practice statement deve specificare tutte le signature creation policy supportate.",
         "testo_integrale": (
             "OVR-6.1-03: The SCASC practice statement shall specify all the supported signature creation "
@@ -238,7 +238,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.1-04",
+        "riferimento": "Parte 2: OVR-6.1-04",
         "testo": "La SCASC practice statement deve specificare tutti i formati di firma supportati.",
         "testo_integrale": (
             "OVR-6.1-04: The SCASC practice statement shall specify all the supported signature formats."
@@ -248,7 +248,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.1-05",
+        "riferimento": "Parte 2: OVR-6.1-05",
         "testo": (
             "La SCASC practice statement deve specificare tutte le classi di firma supportate. NOTA: ETSI "
             "TS 119 102-1 descrive le diverse classi di firma."
@@ -262,7 +262,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.1-06",
+        "riferimento": "Parte 2: OVR-6.1-06",
         "testo": (
             "Lo SCASP deve identificare, nella SCASC practice statement, gli obblighi di tutte le "
             "organizzazioni esterne che supportano i suoi servizi, incluse le politiche e prassi applicabili."
@@ -276,7 +276,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-01",
+        "riferimento": "Parte 2: OVR-6.2-01",
         "testo": (
             "Si applicano i requisiti specificati in ETSI EN 319 401, clausola 6.2 (terms and conditions); "
             "si applicano inoltre i requisiti particolari seguenti (OVR-6.2-02 - OVR-6.2-10)."
@@ -290,7 +290,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-02",
+        "riferimento": "Parte 2: OVR-6.2-02",
         "testo": (
             "Per specificare la trust service policy applicata, i terms and conditions del SCASC devono "
             "elencare o richiamare (es. tramite OID), e descrivere brevemente, le SCASC policy supportate a "
@@ -306,7 +306,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-03",
+        "riferimento": "Parte 2: OVR-6.2-03",
         "testo": (
             "Per specificare la trust service policy applicata, i terms and conditions del SCASC possono "
             "(facoltativamente) utilizzare gli OID definiti in clausola 4.2.2."
@@ -320,7 +320,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-03A",
+        "riferimento": "Parte 2: OVR-6.2-03A",
         "testo": (
             "[Conditional] Se i terms and conditions del SCASC fanno riferimento a una trust service policy "
             "tramite un OID diverso da quelli definiti in clausola 4.2.2, la trust service policy "
@@ -340,7 +340,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-04",
+        "riferimento": "Parte 2: OVR-6.2-04",
         "testo": (
             "L'OID principale ('main'), come definito in clausola 4.2.2, deve essere utilizzato in "
             "relazione a un SCASC solo se il SCASC si conforma ai requisiti normativi della parte "
@@ -356,7 +356,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-05",
+        "riferimento": "Parte 2: OVR-6.2-05",
         "testo": (
             "L'OID 'eu-advanced-x509', come definito in clausola 4.2.2, deve essere utilizzato in relazione "
             "a un SCASC solo se il SCASC si conforma ai requisiti normativi della parte principale del "
@@ -372,7 +372,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-06",
+        "riferimento": "Parte 2: OVR-6.2-06",
         "testo": "I terms and conditions devono indicare i diritti e gli obblighi dello SCASP e del firmatario.",
         "testo_integrale": (
             "OVR-6.2-06: The terms and conditions shall indicate the rights and obligations of the SCASP "
@@ -383,7 +383,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-07",
+        "riferimento": "Parte 2: OVR-6.2-07",
         "testo": (
             "I terms and conditions devono descrivere le opzioni supportate dal servizio; almeno: a) i "
             "formati di firma supportati (esempio: CAdES, XAdES o PAdES); b) i parametri di firma "
@@ -403,7 +403,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-08",
+        "riferimento": "Parte 2: OVR-6.2-08",
         "testo": (
             "I terms and conditions devono includere elementi di Service-Level Agreement (SLA) per la "
             "disponibilità del servizio e, ove applicabile, altre informazioni SLA come i tempi di risposta."
@@ -418,7 +418,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-09",
+        "riferimento": "Parte 2: OVR-6.2-09",
         "testo": (
             "I terms and conditions devono fornire un avviso che l'SLA può essere condizionato dalle "
             "prassi, politiche e SLA di altri TSP non sotto il controllo dello SCASP, come la CA che "
@@ -434,7 +434,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.2-10",
+        "riferimento": "Parte 2: OVR-6.2-10",
         "testo": "I terms and conditions devono spiegare come lo SCASP tratta i dati personali.",
         "testo_integrale": (
             "OVR-6.2-10: The terms and conditions shall explain how the SCASP processes personal data."
@@ -444,7 +444,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.3-01",
+        "riferimento": "Parte 2: OVR-6.3-01",
         "testo": (
             "Si applicano i requisiti specificati in ETSI EN 319 401, clausola 6.3 (politica di sicurezza "
             "delle informazioni); si applica inoltre il requisito particolare seguente (OVR-6.3-02)."
@@ -458,7 +458,7 @@ RIGHE_OBBLIGHI = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
-        "riferimento": "OVR-6.3-02",
+        "riferimento": "Parte 2: OVR-6.3-02",
         "testo": (
             "La politica di sicurezza dovrebbe documentare i controlli di sicurezza e privacy implementati "
             "per proteggere i dati personali. NOTA: se lo SCASP ha accesso al documento da firmare, questo "
@@ -477,7 +477,7 @@ RIGHE_OBBLIGHI = [
 
 RIGHE_PRINCIPI = [
     {
-        "riferimento": "clausola 1 (Scope)",
+        "riferimento": "Parte 2: clausola 1 (Scope)",
         "testo": (
             "Il documento specifica requisiti di policy e sicurezza per i Trust Service Provider (TSP) che "
             "implementano un componente di servizio a supporto della creazione di firme digitali AdES "
@@ -541,7 +541,7 @@ RIGHE_PRINCIPI = [
         ],
     },
     {
-        "riferimento": "clausola 3.1 (Terms)",
+        "riferimento": "Parte 2: clausola 3.1 (Terms)",
         "testo": (
             "La clausola definisce, oltre ai termini richiamati per rinvio da ETSI TR 119 001, un glossario "
             "di 16 termini specifici del documento: AdES (digital) signature (firma digitale CAdES, PAdES o "
@@ -601,7 +601,7 @@ RIGHE_PRINCIPI = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 3.3 (Abbreviations)",
+        "riferimento": "Parte 2: clausola 3.3 (Abbreviations)",
         "testo": (
             "La clausola definisce, oltre alle abbreviazioni richiamate per rinvio da ETSI TR 119 001, 14 "
             "abbreviazioni specifiche del documento: CA (Certification Authority), DTBSR (Data To Be Signed "
@@ -626,7 +626,7 @@ RIGHE_PRINCIPI = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 3.4 (Notations)",
+        "riferimento": "Parte 2: clausola 3.4 (Notations)",
         "testo": (
             "I requisiti del documento comprendono: a) requisiti applicabili a qualunque TSP conforme, "
             "indicati da clausole senza marcatura aggiuntiva; b) requisiti applicabili solo a certe "
@@ -662,7 +662,7 @@ RIGHE_PRINCIPI = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 4.1 (General policy requirements concepts)",
+        "riferimento": "Parte 2: clausola 4.1 (General policy requirements concepts)",
         "testo": (
             "Il documento è strutturato in linea con ETSI EN 319 401, di cui incorpora i requisiti per "
             "riferimento, aggiungendo i requisiti specifici rilevanti per lo SCASP; per guida sui requisiti "
@@ -678,7 +678,7 @@ RIGHE_PRINCIPI = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 4.2.1 (SCASC practice statement)",
+        "riferimento": "Parte 2: clausola 4.2.1 (SCASC practice statement)",
         "testo": (
             "Lo SCASP sviluppa, implementa, applica e aggiorna una SCASC practice statement, istanza della "
             "trust service practice statement definita in ETSI EN 319 401 per un signature creation "
@@ -713,7 +713,7 @@ RIGHE_PRINCIPI = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 4.2.2 (SCASC policy)",
+        "riferimento": "Parte 2: clausola 4.2.2 (SCASC policy)",
         "testo": (
             "Una SCASC policy descrive cosa è offerto e può contenere informazioni ulteriori rispetto "
             "all'ambito del documento, per indicare l'applicabilità del servizio; è definita "
@@ -757,7 +757,7 @@ RIGHE_PRINCIPI = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 4.2.3 (Terms and conditions)",
+        "riferimento": "Parte 2: clausola 4.2.3 (Terms and conditions)",
         "testo": (
             "Oltre alla SCASC practice statement e, quando emessa, alla SCASC policy, lo SCASP emette anche "
             "termini e condizioni (v. clausola 6.2), che possono coprire un ampio ventaglio di termini "
@@ -783,7 +783,7 @@ RIGHE_PRINCIPI = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 4.2.4 (Other documents associated with signature creation)",
+        "riferimento": "Parte 2: clausola 4.2.4 (Other documents associated with signature creation)",
         "testo": (
             "Oltre alla descrizione delle prassi impiegate dallo SCASP per offrire il servizio di creazione "
             "di firma AdES, è importante documentare i criteri di creazione delle firme e la loro idoneità a "
@@ -827,7 +827,7 @@ RIGHE_PRINCIPI = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 4.3 (Architecture)",
+        "riferimento": "Parte 2: clausola 4.3 (Architecture)",
         "testo": (
             "Un componente di servizio TSP a supporto della creazione di firme digitali AdES (SCASC) riceve "
             "il/i documento/i e/o hash da firmare ed eventuali parametri di firma, raccoglie le informazioni "
@@ -864,36 +864,36 @@ RIGHE_PRINCIPI = [
 ]
 
 INDICE_ARTICOLI_LOCALE = [
-    "clausola 1 (Scope)",
-    "clausola 3.1 (Terms)",
-    "clausola 3.3 (Abbreviations)",
-    "clausola 3.4 (Notations)",
-    "clausola 4.1 (General policy requirements concepts)",
-    "clausola 4.2.1 (SCASC practice statement)",
-    "clausola 4.2.2 (SCASC policy)",
-    "clausola 4.2.3 (Terms and conditions)",
-    "clausola 4.2.4 (Other documents associated with signature creation)",
-    "clausola 4.3 (Architecture)",
-    "OVR-5-01",
-    "OVR-6.1-01",
-    "OVR-6.1-02",
-    "OVR-6.1-03",
-    "OVR-6.1-04",
-    "OVR-6.1-05",
-    "OVR-6.1-06",
-    "OVR-6.2-01",
-    "OVR-6.2-02",
-    "OVR-6.2-03",
-    "OVR-6.2-03A",
-    "OVR-6.2-04",
-    "OVR-6.2-05",
-    "OVR-6.2-06",
-    "OVR-6.2-07",
-    "OVR-6.2-08",
-    "OVR-6.2-09",
-    "OVR-6.2-10",
-    "OVR-6.3-01",
-    "OVR-6.3-02",
+    "Parte 2: clausola 1 (Scope)",
+    "Parte 2: clausola 3.1 (Terms)",
+    "Parte 2: clausola 3.3 (Abbreviations)",
+    "Parte 2: clausola 3.4 (Notations)",
+    "Parte 2: clausola 4.1 (General policy requirements concepts)",
+    "Parte 2: clausola 4.2.1 (SCASC practice statement)",
+    "Parte 2: clausola 4.2.2 (SCASC policy)",
+    "Parte 2: clausola 4.2.3 (Terms and conditions)",
+    "Parte 2: clausola 4.2.4 (Other documents associated with signature creation)",
+    "Parte 2: clausola 4.3 (Architecture)",
+    "Parte 2: OVR-5-01",
+    "Parte 2: OVR-6.1-01",
+    "Parte 2: OVR-6.1-02",
+    "Parte 2: OVR-6.1-03",
+    "Parte 2: OVR-6.1-04",
+    "Parte 2: OVR-6.1-05",
+    "Parte 2: OVR-6.1-06",
+    "Parte 2: OVR-6.2-01",
+    "Parte 2: OVR-6.2-02",
+    "Parte 2: OVR-6.2-03",
+    "Parte 2: OVR-6.2-03A",
+    "Parte 2: OVR-6.2-04",
+    "Parte 2: OVR-6.2-05",
+    "Parte 2: OVR-6.2-06",
+    "Parte 2: OVR-6.2-07",
+    "Parte 2: OVR-6.2-08",
+    "Parte 2: OVR-6.2-09",
+    "Parte 2: OVR-6.2-10",
+    "Parte 2: OVR-6.3-01",
+    "Parte 2: OVR-6.3-02",
 ]
 
 MAPPATURA_LOCALE = {rif: [rif] for rif in INDICE_ARTICOLI_LOCALE}

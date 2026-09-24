@@ -129,7 +129,7 @@ RELAZIONI = [
     },
     {
         "nodo_da": ("principio", None, 'clausola 1 (Scope)'),
-        "nodo_a": ("principio", 7, 'QCS-4.3.5-01'),
+        "nodo_a": ("principio", 7, 'Parte 5: QCS-4.3.5-01'),
         "tipo_relazione": 'si sovrappone a',
         "evidence_type": 'inferred',
         "confidence": 0.55,
@@ -137,7 +137,7 @@ RELAZIONI = [
     },
     {
         "nodo_da": ("principio", None, 'clausola 4.1 (Identity proofing actors)'),
-        "nodo_a": ("principio", 7, 'QCS-4.3.5-01'),
+        "nodo_a": ("principio", 7, 'Parte 5: QCS-4.3.5-01'),
         "tipo_relazione": 'si sovrappone a',
         "evidence_type": 'inferred',
         "confidence": 0.5,
@@ -937,7 +937,7 @@ RELAZIONI = [
     },
     {
         "nodo_da": ("obbligo", None, 'QTS-C.3.6-01'),
-        "nodo_a": ("principio", 7, 'Annex A.1 (mapping con Allegato I Reg. 910/2014)'),
+        "nodo_a": ("principio", 7, 'Parte 5: Annex A.1 (mapping con Allegato I Reg. 910/2014)'),
         "tipo_relazione": 'si sovrappone a',
         "evidence_type": 'inferred',
         "confidence": 0.5,
