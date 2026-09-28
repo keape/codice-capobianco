@@ -411,6 +411,33 @@ numero**: le citazioni più vecchie usano la numerazione V1.x (annessi A.8/A.9,
 clausola 11) mentre la V2.1.1 ha rinumerato in clausole 5, 6, 7, 9 e 10 — solo
 le lunghezze di chiave conservano lo stesso numero (9.3). Tabella di mappatura
 completa, proposte scartate e limite noto nel docstring del modulo.
+- **ETSI TS 119 101 V1.1.1 (2016-03)** (Policy and security requirements for
+applications for signature creation and signature validation). `fonte_id=26`.
+Documento **non multi-parte**. Import 2026-09-28 via `split_source.py` + 4
+subagent paralleli (42 pagine), moduli `app/seed_data/etsi_119_101/cap0[1-5].py`
+(cap01 clausole 1-4; cap02 clausole 5-7; cap03 clausola 8; cap04 clausole 9-10
++ Annex A; cap05 capitolo virtuale di Fase 6). 275 nodi (204 obblighi, 71
+principi), 275 item di indice, front matter tagliato prima dello split.
+**Granularità a id di controllo, non a clausola**: questa fonte numera le
+proprie prescrizioni con id propri (UI, GSM, SC, PD, APD, ISMS, NP, ISP, SIA,
+DSS, EL nelle clausole 5-7; SCP 1-94, SVP 1-23, SAP 1-9 nella clausola 8; SDM
+e TC nelle clausole 9-10) e ciascuno ha destinatario e forza deontica propri, a
+differenza di ETSI TS 119 312 che non ha id. I blocchi "Control objective"
+(privi di id) e le sottoclavole senza controlli sono nodi Principio con
+riferimento sintetico. La decisione è stata presa in corso d'opera su
+richiesta di due subagent della stessa fonte e applicata **retroattivamente**
+a cap04, che era stato scritto a granularità di clausola: senza di essa la
+Fonte sarebbe risultata internamente disomogenea. 14 relazioni "richiama" nel
+solo giro **inverso** (`cap05_relazioni_cross.py`): 9 nodi della Fonte 11
+(ETSI TS 119 431 Parte 2) citano questa norma e sei lo fanno **per id di
+controllo** (`UI 1`, `UI 2`, `SCP 13`, `SCP 14`, `SCP 31`, `SCP 37`, `SCP 47`,
+`SCP 61`, `GSM 1.2`, `GSM 1.3`, `GSM 1.4`, `GSM 2.4`) — è il motivo per cui la
+granularità a id non è un dettaglio redazionale ma la condizione perché quei
+rinvii trovino un bersaglio puntuale. Per questa Fonte **non** è stato eseguito
+il giro KNN in direzione diretta: su 275 nodi lo shortlist è dominato dal
+lessico comune degli standard ETSI e non da corrispondenze prescrittive; il
+limite è dichiarato nel docstring del modulo invece di essere mascherato da
+un elenco di proposte scartate.
 - **ETSI EN 319 422 V1.1.1 (2016-03)** (Time-stamping protocol and time-stamp
   token profiles). `fonte_id=19`. Documento **non multi-parte**. Import
   2026-09-24 via 4 subagent paralleli, 4 moduli
@@ -532,10 +559,10 @@ completa, proposte scartate e limite noto nel docstring del modulo.
 | Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502 | 8 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
-| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312 | 10 |
-| **Totale** | | **25** |
+| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101 | 11 |
+| **Totale** | | **26** |
 
-24 delle 25 Fonti hanno copertura granulare completa (ADR-0007) e sono
+25 delle 26 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente

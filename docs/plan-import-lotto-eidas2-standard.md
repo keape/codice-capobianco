@@ -154,7 +154,7 @@ che è il modello di riferimento per una fonte di questo tipo:
 | 3 | Reg. 2025/2531 | 23 | ☑ | ☑ 1 cap. | ☑ | ☑ 3 rel. | ☑ | ☑ |
 | 4 | Reg. 2025/2532 | 24 | ☑ | ☑ 1 cap. | ☑ | ☑ 3 rel. | ☑ | ☑ |
 | 5 | ETSI TS 119 312 | 25 | ☑ | ☑ 4 cap. | ☑ | ☑ 21 rel. inverse | ☑ | ☑ |
-| 6 | ETSI TS 119 101 | 26 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 6 | ETSI TS 119 101 | 26 | ☑ | ☑ 4 cap. | ☑ | ☑ 14 rel. inverse | ☑ | ☑ |
 | 7 | ETSI EN 319 102-1 | 27 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 
 ## 7. Fuori perimetro di questo lotto (backlog, non eseguito)
