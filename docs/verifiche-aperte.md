@@ -12,7 +12,8 @@ esito è scritto nella scheda della Fonte in `docs/fonti-censite.md` o nel
 docstring del modulo interessato.
 
 Ultimo aggiornamento: 2026-09-28 (chiusura del lotto 1: atti di esecuzione
-eIDAS2 + TS 119 312, TS 119 101, EN 319 102-1).
+eIDAS2 + TS 119 312, TS 119 101, EN 319 102-1; poi decisioni sull'apertura del
+lotto 2: § 7 chiusa, § 9 integrata con i rinvii ratificati).
 
 ---
 
@@ -111,22 +112,24 @@ cui deriva è stato agganciato a `REQ-7.5-01` di Fonte 10. Il punto 6
 **Quando riverificare.** Se la Fonte 11 o la Fonte 10 vengono rieditate con
 clausole nuove.
 
-## 7. Inconsistenza dichiarata e non risolta: eIDAS ed eIDAS2 come due Fonti
+## 7. eIDAS ed eIDAS2 come due Fonti — chiuso: restano separate
 
-**In sospeso da prima di questo lotto.** `CONTEXT.md` dichiara che una Fonte
-esiste una volta sola nel censimento; `app/seed.py` modella il Reg. 910/2014 e
-il Reg. 2024/1183 come **due Fonti separate** (1 e 2), scelta deliberata per
-poter confrontare prima/dopo, con una nota in `CLAUDE.md` che la segnala come
-divergenza "da riconciliare esplicitamente con l'utente".
+**Chiuso il 2026-09-28, su decisione esplicita dell'utente: eIDAS (Reg.
+910/2014, Fonte 1) ed eIDAS2 (Reg. 2024/1183, Fonte 2) restano due Fonti
+distinte.** Non è un'incoerenza da sanare ma una scelta di modellazione
+confermata, per poter confrontare prima/dopo. La regola di `CONTEXT.md` ("una
+Fonte esiste una volta sola nel censimento") va letta con questa eccezione
+dichiarata, non come una regola violata; nessuna unificazione, nessun
+rimappaggio delle relazioni esistenti.
 
-**Perché conta.** Determina dove vivono i nodi degli articoli modificati da
-eIDAS2: tutti gli atti di esecuzione importati puntano alla Fonte 2 per le
-disposizioni vigenti (artt. 24, 29-bis, 45-sexies eIDAS2). Se le due Fonti
-venissero unificate, tutte le relazioni di quei 4 atti dovrebbero essere
-rimappate.
+**Perché la separazione va comunque ricordata.** Gli atti di esecuzione
+puntano alla Fonte 2 per le disposizioni vigenti (artt. 24, 29-bis, 45-sexies
+eIDAS2): chi cerca una disposizione modificata da eIDAS2 deve sapere che il
+nodo vive sulla Fonte 2, non sulla 1.
 
-**Quando riverificare.** Alla prima occasione di revisione con l'utente: è una
-decisione di modellazione, non un errore da correggere in autonomia.
+**Quando riverificare.** Solo se in futuro si decide di unificare: il costo
+sarebbe il rimappaggio delle relazioni dei quattro atti di esecuzione del
+lotto 1.
 
 ## 8. Date di pubblicazione ETSI a precisione mensile
 
@@ -150,8 +153,18 @@ clausole di **CEN/TS 18170** (6.1, 6.2, 7.3, 7.13, 13.3.1), oltre che a ISO
 non è stata creata alcuna relazione: un rinvio di clausola non ha un bersaglio
 puntuale e non ne è stato scelto uno arbitrario.
 
-**Quando riverificare.** Dopo l'import di CEN/TS 18170 (backlog) e a ogni
-import di una delle norme elencate: quei rinvii diventano relazioni possibili.
+**Decisione del 2026-09-28 (lotto 2): i rinvii restano aperti per scelta, non
+per inerzia.** CEN/TS 18170 è **rinviata** (testo non libero *e* revisione CEN
+prevista entro fine 2026: importarla ora significherebbe rifare il lavoro sulla
+versione corretta); ISO/IEC 15408:2022, ISO 23257:2022 e ISO/TS 23635:2022
+sono **rinviate** per indisponibilità del testo ufficiale; ISO 14721:2025 è
+**rinviata** in attesa della versione definitiva, senza adottare l'equivalente
+gratuito CCSDS 650.0-M-2 come sostituto. Le fonti libere del backlog sono
+invece in import: `docs/plan-import-lotto-2-backlog-e-ades.md`.
+
+**Quando riverificare.** Dopo l'import di CEN/TS 18170 (a revisione CEN
+conclusa) e a ogni import di una delle norme elencate: quei rinvii diventano
+relazioni possibili.
 
 ---
 

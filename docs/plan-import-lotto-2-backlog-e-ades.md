@@ -112,6 +112,21 @@ piano del lotto 1, con in più:
 
 ## 5. Stato
 
-Nessun import di questo lotto è iniziato. Al momento della scrittura è in corso
-solo una normalizzazione su Fonte 27 (criterio Input/Inputs di EN 319 102-1,
-deciso dall'utente il 2026-09-28) che richiede un ultimo seed di quella Fonte.
+**Aggiornamento 2026-09-28 (sera).** Blocco A **in corso**: primo import =
+Fonte 28, Reg. di esecuzione (UE) 2024/2979 (testo ufficiale in
+`app/.source_cache/reg_ue_2024_2979/`, provenienza CELLAR, split in 5 capitoli:
+Capo I-IV + allegati I-V).
+
+Decisioni dell'utente sul blocco C, tutte di **rinvio**, quindi il blocco resta
+fuori dal perimetro eseguito: CEN/TS 18170 rimandata (accesso non libero *e*
+revisione CEN prevista entro fine 2026); ISO/IEC 15408, ISO 23257 e ISO/TS
+23635 rimandate per indisponibilità del testo ufficiale; ISO 14721 rimandata in
+attesa della versione definitiva, senza adottare come sostituto l'equivalente
+gratuito CCSDS 650.0-M-2. Di conseguenza i rinvii di clausola registrati in
+`docs/verifiche-aperte.md` § 9 restano aperti, come limite dichiarato e non
+come errore.
+
+Precedente (§ 5 al momento della scrittura del piano): nessun import di questo
+lotto era iniziato; era in corso solo la normalizzazione di Fonte 27 (criterio
+Input/Inputs di EN 319 102-1, deciso dall'utente il 2026-09-28), conclusa con i
+commit `23fa4ee` e `44ae598`.

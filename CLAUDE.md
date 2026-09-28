@@ -120,9 +120,9 @@ Ogni riga di `relazioni` porta `evidence_type` (`textual`/`inferred`/`human-cura
 
 `schema.sql` e `seed.py` referenziano numeri di "ticket" sequenziali (03, 04, 05, 07, 08) come origine di varie decisioni di design (es. `modifiche_rilevate` da ticket 05, nodo Principio da ticket 08/ADR-0004). Un file `map.md` è citato nei commenti come riferimento per la cronologia di queste decisioni ma non è presente nell'albero del repo (potrebbe esistere solo nella storia git).
 
-### Inconsistenza nota: eIDAS/eIDAS2 come due Fonti
+### eIDAS/eIDAS2 come due Fonti: eccezione dichiarata, non incoerenza
 
-`CONTEXT.md` dichiara che una Fonte esiste una volta sola nel censimento, ma `seed.py` modella eIDAS 910/2014 ed eIDAS2 (2024/1183) come **due righe `fonti` separate** (scelta esplicita per permettere confronto prima/dopo), segnalata in un commento di `seed.py` come divergenza da riconciliare con l'utente, non ancora risolta.
+`CONTEXT.md` dichiara che una Fonte esiste una volta sola nel censimento; `seed.py` modella invece eIDAS 910/2014 (Fonte 1) ed eIDAS2 2024/1183 (Fonte 2) come **due righe `fonti` separate**. **Decisione confermata dall'utente il 2026-09-28**: restano due Fonti, per poter confrontare prima/dopo. Non è più una divergenza «da riconciliare» — è un'eccezione dichiarata alla regola di `CONTEXT.md` (vedi `docs/verifiche-aperte.md` § 7, chiusa). Conseguenza operativa da ricordare: gli articoli modificati da eIDAS2 vivono sulla Fonte 2, ed è lì che puntano i quattro atti di esecuzione del lotto 1 (artt. 24, 29-bis, 45-sexies eIDAS2).
 
 ### Copertura completa per articolo (ADR-0007): nessun discrimine di rilevanza in estrazione
 
