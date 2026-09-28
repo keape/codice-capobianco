@@ -15,13 +15,14 @@ con contenuto proprio - 5.6.1 (Introduction); cinque "Description"
 (5.6.2.1.1, 5.6.2.2.1, 5.6.2.3.1, 5.6.2.4.1, 5.6.3.1); cinque "Input"
 (5.6.2.1.2, 5.6.2.2.2, 5.6.2.3.2, 5.6.2.4.2, 5.6.3.2); cinque "Output"
 (5.6.2.1.3, 5.6.2.2.3, 5.6.2.3.3, 5.6.2.4.3, 5.6.3.3); cinque "Processing"
-(5.6.2.1.4, 5.6.2.2.4, 5.6.2.3.4, 5.6.2.4.4, 5.6.3.4). Di questi 21 nodi 8
-sono Obblighi (le cinque clausole "Processing" e le tre clausole "Output" che
-contengono un verbo prescrittivo) e 13 Principi (introduzione, descrizioni,
-tabelle di input e le due tabelle di output puramente dichiarative). Nessuna
-clausola coperta due volte, nessuna omessa: tutte le parole del file (piedini di
-pagina esclusi) risultano distribuite fra i 21 nodi, le 28 intestazioni
-numerate e le 2 righe di continuazione dei titoli lunghi.
+(5.6.2.1.4, 5.6.2.2.4, 5.6.2.3.4, 5.6.2.4.4, 5.6.3.4). Di questi 21 nodi 13
+sono Obblighi (le cinque clausole "Processing", le cinque clausole "Input" e
+le tre clausole "Output" che portano una prescrizione) e 8 Principi
+(l'introduzione, le cinque "Description" e le due clausole "Output" senza
+colonna "Requirement"). Nessuna clausola coperta due volte, nessuna omessa:
+tutte le parole del file (piedini di pagina esclusi) risultano distribuite fra i
+21 nodi, le 28 intestazioni numerate e le 2 righe di continuazione dei titoli
+lunghi.
 
 Scelte di modellazione non ovvie:
 
@@ -37,32 +38,33 @@ Scelte di modellazione non ovvie:
   procedura, e l'unità di copertura e' la clausola numerata. Il testo_integrale
   riporta l'algoritmo completo passo per passo, comprese le NOTE e gli EXAMPLE
   ufficiali (ADR-0010).
-- `tipo_obbligo`: "tecnico/sicurezza" per i sei nodi dei blocchi costitutivi
-  aggiuntivi della clausola 5.6.2 (5.6.2.1.4, 5.6.2.2.4, 5.6.2.3.3, 5.6.2.3.4,
-  5.6.2.4.3, 5.6.2.4.4: percorso di certificazione X.509, dati di revoca,
-  vincoli crittografici e affidabilità degli algoritmi, POE e funzioni di hash),
-  come per le clausole "Processing"/"Outputs" dei blocchi costitutivi di base
-  della clausola 5.2 (app/seed_data/etsi_319_102/cap04.py); "procedurale" per i
+- `tipo_obbligo`: "tecnico/sicurezza" per gli undici nodi tecnici - le cinque
+  clausole "Input" (5.6.2.1.2, 5.6.2.2.2, 5.6.2.3.2, 5.6.2.4.2, 5.6.3.2) e i
+  sei nodi dei blocchi costitutivi aggiuntivi della clausola 5.6.2 (5.6.2.1.4,
+  5.6.2.2.4, 5.6.2.3.3, 5.6.2.3.4, 5.6.2.4.3, 5.6.2.4.4: percorso di
+  certificazione X.509, dati di revoca, vincoli crittografici e affidabilità
+  degli algoritmi, POE e funzioni di hash) - come per le clausole
+  "Processing"/"Outputs"/"Inputs" dei blocchi costitutivi di base della
+  clausola 5.2 (app/seed_data/etsi_319_102/cap04.py); "procedurale" per i
   due nodi del processo di convalida a lungo termine 5.6.3 (5.6.3.3, 5.6.3.4),
   come per le clausole "Processing" dei processi di convalida 5.3-5.5
   (cap05.py e cap06.py della stessa Fonte).
-- Clausole "Output" -> il tipo dipende dalla presenza di un verbo prescrittivo:
+- Clausole "Output" -> il tipo dipende dalla presenza di una prescrizione:
   5.6.2.3.3, 5.6.2.4.3 e 5.6.3.3 contengono "shall return"/"shall be" con
   destinatario individuabile (il processo o la SVA) e sono Obblighi; 5.6.2.1.3
-  e 5.6.2.2.3 sono solo tabelle di indicazioni possibili, senza prescrizione, e
-  sono Principi "altro". Nella clausola 5.2 (cap04.py) la stessa distinzione
-  separa le clausole "Outputs" prescrittive (Obbligo) da quelle dichiarative;
-  nelle clausole 5.3.3, 5.4.3 e 5.5.3 (cap05.py, cap06.py) la "Outputs" e' un
-  Principio perché il verbo modale manca, come qui in 5.6.2.1.3 e 5.6.2.2.3.
+  e 5.6.2.2.3 sono solo tabelle di indicazioni possibili (Tabelle 22 e 24, unica
+  colonna "Indication", nessuna colonna "Requirement") e restano Principi
+  "altro", come le clausole "Outputs" 5.3.3, 5.4.3 e 5.5.3 di cap05.py e
+  cap06.py.
 - Clausole "Input" (5.6.2.1.2, 5.6.2.2.2, 5.6.2.3.2, 5.6.2.4.2, 5.6.3.2) ->
-  Principi "altro": le tabelle 21, 23, 25, 26 e 27 dichiarano la firma
-  dell'interfaccia del blocco costitutivo (input obbligatori o opzionali) senza
-  imporre un comportamento a un soggetto, quindi non contengono alcun verbo
-  modale. Stessa lettura delle clausole "Inputs" della clausola 5.2 (cap04.py);
-  cap06.py ha invece censito come Obbligo la 5.5.2 (Inputs) del processo di
-  convalida con tempo: la divergenza e' fra capitoli della stessa Fonte, non
-  dentro questa porzione, dove tutte le tabelle prive di verbo modale sono
-  Principi.
+  Obblighi "tecnico/sicurezza", soggetto QTSP/gestore obbligato: le Tabelle 21,
+  23, 25, 26 e 27 portano la colonna "Requirement" con valori Mandatory/Optional
+  (la Tabella 25 anche "Mandatory (but may be empty)"), quindi fissano in modo
+  prescrittivo quali input il blocco costitutivo - o il processo di convalida a
+  lungo termine - deve ricevere e quali ammette, pur senza un "shall" esplicito
+  nel corpo della clausola. E' la regola unica adottata per l'intera Fonte, che
+  riassorbe la divergenza fra la lettura di cap04.py (che censiva come Principi
+  le clausole "Inputs" della clausola 5.2) e quella di cap05.py/cap06.py.
 - Clausole "Description" (5.6.2.1.1, 5.6.2.2.1, 5.6.2.3.1, 5.6.2.4.1, 5.6.3.1)
   e "Introduction" (5.6.1) -> Principi "altro": espongono modello, razionale e
   presupposti dei processi, incluse NOTE ed EXAMPLE ufficiali. Per la 5.6.1 non
@@ -95,6 +97,29 @@ Scelte di modellazione non ovvie:
 """
 
 RIGHE_OBBLIGHI: list[dict] = [
+    {
+        "riferimento": "clausola 5.6.2.1.2 (Input)",
+        "testo": (
+            "Tabella 21 - Input del blocco costitutivo di convalida passata del certificato: certificato "
+            "obiettivo (obbligatorio); parametri di convalida X.509, incluso l'insieme delle trust anchor "
+            "(obbligatorio); un insieme di POE (obbligatorio); dati di convalida dei certificati (obbligatorio); "
+            "vincoli di convalida X.509 (opzionale); vincoli crittografici (opzionale)."
+        ),
+        "testo_integrale": (
+            "**Table 21: Inputs to past certificate validation building block**\n\n"
+            "|Input|Requirement|\n"
+            "|---|---|\n"
+            "|Target certificate|Mandatory|\n"
+            "|X.509 Validation Parameters including set of trust anchors|Mandatory|\n"
+            "|A set of POEs|Mandatory|\n"
+            "|Certificate Validation Data|Mandatory|\n"
+            "|X.509 Validation Constraints|Optional|\n"
+            "|Cryptographic Constraints|Optional|"
+        ),
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
     {
         "riferimento": "clausola 5.6.2.1.4 (Processing)",
         "testo": (
@@ -154,6 +179,29 @@ RIGHE_OBBLIGHI: list[dict] = [
             "5) The building block shall return the current status. If the current status is PASSED, the building "
             "block shall also return the certificate chain as well as the calculated validation time returned in "
             "step 3)."
+        ),
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
+        "riferimento": "clausola 5.6.2.2.2 (Input)",
+        "testo": (
+            "Tabella 23 - Input del blocco costitutivo di scorrimento del tempo di convalida: una catena di "
+            "certificati prospettica (obbligatorio); un insieme di POE (obbligatorio); dati di convalida dei "
+            "certificati (obbligatorio); una sunset date della trust anchor (opzionale); vincoli crittografici "
+            "(opzionale); vincoli di convalida X.509 (opzionale)."
+        ),
+        "testo_integrale": (
+            "**Table 23: Inputs to the validation time sliding building block**\n\n"
+            "|Input|Requirement|\n"
+            "|---|---|\n"
+            "|A prospective certificate chain|Mandatory|\n"
+            "|A set of POEs|Mandatory|\n"
+            "|Certificate Validation Data|Mandatory|\n"
+            "|A trust anchor sunset date|Optional|\n"
+            "|Cryptographic constraints|Optional|\n"
+            "|X.509 validation constraints|Optional|"
         ),
         "tipo_obbligo": "tecnico/sicurezza",
         "stato": "vigente",
@@ -281,6 +329,25 @@ RIGHE_OBBLIGHI: list[dict] = [
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
+        "riferimento": "clausola 5.6.2.3.2 (Input)",
+        "testo": (
+            "Tabella 25 - Input del blocco costitutivo di estrazione delle POE: firma (obbligatorio); un "
+            "attributo con un token di marca temporale (obbligatorio); un insieme di POE (obbligatorio, ma puo' "
+            "essere vuoto)."
+        ),
+        "testo_integrale": (
+            "**Table 25: Inputs to the POE extraction building block**\n\n"
+            "|Input|Requirement|\n"
+            "|---|---|\n"
+            "|Signature|Mandatory|\n"
+            "|An attribute with a time-stamp token|Mandatory|\n"
+            "|A set of POEs|Mandatory (but may be empty)|"
+        ),
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
         "riferimento": "clausola 5.6.2.3.3 (Output)",
         "testo": (
             "Il processo di estrazione delle POE DEVE restituire un insieme di POE, che puo' essere un insieme "
@@ -328,6 +395,33 @@ RIGHE_OBBLIGHI: list[dict] = [
             "least T2, the building block shall add to P a POE for O at T1.\n\n"
             "5) For each object contained in S, the building block shall add to P a POE for that object at T1.\n\n"
             "6) The building block shall return the set P of POEs."
+        ),
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
+        "riferimento": "clausola 5.6.2.4.2 (Input)",
+        "testo": (
+            "Tabella 26 - Input del blocco costitutivo di convalida passata della firma: firma (obbligatorio); "
+            "indicazione/sotto-indicazione dello stato al momento corrente (obbligatorio); certificato obiettivo "
+            "(obbligatorio); parametri di convalida X.509 (obbligatorio); un insieme di POE (obbligatorio); "
+            "best-signature-time (obbligatorio); dati di convalida dei certificati (opzionale); vincoli di "
+            "convalida X.509 (opzionale); vincoli crittografici (opzionale)."
+        ),
+        "testo_integrale": (
+            "**Table 26: Inputs to the past signature validation building block**\n\n"
+            "|Input|Requirement|\n"
+            "|---|---|\n"
+            "|Signature|Mandatory|\n"
+            "|The current time status indication/sub-indication|Mandatory|\n"
+            "|Target certificate|Mandatory|\n"
+            "|X.509 Validation Parameters|Mandatory|\n"
+            "|A set of POEs|Mandatory|\n"
+            "|Best-signature-time|Mandatory|\n"
+            "|Certificate Validation Data|Optional|\n"
+            "|X.509 Validation Constraints|Optional|\n"
+            "|Cryptographic constraints|Optional|"
         ),
         "tipo_obbligo": "tecnico/sicurezza",
         "stato": "vigente",
@@ -478,6 +572,32 @@ RIGHE_OBBLIGHI: list[dict] = [
             "together with an explanation of the failure.\n\n"
             "7) The building block shall return the indication and subindication contained in "
             "sig_cert_revocation_poe-status."
+        ),
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
+        "riferimento": "clausola 5.6.3.2 (Input)",
+        "testo": (
+            "Tabella 27 - Input del processo di convalida a lungo termine (Long Term Validation): Signed Data "
+            "Object (obbligatorio); documento del firmatario o SDR, elenco delle trust anchor (per esempio TSL), "
+            "politiche di convalida della firma, configurazione locale, un insieme di POE, certificato di firma, "
+            "Evidence Records e dati di convalida dei certificati (tutti opzionali)."
+        ),
+        "testo_integrale": (
+            "**Table 27: Inputs to the Long Term Validation process**\n\n"
+            "|Input|Requirement|\n"
+            "|---|---|\n"
+            "|Signed Data Object|Mandatory|\n"
+            "|Signer's Document or SDR|Optional|\n"
+            "|Trust anchor list (e.g. TSL)|Optional|\n"
+            "|Signature Validation Policies|Optional|\n"
+            "|Local configuration|Optional|\n"
+            "|A set of POEs|Optional|\n"
+            "|Signing Certificate|Optional|\n"
+            "|Evidence Records|Optional|\n"
+            "|Certificate Validation Data|Optional|"
         ),
         "tipo_obbligo": "tecnico/sicurezza",
         "stato": "vigente",
@@ -863,28 +983,6 @@ RIGHE_PRINCIPI: list[dict] = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 5.6.2.1.2 (Input)",
-        "testo": (
-            "Tabella 21 - Input del blocco costitutivo di convalida passata del certificato: certificato "
-            "obiettivo (obbligatorio); parametri di convalida X.509, incluso l'insieme delle trust anchor "
-            "(obbligatorio); un insieme di POE (obbligatorio); dati di convalida dei certificati (obbligatorio); "
-            "vincoli di convalida X.509 (opzionale); vincoli crittografici (opzionale)."
-        ),
-        "testo_integrale": (
-            "**Table 21: Inputs to past certificate validation building block**\n\n"
-            "|Input|Requirement|\n"
-            "|---|---|\n"
-            "|Target certificate|Mandatory|\n"
-            "|X.509 Validation Parameters including set of trust anchors|Mandatory|\n"
-            "|A set of POEs|Mandatory|\n"
-            "|Certificate Validation Data|Mandatory|\n"
-            "|X.509 Validation Constraints|Optional|\n"
-            "|Cryptographic Constraints|Optional|"
-        ),
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
         "riferimento": "clausola 5.6.2.1.3 (Output)",
         "testo": (
             "Tabella 22 - Output del blocco costitutivo di convalida passata del certificato: PASSED con tempo di "
@@ -921,28 +1019,6 @@ RIGHE_PRINCIPI: list[dict] = [
             "The process outputs the last value of validation time associated with the target certificate (the "
             "certificate to validate) which is a point in time when the signing certificate is valid and the "
             "chain can be validated corresponding to the selected model (chain model or shell model)."
-        ),
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
-        "riferimento": "clausola 5.6.2.2.2 (Input)",
-        "testo": (
-            "Tabella 23 - Input del blocco costitutivo di scorrimento del tempo di convalida: una catena di "
-            "certificati prospettica (obbligatorio); un insieme di POE (obbligatorio); dati di convalida dei "
-            "certificati (obbligatorio); una sunset date della trust anchor (opzionale); vincoli crittografici "
-            "(opzionale); vincoli di convalida X.509 (opzionale)."
-        ),
-        "testo_integrale": (
-            "**Table 23: Inputs to the validation time sliding building block**\n\n"
-            "|Input|Requirement|\n"
-            "|---|---|\n"
-            "|A prospective certificate chain|Mandatory|\n"
-            "|A set of POEs|Mandatory|\n"
-            "|Certificate Validation Data|Mandatory|\n"
-            "|A trust anchor sunset date|Optional|\n"
-            "|Cryptographic constraints|Optional|\n"
-            "|X.509 validation constraints|Optional|"
         ),
         "tipo_principio": "altro",
         "stato": "vigente",
@@ -1001,24 +1077,6 @@ RIGHE_PRINCIPI: list[dict] = [
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 5.6.2.3.2 (Input)",
-        "testo": (
-            "Tabella 25 - Input del blocco costitutivo di estrazione delle POE: firma (obbligatorio); un "
-            "attributo con un token di marca temporale (obbligatorio); un insieme di POE (obbligatorio, ma puo' "
-            "essere vuoto)."
-        ),
-        "testo_integrale": (
-            "**Table 25: Inputs to the POE extraction building block**\n\n"
-            "|Input|Requirement|\n"
-            "|---|---|\n"
-            "|Signature|Mandatory|\n"
-            "|An attribute with a time-stamp token|Mandatory|\n"
-            "|A set of POEs|Mandatory (but may be empty)|"
-        ),
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
         "riferimento": "clausola 5.6.2.4.1 (Description)",
         "testo": (
             "Il blocco costitutivo si usa quando la convalida di una firma (o di un token di marca temporale) "
@@ -1029,32 +1087,6 @@ RIGHE_PRINCIPI: list[dict] = [
             "This building block is used when validation of a signature (or a time-stamp token) fails at the "
             "current time with an INDETERMINATE status such that the provided proofs of existence may help to go "
             "to a determined status."
-        ),
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
-        "riferimento": "clausola 5.6.2.4.2 (Input)",
-        "testo": (
-            "Tabella 26 - Input del blocco costitutivo di convalida passata della firma: firma (obbligatorio); "
-            "indicazione/sotto-indicazione dello stato al momento corrente (obbligatorio); certificato obiettivo "
-            "(obbligatorio); parametri di convalida X.509 (obbligatorio); un insieme di POE (obbligatorio); "
-            "best-signature-time (obbligatorio); dati di convalida dei certificati (opzionale); vincoli di "
-            "convalida X.509 (opzionale); vincoli crittografici (opzionale)."
-        ),
-        "testo_integrale": (
-            "**Table 26: Inputs to the past signature validation building block**\n\n"
-            "|Input|Requirement|\n"
-            "|---|---|\n"
-            "|Signature|Mandatory|\n"
-            "|The current time status indication/sub-indication|Mandatory|\n"
-            "|Target certificate|Mandatory|\n"
-            "|X.509 Validation Parameters|Mandatory|\n"
-            "|A set of POEs|Mandatory|\n"
-            "|Best-signature-time|Mandatory|\n"
-            "|Certificate Validation Data|Optional|\n"
-            "|X.509 Validation Constraints|Optional|\n"
-            "|Cryptographic constraints|Optional|"
         ),
         "tipo_principio": "altro",
         "stato": "vigente",
@@ -1092,31 +1124,6 @@ RIGHE_PRINCIPI: list[dict] = [
             "EXAMPLE: Such POEs can be provided by the DA for signatures, certificates or time-stamps and can be "
             "derived from external archival systems and other sources. POEs for CAs can be extracted from Trusted "
             "Lists."
-        ),
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
-        "riferimento": "clausola 5.6.3.2 (Input)",
-        "testo": (
-            "Tabella 27 - Input del processo di convalida a lungo termine (Long Term Validation): Signed Data "
-            "Object (obbligatorio); documento del firmatario o SDR, elenco delle trust anchor (per esempio TSL), "
-            "politiche di convalida della firma, configurazione locale, un insieme di POE, certificato di firma, "
-            "Evidence Records e dati di convalida dei certificati (tutti opzionali)."
-        ),
-        "testo_integrale": (
-            "**Table 27: Inputs to the Long Term Validation process**\n\n"
-            "|Input|Requirement|\n"
-            "|---|---|\n"
-            "|Signed Data Object|Mandatory|\n"
-            "|Signer's Document or SDR|Optional|\n"
-            "|Trust anchor list (e.g. TSL)|Optional|\n"
-            "|Signature Validation Policies|Optional|\n"
-            "|Local configuration|Optional|\n"
-            "|A set of POEs|Optional|\n"
-            "|Signing Certificate|Optional|\n"
-            "|Evidence Records|Optional|\n"
-            "|Certificate Validation Data|Optional|"
         ),
         "tipo_principio": "altro",
         "stato": "vigente",

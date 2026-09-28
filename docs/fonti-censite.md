@@ -444,12 +444,12 @@ Validation of AdES Digital Signatures; Parte 1: Creation and Validation).
 Import 2026-09-28, il più esteso del lotto (88 pagine): front matter tagliato
 prima dello split, 8 capitoli via `split_source.py` e 8 subagent in due lotti
 (la clausola 5 è spaccata in cinque capitoli: 5.1 / 5.2 / 5.3-5.4 / 5.5 /
-5.6), moduli `app/seed_data/etsi_319_102/cap0[1-9].py`. 136 nodi (82 obblighi,
-54 principi), 136 item di indice. Annex D (Change history) e la sezione
-History esclusi come paratesto editoriale (decisione presa in corso d'opera su
-richiesta del subagent di cap08). **9 relazioni "richiama"** nel solo giro
-inverso (`cap09_relazioni_cross.py`): nodi delle Fonti 9, 19 e 20 citano questa
-norma, e due di essi la citano con il risultato di convalida
+5.6), moduli `app/seed_data/etsi_319_102/cap0[1-9].py`. 136 nodi (**94
+obblighi, 42 principi**), 136 item di indice. Annex D (Change history) e la
+sezione History esclusi come paratesto editoriale (decisione presa in corso
+d'opera su richiesta del subagent di cap08). **9 relazioni "richiama"** nel solo
+giro inverso (`cap09_relazioni_cross.py`): nodi delle Fonti 9, 19 e 20 citano
+questa norma, e due di essi la citano con il risultato di convalida
 (TOTAL-PASSED) definito dallo standard; Fonte 20 lo cita una volta con
 riferimento **puntuale di sottoclavola** («Figure 1 (derived from ETSI EN 319
 102-1, clause 4.2.1)»). Terzo caso del lotto di relazioni inverse, dopo Fonti
@@ -461,13 +461,17 @@ riferimento **puntuale di sottoclavola** («Figure 1 (derived from ETSI EN 319
     non esiste ambiguità, e il prefisso va aggiunto — su questi 8 moduli, sul
     capitolo di Fase 6 e sui riferimenti a Fonte 27 in altre Fonti — se e quando
     si importerà TS 119 102-2 nella stessa Fonte.
-  - **Nota di revisione aperta**: le clausole "Input/Inputs" sono classificate
-    Obbligo da cap05 (5.3.2, 5.4.2) e cap06 (5.5.2) e Principio da cap04 (5.2.x)
-    e cap07 (5.6.x), pur avendo le rispettive tabelle la stessa colonna
-    Requirement con valori Mandatory/Optional (verificato a mano su 5.2.2.2 e
-    5.3.2). Incoerenza **dichiarata, non nascosta**: da risolvere in revisione
-    umana decidendo il criterio una volta per la Fonte — tutte le righe sono
-    comunque `stato_validazione='bozza'`.
+  - **Criterio di classificazione delle clausole con tabella "Requirement"**
+    (deciso con l'utente il 2026-09-28, applicato su cap04 e cap07): una clausola
+    la cui tabella ha la colonna `Requirement` (Mandatory/Optional) è
+    prescrittiva sul processo e va censita come Obbligo "tecnico/sicurezza"
+    anche senza `shall` esplicito; restano Principio le clausole dichiarative o
+    di interfaccia senza quella colonna. La Fonte era internamente incoerente
+    (cap05/cap06 Obbligo, cap04/cap07 Principio sulle stesse tabelle, verificato
+    su 5.2.2.2 e 5.3.2): 12 clausole sono state riclassificate — 7 "Inputs" di
+    cap04 (5.2.2.2-5.2.8.2) e 5 "Input" di cap07 (5.6.2.1.2-5.6.3.2). Le guardie
+    di copertura **non** rilevano questo tipo di incoerenza: verificano che ogni
+    item sia coperto, non che i criteri di classificazione siano omogenei.
 - **ETSI EN 319 422 V1.1.1 (2016-03)** (Time-stamping protocol and time-stamp
   token profiles). `fonte_id=19`. Documento **non multi-parte**. Import
   2026-09-24 via 4 subagent paralleli, 4 moduli

@@ -7,21 +7,21 @@ app/.source_cache/etsi_319_102/manifest.json. Il file non importa nulla: id e
 relazioni sono risolti per riferimento dalla sessione principale tramite
 app/seed_data/lib.py (questo modulo NON tocca app/seed.py).
 
-Perimetro coperto (36 item di indice, 23 Obblighi + 13 Principi):
+Perimetro coperto (36 item di indice, 30 Obblighi + 6 Principi):
 - 5.2.1 (Description) -> Principio "altro"
-- 5.2.2.1 (Description) -> Obbligo; 5.2.2.2 (Inputs) -> Principio; 5.2.2.3
+- 5.2.2.1 (Description) -> Obbligo; 5.2.2.2 (Inputs) -> Obbligo; 5.2.2.3
   (Outputs) -> Obbligo
-- 5.2.3.1 (Description) -> Principio; 5.2.3.2 (Inputs) -> Principio; 5.2.3.3
+- 5.2.3.1 (Description) -> Principio; 5.2.3.2 (Inputs) -> Obbligo; 5.2.3.3
   (Outputs) -> Obbligo; 5.2.3.4 (Processing) -> Obbligo
-- 5.2.4.1 (Description) -> Principio; 5.2.4.2 (Inputs) -> Principio; 5.2.4.3
+- 5.2.4.1 (Description) -> Principio; 5.2.4.2 (Inputs) -> Obbligo; 5.2.4.3
   (Outputs) -> Obbligo; 5.2.4.4 (Processing) -> Obbligo
-- 5.2.5.1 (Description) -> Principio; 5.2.5.2 (Inputs) -> Principio; 5.2.5.3
+- 5.2.5.1 (Description) -> Principio; 5.2.5.2 (Inputs) -> Obbligo; 5.2.5.3
   (Output) -> Obbligo; 5.2.5.4 (Processing) -> Obbligo
-- 5.2.6.1 (Description) -> Obbligo; 5.2.6.2 (Inputs) -> Principio; 5.2.6.3
+- 5.2.6.1 (Description) -> Obbligo; 5.2.6.2 (Inputs) -> Obbligo; 5.2.6.3
   (Outputs) -> Obbligo; 5.2.6.4 (Processing) -> Obbligo
-- 5.2.7.1 (Description) -> Principio; 5.2.7.2 (Inputs) -> Principio; 5.2.7.3
+- 5.2.7.1 (Description) -> Principio; 5.2.7.2 (Inputs) -> Obbligo; 5.2.7.3
   (Outputs) -> Obbligo; 5.2.7.4 (Processing) -> Obbligo
-- 5.2.8.1 (Description) -> Principio; 5.2.8.2 (Inputs) -> Principio; 5.2.8.3
+- 5.2.8.1 (Description) -> Principio; 5.2.8.2 (Inputs) -> Obbligo; 5.2.8.3
   (Outputs) -> Obbligo; 5.2.8.4.1 (General requirements) -> Obbligo;
   5.2.8.4.2.1 - 5.2.8.4.2.7 (Processing ...) -> Obbligo ciascuna
 - 5.2.9 (Signature validation presentation building block) -> Obbligo
@@ -36,14 +36,28 @@ Scelte di modellazione non ovvie:
   (Signature Acceptance Validation (SAV)), 5.2.8.4 (Processing) e 5.2.8.4.2
   (Processing AdES attributes). Stesso trattamento riservato ai titoli di
   raggruppamento delle altre fonti ETSI gia' censite.
-- Tabelle di soli ingressi (clausole "Inputs"): non contengono alcun verbo
-  modale rivolto a un destinatario individuabile, ma solo la specifica
-  dell'interfaccia del blocco (colonna "Requirement": Mandatory/Optional) ->
-  Principio "altro", non Obbligo. Le clausole "Outputs"/"Output" invece
-  aprono con un enunciato prescrittivo ("the output shall be ...", "The
-  process shall output ...") e sono quindi Obblighi "tecnico/sicurezza"; le
+- Clausole con tabella a colonna "Requirement" (valori Mandatory/Optional) ->
+  Obbligo "tecnico/sicurezza", anche in assenza di un "shall" esplicito:
+  regola Fonte-wide adottata dalla sessione principale dopo revisione di questo
+  capitolo, per coerenza con i capitoli delle clausole 5.3-5.4 della stessa
+  fonte (che censivano come Obbligo le stesse tabelle) e per superare
+  l'incongruenza con i capitoli che le censivano come Principio. Riguarda le
+  sette clausole "Inputs" di questa porzione - 5.2.2.2, 5.2.3.2, 5.2.4.2,
+  5.2.5.2, 5.2.6.2, 5.2.7.2, 5.2.8.2 (Tabelle 8, 9, 10, 11A, 12, 14 e 16): le
+  righe corrispondenti sono state spostate in RIGHE_OBBLIGHI con `testo` e
+  `testo_integrale` invariati, perche' la prescrizione e' sul processo (quali
+  ingressi sono obbligatori e quali facoltativi) e il destinatario e' chi
+  implementa il processo di convalida (QTSP/gestore). Prima di questa revisione
+  erano Principi "altro", sul criterio del verbo modale assente.
+- Nessuna tabella "Outputs"/"Output" della porzione porta la colonna
+  "Requirement" (Tabelle 11, 11B, 13, 15 e 17 contengono solo indicazioni,
+  sotto-indicazioni, descrizioni e informazioni aggiuntive): quelle clausole
+  restano Obblighi per via dell'enunciato prescrittivo esplicito che le
+  introduce ("the output shall be ...", "The process shall output ..."), e le
   tabelle di indicazioni/sotto-indicazioni restano per intero nel loro
-  `testo_integrale` (sono contenuto della clausola che le contiene).
+  `testo_integrale`. Restano Principi le sole clausole dichiarative o di
+  interfaccia prive di quella colonna: 5.2.1, 5.2.3.1, 5.2.4.1, 5.2.5.1,
+  5.2.7.1 e 5.2.8.1 (tutte "Description").
 - Clausola 5.2.6.1 (Description) -> Obbligo: a differenza delle altre
   "Description" della porzione, contiene una prescrizione in senso proprio
   ("If the validation time is not provided as an input, the validation shall
@@ -112,12 +126,39 @@ NOTE: This checking process does not include any checks on conformance to a spec
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
+        "riferimento": "clausola 5.2.2.2 (Inputs)",
+        "testo": (
+            "Ingressi del blocco di controllo di formato (Tabella 8, Input | Requirement): Signed Data Object | "
+            "Mandatory."
+        ),
+        "testo_integrale": """Table 8: Inputs to the format checking building block
+Input | Requirement
+Signed Data Object | Mandatory""",
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
         "riferimento": "clausola 5.2.2.3 (Outputs)",
         "testo": (
             "Se la firma e' conforme al formato di base applicabile, l'uscita deve essere l'indicazione PASSED; se la "
             "firma non e' conforme, l'uscita deve essere FAILED."
         ),
         "testo_integrale": """In case the signature is conformant to the applicable base format, the output shall be the indication PASSED. If the signature is not conformant, the output shall be FAILED.""",
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
+        "riferimento": "clausola 5.2.3.2 (Inputs)",
+        "testo": (
+            "Ingressi del blocco di identificazione del certificato di firma (Tabella 9, Input | Requirement): "
+            "Signature | Mandatory; Signing Certificate | Optional."
+        ),
+        "testo_integrale": """Table 9: Inputs to the identification of the signing certificate building block
+Input | Requirement
+Signature | Mandatory
+Signing Certificate | Optional""",
         "tipo_obbligo": "tecnico/sicurezza",
         "stato": "vigente",
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
@@ -190,6 +231,23 @@ NOTE 2: This process can succeed even when the signature does not contain a refe
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
+        "riferimento": "clausola 5.2.4.2 (Inputs)",
+        "testo": (
+            "Ingressi del blocco di inizializzazione del contesto di convalida (Tabella 10, Input | Requirement): "
+            "Signature | Mandatory; Signature Validation Policies | Optional; Trust anchor list (e.g. TSL) | "
+            "Optional; Local configuration | Optional."
+        ),
+        "testo_integrale": """Table 10: Inputs to the validation context initialization building block
+Input | Requirement
+Signature | Mandatory
+Signature Validation Policies | Optional
+Trust anchor list (e.g. TSL) | Optional
+Local configuration | Optional""",
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
         "riferimento": "clausola 5.2.4.3 (Outputs)",
         "testo": (
             "In caso di fallimento il blocco deve produrre lo stato INDETERMINATE insieme a una sotto-indicazione "
@@ -249,6 +307,23 @@ NOTE: A default signature validation policy can be provided by the DA, by the co
 • The building block shall access the electronic document identified by the contents of the property/attribute and containing the details of the policy; if it is not available, the building block shall return the indication INDETERMINATE with the sub-indication SIGNATURE_POLICY_NOT_AVAILABLE. If it cannot be parsed or processed for any other reason, the building block shall return the indication INDETERMINATE with the sub-indication POLICY_PROCESSING_ERROR.
 
 • The building block shall extract the validation constraints from the rules encoded in the validation policy and return the indication PASSED together with the extracted validation constraints.""",
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
+        "riferimento": "clausola 5.2.5.2 (Inputs)",
+        "testo": (
+            "Ingressi del processo Revocation Freshness Checker (Tabella 11A, Input | Requirement): Revocation data | "
+            "Mandatory; The certificate for which the revocation is being checked | Mandatory; Validation time | "
+            "Mandatory; X.509 validation constraints | Mandatory."
+        ),
+        "testo_integrale": """Table 11A: Inputs to the Revocation Freshness Checker process
+Input | Requirement
+Revocation data | Mandatory
+The certificate for which the revocation is being checked | Mandatory
+Validation time | Mandatory
+X.509 validation constraints | Mandatory""",
         "tipo_obbligo": "tecnico/sicurezza",
         "stato": "vigente",
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
@@ -327,6 +402,31 @@ NOTE 3: Revocation status information issuance time and revocation data issuance
             "fornito come input, la convalida deve essere eseguita al tempo corrente."
         ),
         "testo_integrale": """This building block validates the signing certificate at validation time. If the validation time is not provided as an input, the validation shall be performed at current time.""",
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
+        "riferimento": "clausola 5.2.6.2 (Inputs)",
+        "testo": (
+            "Ingressi del blocco di convalida del certificato X.509 (Tabella 12, Input | Requirement): Signing "
+            "certificate | Mandatory; X.509 Validation Constraints | Mandatory; Validation time | Optional; "
+            "Certificate Validation Data | Optional; X.509 Validation Parameters | Optional; Cryptographic "
+            "Constraints | Optional; Other Certificates | Optional; Trust Anchors | Mandatory. Il processo di "
+            "convalida puo' acquisire dati aggiuntivi di convalida dei certificati da fonti esterne."
+        ),
+        "testo_integrale": """Table 12: Inputs to the X.509 certificate validation building block
+Input | Requirement
+Signing certificate | Mandatory
+X.509 Validation Constraints | Mandatory
+Validation time | Optional
+Certificate Validation Data | Optional
+X.509 Validation Parameters | Optional
+Cryptographic Constraints | Optional
+Other Certificates | Optional
+Trust Anchors | Mandatory
+
+The validation process may acquire additional certificate validation data from external sources.""",
         "tipo_obbligo": "tecnico/sicurezza",
         "stato": "vigente",
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
@@ -530,6 +630,33 @@ NOTE 10: For more information and rationale about certificate chain construction
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
     },
     {
+        "riferimento": "clausola 5.2.7.2 (Inputs)",
+        "testo": (
+            "Ingressi del blocco di convalida crittografica (Tabella 14, Input | Requirement): Signature | "
+            "Mandatory; Signing Certificate | Mandatory; Validated certificate chain | Optional; Signer's Document "
+            "or Signer's Document Representation | Optional. Note: nella maggior parte dei casi la verifica "
+            "crittografica richiede solo il certificato di firma e non l'intera catena validata, ma per alcuni "
+            "algoritmi puo' servire l'intera catena (es. chiavi pubbliche DSS/DSA, che ereditano i parametri dal "
+            "certificato dell'emittente); nella convalida di firme di tipo detached, dove sono firmati solo gli hash "
+            "degli oggetti e gli oggetti non fanno parte della firma, non e' specificato se spetti al DA convalidare "
+            "tali hash o se un'implementazione usi la presente clausola per farli convalidare all'SVA (entrambe le "
+            "varianti sono possibili)."
+        ),
+        "testo_integrale": """Table 14: Inputs to the cryptographic validation building block
+Input | Requirement
+Signature | Mandatory
+Signing Certificate | Mandatory
+Validated certificate chain | Optional
+Signer's Document or Signer's Document Representation | Optional
+
+NOTE 1: In most cases, the cryptographic verification requires only the signing certificate and not the entire validated chain. However, for some algorithms the full chain can be required (e.g. the case of DSS/DSA public keys, which inherit their parameters from the issuer certificate).
+
+NOTE 2: When validating signatures like detached signatures, where only the hashes of objects are signed but the objects themselves are not part of the signature, it is unspecified whether it is the task of the DA to validate these hashes or whether an implementation uses the present clause for having the hash(es) of such objects validated by the SVA. Both variants are possible.""",
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
         "riferimento": "clausola 5.2.7.3 (Outputs)",
         "testo": (
             "Il processo deve produrre una delle indicazioni della Tabella 15 insieme ai dati di rapporto di "
@@ -577,6 +704,25 @@ INDETERMINATE / SIGNED_DATA_NOT_FOUND | Cannot obtain signed data. | The process
 3) The building block shall verify the cryptographic signature using the public key extracted from the signing certificate in the chain, the signature value and the signature algorithm extracted from the signature. If this cryptographic verification outputs a success indication, the building block shall return the indication PASSED.
 
 4) Otherwise, the building block shall return the indication FAILED and the sub-indication SIG_CRYPTO_FAILURE.""",
+        "tipo_obbligo": "tecnico/sicurezza",
+        "stato": "vigente",
+        "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
+    },
+    {
+        "riferimento": "clausola 5.2.8.2 (Inputs)",
+        "testo": (
+            "Ingressi del blocco SAV (Tabella 16, Input | Requirement): Signature | Mandatory; Certificate Chain | "
+            "Optional; Validation time | Optional; Cryptographic verification output | Optional; Cryptographic "
+            "Constraints | Optional; Signature Elements Constraints | Optional."
+        ),
+        "testo_integrale": """Table 16: Inputs to the SAV building block
+Input | Requirement
+Signature | Mandatory
+Certificate Chain | Optional
+Validation time | Optional
+Cryptographic verification output | Optional
+Cryptographic Constraints | Optional
+Signature Elements Constraints | Optional""",
         "tipo_obbligo": "tecnico/sicurezza",
         "stato": "vigente",
         "soggetti": [{"categoria": "QTSP/gestore", "ruolo": "obbligato"}],
@@ -878,37 +1024,12 @@ Figure 12: Basic Signature Validation""",
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 5.2.2.2 (Inputs)",
-        "testo": (
-            "Ingressi del blocco di controllo di formato (Tabella 8, Input | Requirement): Signed Data Object | "
-            "Mandatory."
-        ),
-        "testo_integrale": """Table 8: Inputs to the format checking building block
-Input | Requirement
-Signed Data Object | Mandatory""",
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
         "riferimento": "clausola 5.2.3.1 (Description)",
         "testo": (
             "Questo blocco costitutivo e' responsabile dell'identificazione del certificato di firma che sara' usato "
             "per convalidare la firma."
         ),
         "testo_integrale": """This building block is responsible for identifying the signing certificate that will be used to validate the signature.""",
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
-        "riferimento": "clausola 5.2.3.2 (Inputs)",
-        "testo": (
-            "Ingressi del blocco di identificazione del certificato di firma (Tabella 9, Input | Requirement): "
-            "Signature | Mandatory; Signing Certificate | Optional."
-        ),
-        "testo_integrale": """Table 9: Inputs to the identification of the signing certificate building block
-Input | Requirement
-Signature | Mandatory
-Signing Certificate | Optional""",
         "tipo_principio": "altro",
         "stato": "vigente",
     },
@@ -921,22 +1042,6 @@ Signing Certificate | Optional""",
             "parametri sono inizializzati da una qualunque delle fonti elencate nella clausola 5.1.4."
         ),
         "testo_integrale": """This building block initializes the validation constraints (X.509 validation constraints, cryptographic constraints, signature elements constraints) and related parameters (X.509 validation parameters including trust anchors and certificate validation data) that will be used to validate the signature. The constraints and parameters are initialized from any of the sources listed in clause 5.1.4.""",
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
-        "riferimento": "clausola 5.2.4.2 (Inputs)",
-        "testo": (
-            "Ingressi del blocco di inizializzazione del contesto di convalida (Tabella 10, Input | Requirement): "
-            "Signature | Mandatory; Signature Validation Policies | Optional; Trust anchor list (e.g. TSL) | "
-            "Optional; Local configuration | Optional."
-        ),
-        "testo_integrale": """Table 10: Inputs to the validation context initialization building block
-Input | Requirement
-Signature | Mandatory
-Signature Validation Policies | Optional
-Trust anchor list (e.g. TSL) | Optional
-Local configuration | Optional""",
         "tipo_principio": "altro",
         "stato": "vigente",
     },
@@ -961,77 +1066,11 @@ NOTE: This is important when the signature that is being validated is a basic si
         "stato": "vigente",
     },
     {
-        "riferimento": "clausola 5.2.5.2 (Inputs)",
-        "testo": (
-            "Ingressi del processo Revocation Freshness Checker (Tabella 11A, Input | Requirement): Revocation data | "
-            "Mandatory; The certificate for which the revocation is being checked | Mandatory; Validation time | "
-            "Mandatory; X.509 validation constraints | Mandatory."
-        ),
-        "testo_integrale": """Table 11A: Inputs to the Revocation Freshness Checker process
-Input | Requirement
-Revocation data | Mandatory
-The certificate for which the revocation is being checked | Mandatory
-Validation time | Mandatory
-X.509 validation constraints | Mandatory""",
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
-        "riferimento": "clausola 5.2.6.2 (Inputs)",
-        "testo": (
-            "Ingressi del blocco di convalida del certificato X.509 (Tabella 12, Input | Requirement): Signing "
-            "certificate | Mandatory; X.509 Validation Constraints | Mandatory; Validation time | Optional; "
-            "Certificate Validation Data | Optional; X.509 Validation Parameters | Optional; Cryptographic "
-            "Constraints | Optional; Other Certificates | Optional; Trust Anchors | Mandatory. Il processo di "
-            "convalida puo' acquisire dati aggiuntivi di convalida dei certificati da fonti esterne."
-        ),
-        "testo_integrale": """Table 12: Inputs to the X.509 certificate validation building block
-Input | Requirement
-Signing certificate | Mandatory
-X.509 Validation Constraints | Mandatory
-Validation time | Optional
-Certificate Validation Data | Optional
-X.509 Validation Parameters | Optional
-Cryptographic Constraints | Optional
-Other Certificates | Optional
-Trust Anchors | Mandatory
-
-The validation process may acquire additional certificate validation data from external sources.""",
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
         "riferimento": "clausola 5.2.7.1 (Description)",
         "testo": (
             "Il blocco verifica l'integrita' dei dati firmati eseguendo le verifiche crittografiche."
         ),
         "testo_integrale": """This building block checks the integrity of the signed data by performing the cryptographic verifications.""",
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
-        "riferimento": "clausola 5.2.7.2 (Inputs)",
-        "testo": (
-            "Ingressi del blocco di convalida crittografica (Tabella 14, Input | Requirement): Signature | "
-            "Mandatory; Signing Certificate | Mandatory; Validated certificate chain | Optional; Signer's Document "
-            "or Signer's Document Representation | Optional. Note: nella maggior parte dei casi la verifica "
-            "crittografica richiede solo il certificato di firma e non l'intera catena validata, ma per alcuni "
-            "algoritmi puo' servire l'intera catena (es. chiavi pubbliche DSS/DSA, che ereditano i parametri dal "
-            "certificato dell'emittente); nella convalida di firme di tipo detached, dove sono firmati solo gli hash "
-            "degli oggetti e gli oggetti non fanno parte della firma, non e' specificato se spetti al DA convalidare "
-            "tali hash o se un'implementazione usi la presente clausola per farli convalidare all'SVA (entrambe le "
-            "varianti sono possibili)."
-        ),
-        "testo_integrale": """Table 14: Inputs to the cryptographic validation building block
-Input | Requirement
-Signature | Mandatory
-Signing Certificate | Mandatory
-Validated certificate chain | Optional
-Signer's Document or Signer's Document Representation | Optional
-
-NOTE 1: In most cases, the cryptographic verification requires only the signing certificate and not the entire validated chain. However, for some algorithms the full chain can be required (e.g. the case of DSS/DSA public keys, which inherit their parameters from the issuer certificate).
-
-NOTE 2: When validating signatures like detached signatures, where only the hashes of objects are signed but the objects themselves are not part of the signature, it is unspecified whether it is the task of the DA to validate these hashes or whether an implementation uses the present clause for having the hash(es) of such objects validated by the SVA. Both variants are possible.""",
         "tipo_principio": "altro",
         "stato": "vigente",
     },
@@ -1045,24 +1084,6 @@ NOTE 2: When validating signatures like detached signatures, where only the hash
         "testo_integrale": """This building block covers additional verification to be performed on the signature itself or on the attributes of the signature.
 
 NOTE: This process can also include other checks mandated by a signature validation policy. Checks, listed here or not, are not mandatory to be implemented by an SVA however.""",
-        "tipo_principio": "altro",
-        "stato": "vigente",
-    },
-    {
-        "riferimento": "clausola 5.2.8.2 (Inputs)",
-        "testo": (
-            "Ingressi del blocco SAV (Tabella 16, Input | Requirement): Signature | Mandatory; Certificate Chain | "
-            "Optional; Validation time | Optional; Cryptographic verification output | Optional; Cryptographic "
-            "Constraints | Optional; Signature Elements Constraints | Optional."
-        ),
-        "testo_integrale": """Table 16: Inputs to the SAV building block
-Input | Requirement
-Signature | Mandatory
-Certificate Chain | Optional
-Validation time | Optional
-Cryptographic verification output | Optional
-Cryptographic Constraints | Optional
-Signature Elements Constraints | Optional""",
         "tipo_principio": "altro",
         "stato": "vigente",
     },

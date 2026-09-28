@@ -41,7 +41,9 @@ Un modulo capitolo (`app/seed_data/<fonte>/cap0N.py`) espone:
         {"nodo_da": (tipo, fonte_id_o_None, riferimento),
          "nodo_a": (tipo, fonte_id_o_None, riferimento),
          "tipo_relazione": nome,
-         "evidence_type": "textual"|"inferred"|"human-curated" (default "textual"),
+         "evidence_type": "textual"|"inferred"|"human-curated" (default "inferred":
+             va dichiarato "textual" solo se la relazione e' una citazione letterale
+             verificata sul testo, mai per inerzia — vedi ADR-0005),
          "confidence": float|None (default None)}
         `fonte_id_o_None`: None risolve alla fonte corrente (quella passata a
         `inserisci_capitoli`); un intero esplicito referenzia un'altra fonte
@@ -295,7 +297,16 @@ def inserisci_capitoli(cursor, fonte_id: int, capitoli: list, lookup: dict, regi
                 (
                     tipo_da, nodo_da_id, tipo_a, nodo_a_id,
                     lookup["tipi_relazione"][rel["tipo_relazione"]],
-                    rel.get("evidence_type", "textual"), rel.get("confidence"),
+                    # Default 'inferred', non 'textual' (cambiato il 2026-09-28): una
+                    # relazione la cui provenienza non e' dichiarata dal modulo
+                    # capitolo non deve dichiararsi da sola "citazione letterale nel
+                    # testo": `textual` e' la classe di evidenza piu' forte del
+                    # censimento (ADR-0005) e va attribuita solo quando chi scrive la
+                    # relazione l'ha verificata sul testo. Con il default opposto ogni
+                    # relazione costruita per costruzione si presentava come citazione
+                    # letterale senza esserlo (rilevato da
+                    # app/tools/verifica_relazioni_textual.py).
+                    rel.get("evidence_type", "inferred"), rel.get("confidence"),
                 ),
             )
 
