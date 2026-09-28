@@ -70,6 +70,38 @@ rinvio ai meccanismi crittografici ENISA, documento non censito): nessuno è
 un'isola quanto a `DA_FONTE`, e le relazioni "entrata in vigore" ↔ "entrata
 in vigore" proposte dal KNN a score 1.0 sono state scartate come nel giro
 Fase 6 del Reg. 2025/1566.
+- **Regolamento di esecuzione (UE) 2025/1569** — modalità di applicazione
+del regolamento (UE) n.910/2014 per quanto riguarda gli attestati
+elettronici qualificati di attributi (QEAA) e gli attestati elettronici di
+attributi rilasciati da un organismo del settore pubblico responsabile di una
+fonte autentica o per suo conto (basi giuridiche dichiarate: artt. 45
+quinquies §5, 45 sexies §2, 45 septies §6 e §7 eIDAS2). `fonte_id=22`. Import
+2026-09-28, testo ufficiale italiano via `app/tools/cellar_fetch.py` (CELEX
+`32025R1569`), 11 articoli + 3 allegati (28.500 caratteri di articolato, il
+preambolo resta fuori perimetro), diviso in 3 capitoli con
+`app/tools/split_source.py` ed estratto da 3 subagent paralleli con path di
+output assegnati prima del dispatch (`cap0[1-3].py`) più il capitolo virtuale
+di Fase 6 (`cap04_relazioni_cross.py`). 53 nodi (41 obblighi, 12 principi),
+102 item di indice: un nodo per articolo e per comma, con le lettere
+indicizzate separatamente e mappate al nodo del proprio comma quando non
+hanno prescrizione autonoma (art. 4 §3 a-c, art. 6 §2 e §3, art. 7 §5 a-h,
+art. 8 §3 a-i). 13 relazioni: 9 native (4 "attua" dall'art. 1 verso le
+quattro basi giuridiche, 3 "richiama" verso eIDAS2 artt. 45 septies §3 e 45
+sexies §1, 1 "specifica" verso la clausola 1 di ETSI EN 319 401) + 4 dal giro
+Fase 6 (2 "specifica" verso eIDAS2 artt. 45 quinquies §1 e 24 §4-bis, 2 "si
+sovrappone a" verso ETSI TS 119 461 `QTS-C.2.3-03` ed ETSI EN 319 411-1
+`Parte 1: REG-6.3.1-00F`). Primo giro di Fase 6 del progetto eseguito **senza
+seedare prima la Fonte nuova** (candidati KNN calcolati al volo con
+`app/tools/fase6_candidati_knn.py`): un solo `seed.py` per import. Il numero
+contenuto di relazioni è un esito verificato, non una fase saltata: gli
+istituti dell'atto (catalogo degli attributi, catalogo dei regimi, attestati
+per il portafoglio EUDI, notifica degli organismi del settore pubblico) sono
+in larga parte nuovi rispetto al corpus censito, orientato a certificati,
+formati AdES, marche temporali e identity proofing; 10 dei 53 nodi non hanno
+alcun candidato sopra soglia. Nota di perimetro: l'allegato II punto 1 rinvia
+ai formati del **Reg. di esecuzione (UE) 2024/2979** (portafogli EUDI), non
+ancora censito — vedi backlog in
+`docs/plan-import-lotto-eidas2-standard.md` § 7.
 - **Regolamento di esecuzione (UE) 2015/1502** — specifiche/procedure
   tecniche minime sui livelli di garanzia (basso/significativo/elevato) dei
   mezzi di identificazione elettronica, ex art. 8 §3 eIDAS. `fonte_id=14`.
@@ -413,13 +445,13 @@ preambolo delle fonti legislative).
 
 | Categoria | Fonti | Totale |
 |---|---|---|
-| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2015/1502 | 5 |
+| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2015/1502 | 6 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
 | Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612 | 9 |
-| **Totale** | | **21** |
+| **Totale** | | **22** |
 
-20 delle 21 Fonti hanno copertura granulare completa (ADR-0007) e sono
+21 delle 22 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
