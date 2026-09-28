@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "neo4j-codice-capobianco": {
+      "command": "./app/tools/neo4j_mcp_stdio.sh"
+    }
+  }
+}

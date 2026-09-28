@@ -43,7 +43,15 @@ Avviare la web UI (default `http://127.0.0.1:8010`, opzioni `--host`/`--port`):
 app/.venv/bin/python app/web_ui.py
 ```
 
+Interrogare il grafo dall'agente senza scrivere uno script ogni volta: canale **MCP in sola lettura** (client `pi-mcp-adapter` installato a livello utente + server ufficiale `neo4j-mcp` dichiarato in `.mcp.json` **di progetto**); decisione, prerequisito APOC e verifiche in `docs/adr/0011-canale-mcp-sola-lettura-per-l-agente.md`. Non serve per eseguire nessuno dei comandi sopra, che restano l'unico percorso di scrittura.
+
 Non esistono test automatizzati né linter configurati nel repo.
+
+## Ambiente dell'agente (harness pi)
+
+Il repo è usato con l'harness **pi** accanto a Claude Code. La skill di progetto `import-fonte-normativa` vive in `.claude/skills/` (il percorso che legge Claude Code); per pi è resa visibile dal puntatore in `.pi/settings.json` — `{"skills": ["../.claude/skills"]}` — che è **gitignorato**, perché il `.gitignore` esclude l'intera cartella `.pi/`: su un clone nuovo va ricreato a mano, altrimenti pi non carica la skill e la procedura di import non arriva mai nel contesto dell'agente.
+
+Pacchetti pi installati a livello utente, quindi attivi in **ogni** progetto e non solo qui (`~/.pi/agent/settings.json`): `pi-web-access`, `pi-background-tasks`, `pi-mcp-adapter`, `pi-subagents`, `@juicesharp/rpiv-ask-user-question`. Stato per-macchina, non del repo: se un tool atteso non c'è, verificare `pi list` prima di dedurre che manchi qualcosa nel progetto.
 
 ## Architettura
 
@@ -58,6 +66,31 @@ Storage: **Neo4j 5.x** (Neo4j Desktop, istanza locale), non più SQLite. Migrazi
 Mappatura schema -> grafo: `:Obbligo`/`:Principio` come nodi con le colonne di `schema.sql` come proprietà (incluse `tipo_obbligo`/`tipo_principio`/`stato_obbligo`, ex-lookup-table, ora stringhe dirette sul nodo — niente join per valori enumerativi senza attributi propri); `:Fonte` con arco `DA_FONTE`; `:CategoriaSoggetto`/`:OggettoGiuridico` come nodi con archi `HA_SOGGETTO {ruolo}`/`HA_OGGETTO`. Le 14 relazioni tipizzate (ADR-0004/0005/0008) sono archi Cypher nativi con proprietà `relazione_id`/`evidence_type`/`confidence`/`tipo_relazione` (mappatura nome->tipo arco in `neo4j_common.TIPO_RELAZIONE_TO_ARCO`); la relazione inversa (`nome_inverso`) si ottiene via traversal a ritroso in `_vicini_di`, non è duplicata come arco separato. `modifiche_rilevate` (monitor…
 
 Retrieval ibrido a tre indici paralleli (ADR-0006): full-text Lucene (`idxTestoObbligo`/`idxTestoPrincipio`, sostituisce lo scan Python case-insensitive pre-migrazione), range temporale su `data_inizio_vigore`/`data_fine_vigore` (pre-filtro `WHERE`, mai termine pesato — un nodo non vigente non deve mai comparire indipendentemente dalla rilevanza), vector HNSW (`idxEmbeddingObbligo`/`idxEmbeddingPrincipio`, 768 dim, cosine). Reranking a fusione pesata (WRRF) tra lessicale e semantico, pesi 0.55/0.45 (costanti `PESO_LESSICALE`/`PESO_SEMANTICO` in `web_ui.py`, provvisori — vedi ADR-0006 per il piano di revisione). `_vicini_di` è un traversal Cypher nativo multi-hop (parametro `profondita`, default 1): ranking per hop crescente poi per direttezza del tipo di relazione decrescente (`neo4j_common.DIRETTEZZA_PESO`).
+
+### Interrogare il grafo: canale MCP in sola lettura (ADR-0011)
+
+L'agente può interrogare il censimento senza scrivere uno script Python
+usa-e-getta: client MCP globale (`pi-mcp-adapter`) + server **ufficiale**
+`neo4j-mcp` (installato con Homebrew) dichiarato in `.mcp.json` **di
+progetto**, quindi attivo solo in questa cartella. Le credenziali non stanno
+in nessun file di configurazione: `app/tools/neo4j_mcp_stdio.sh` le legge da
+`app/.env` a runtime, mappa `NEO4J_*` su `NEO4J_MCP_*`, forza la sola lettura
+e disattiva la telemetria. Tool esposti: `get-schema` e `read-cypher` —
+nessun tool di scrittura, e le query di scrittura sono respinte dal server
+(verificato con un `CREATE` reale, vedi ADR-0011). Le scritture restano
+perciò possibili solo via `app/seed.py` + `app/seed_data/lib.py`, con
+registro id, `verifica_copertura` e guardia ADR-0010: nessun aggiramento per
+sbaglio da una query dell'agente.
+
+Prerequisito sull'istanza locale: **APOC 2026.08.1** in `plugins/` e
+`dbms.security.procedures.unrestricted=apoc.meta.*` in `conf/neo4j.conf`.
+Senza APOC il binario non parte (`get-schema` usa `apoc.meta.schema`):
+sintomo e rimedio in `docs/runbook-neo4j-import.md`. Alla prima attivazione
+in una sessione interattiva pi chiede un'approvazione esplicita e la
+memorizza; i server di progetto non approvati sono **saltati** nelle sessioni
+non interattive (`pi -p`). Il canale è di ispezione, non di certificazione:
+una query `read-cypher` non sostituisce un controllo bloccante come
+`verifica_copertura` o `verifica_troncamento.py`.
 
 ### Estrazione LLM solo dentro sessioni Claude Code
 

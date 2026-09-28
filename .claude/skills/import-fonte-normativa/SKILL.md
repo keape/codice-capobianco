@@ -32,6 +32,12 @@ Riferimenti canonici (leggere prima di agire, non duplicati qui):
   `app/tools/verifica_troncamento.py`
 - `docs/adr/0009-collegamento-cross-fonte-a-posteriori.md` — pipeline di
   collegamento (fase 6 sotto, letta per intero prima di eseguirla)
+- `docs/adr/0011-canale-mcp-sola-lettura-per-l-agente.md` — il grafo è
+  interrogabile dall'agente in sola lettura via MCP (`get-schema`,
+  `read-cypher`): usarlo per la ricognizione (conteggi per fonte,
+  riferimenti già presenti, ricerca di marcatori di elisione in
+  `testo_integrale`) invece di scrivere script usa-e-getta. Solo ispezione:
+  la scrittura passa da `seed.py`.
 - `app/seed_data/lib.py` — contratto dati esatto di un modulo capitolo
   (`RIGHE_OBBLIGHI`/`RIGHE_PRINCIPI`/`INDICE_ARTICOLI_LOCALE`/`MAPPATURA_LOCALE`/`RELAZIONI`),
   `verifica_copertura`, `inserisci_capitoli`
@@ -106,7 +112,13 @@ Ogni relazione inserita porta `evidence_type`/`confidence` per-arco (ADR-0005)
 - Mai testo ufficiale completo incollato inline in un prompt subagent.
 - Mai path di output scelto dal subagent — sempre assegnato prima del dispatch.
 - Problemi infrastrutturali (driver Neo4j, connessione) → sessione dedicata,
-  mai dentro la sessione di estrazione/collegamento.
+  mai dentro la sessione di estrazione/collegamento. Se manca il canale MCP
+  (server non approvato, o APOC assente sull'istanza) non è un problema del
+  progetto: punto 4 di `docs/runbook-neo4j-import.md`.
+- Ispezione via MCP sì, scrittura via MCP mai: il server espone solo
+  `get-schema`/`read-cypher` e respinge le query di scrittura (ADR-0011).
+  Qualunque modifica al grafo passa da `seed_data/lib.py` + `seed.py` con le
+  sue guardie, non da Cypher arbitrario.
 - Import non completo finché la fase 6 non è stata eseguita e il suo esito
   (N relazioni inserite, per tipo) riportato all'utente.
 - Mai un `testo_integrale` con marcatore di elisione (`...`/`…`/`[...]`) —

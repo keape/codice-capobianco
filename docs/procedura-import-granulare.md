@@ -101,6 +101,15 @@ troncamento in estrazione — vedi ADR-0010), lo script si ferma con
 l'elenco esatto, senza bisogno che l'agente rilegga e confronti a mano
 centinaia di righe o di caratteri.
 
+Per la ricognizione prima di arrivare a quel punto — capire dove guardare
+prima di lanciare lo script — l'agente ha a disposizione il canale MCP in
+sola lettura (ADR-0011): `read-cypher` permette di contare i nodi di una
+fonte, elencare i riferimenti già presenti per un capitolo, o cercare
+marcatori di elisione in `testo_integrale`, senza scrivere uno script Python
+e senza passare dal venv. Resta uno strumento di **ispezione**: la verifica
+che blocca il merge è `inserisci_capitoli` (e, a posteriori,
+`app/tools/verifica_troncamento.py`), non una query MCP.
+
 ### 5. Seed e verifica finale
 
 ```bash
@@ -118,6 +127,13 @@ seedate prima dell'introduzione della guardia in ADR-0010):
 ```bash
 app/.venv/bin/python app/tools/verifica_troncamento.py [--fonte-id N]
 ```
+
+Con il canale MCP di ADR-0011 lo stesso audit si può lanciare come query di
+ricognizione in `read-cypher` (cercare `...`/`…`/`[...]` nei
+`testo_integrale` di una fonte) prima di eseguire lo script: l'esito
+autorevole resta quello dello script, che importa la stessa normalizzazione
+di `seed_data.lib` e quindi conosce le convenzioni in cui un'ellissi è
+contenuto autentico del testo ufficiale.
 
 ### 6. Collegamento cross-fonte a posteriori (opzionale, fonte già importata)
 

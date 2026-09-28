@@ -82,7 +82,48 @@ dell'istanza `codice-capobianco` prima di lanciare, non indovinare un path).
 poi una query di prova (`cypher-shell` o driver) prima di procedere con
 `seed.py`.
 
-## 4. Prima di ogni sessione di import
+## 4. Il server MCP Neo4j non si avvia: manca APOC sull'istanza
+
+**Sintomo:** il tool MCP `get-schema`/`read-cypher` non compare, o il server
+muore subito. Provando a lanciarlo a mano (`sh app/tools/neo4j_mcp_stdio.sh`)
+il processo termina da solo con: `please ensure the APOC plugin is installed
+and includes the 'meta' component`.
+
+**Causa:** `neo4j-mcp` non parte senza il plugin APOC: all'avvio verifica
+`SHOW PROCEDURES ... name = 'apoc.meta.schema'` e termina con errore se
+assente. Non esiste un flag per aggirarlo. Le procedure APOC presenti
+sull'istanza si contano con
+`SHOW PROCEDURES YIELD name WHERE name STARTS WITH 'apoc' RETURN count(*)`
+(0 = plugin assente).
+
+**Fix (fatto 2026-09-28, istanza `2026.08.1`):** jar ufficiale
+`apoc-<versione-kernel>-core.jar` (stesso numero di versione del kernel
+Neo4j, altrimenti il plugin non si carica) in
+`~/Library/Application Support/neo4j-desktop/Application/Data/dbmss/<id-istanza>/plugins/`,
+più in `conf/neo4j.conf` la riga
+`dbms.security.procedures.unrestricted=apoc.meta.*` — minimo privilegio:
+serve solo `apoc.meta.schema` per il tool `get-schema`, non tutto `apoc.*`.
+Poi riavviare l'istanza da Neo4j Desktop (Stop/Start) e verificare che le
+procedure APOC siano > 0 e che `apoc.meta.schema` sia eseguibile.
+
+**Attenzione:** Neo4j Desktop riscrive `conf/neo4j.conf` a ogni avvio (la
+data del file coincide con l'ultimo start). La riga è sopravvissuta al
+riavvio del 2026-09-28, ma se in futuro sparisse il percorso pulito è
+installare APOC dalla scheda Plugin dell'istanza nella GUI, che gestisce lui
+la configurazione. Backup pre-modifica:
+`conf/neo4j.conf.bak-20260928-pre-apoc` (fuori dal repo: è dentro la cartella
+dell'istanza Neo4j Desktop).
+
+**Dettaglio che non va sbagliato:** il binario legge variabili `NEO4J_MCP_*`
+(`NEO4J_MCP_URI`, `NEO4J_MCP_USERNAME`, `NEO4J_MCP_PASSWORD`,
+`NEO4J_MCP_DATABASE`), **non** i nomi `NEO4J_*` usati dal progetto: le
+credenziali stanno in `app/.env` con la nomenclatura del progetto (e
+`NEO4J_USER`, non `NEO4J_USERNAME`), e il wrapper
+`app/tools/neo4j_mcp_stdio.sh` fa la traduzione. I nomi `NEO4J_*` sono
+accettati dal binario come deprecati, con warning a ogni avvio: il wrapper
+evita esplicitamente di esportarli.
+
+## 5. Prima di ogni sessione di import
 
 Checklist rapida (sostituisce la diagnosi da zero):
 
@@ -91,6 +132,9 @@ Checklist rapida (sostituisce la diagnosi da zero):
    nel venv che si userà → deve stampare `5.28.1`. Se no, punto 1 (la
    guardia in `get_driver()` lo segnala comunque al primo uso).
 3. **[Storico, non più applicabile dal 2026-09-17]** Se il venv sotto iCloud mostrava blocchi anomali su comandi banali → punto 2 (il repo non è più sotto iCloud).
+4. Se si vuole usare il canale MCP in sola lettura (ADR-0011): il server è
+   approvato nella sessione corrente e APOC è presente? Se il server non
+   compare, punto 4 — non è un problema del progetto né del wrapper.
 
 Se uno di questi problemi si ripresenta in una forma nuova (non coperta
 sopra), risolverlo **in una sessione/subagent dedicato alla sola
@@ -133,6 +177,19 @@ prima di considerarlo bloccato e passare al venv di fallback
 mentre si attende, per non confondere lentezza-per-attesa con blocco
 reale. Se anche con timeout lungo non completa, usare il fallback (punto
 2) senza insistere oltre.
+
+**2026-09-28** — Installato il canale MCP in sola lettura (ADR-0011): client
+`pi-mcp-adapter` a livello utente, server ufficiale `neo4j-mcp` 1.6.0 via
+Homebrew, dichiarato in `.mcp.json` di progetto con wrapper
+`app/tools/neo4j_mcp_stdio.sh` (credenziali da `app/.env`, sola lettura,
+telemetria off). All'avvio il server è morto subito per APOC assente
+(174 procedure APOC attese, 0 presenti): risolto secondo il punto 4 con
+`apoc-2026.08.1-core.jar` (sha256 verificato contro il digest della release
+GitHub) e `dbms.security.procedures.unrestricted=apoc.meta.*`. Verificato
+dopo il riavvio: `apoc.meta.schema` eseguibile, `neo4j-mcp v1.6.0`
+funzionante, tool esposti `get-schema` e `read-cypher`, query di scrittura
+**respinte** dal server (tentativo di `CREATE` rifiutato, nessun nodo
+estraneo nel grafo). La riga in `neo4j.conf` è sopravvissuta al riavvio.
 
 **2026-09-17** — Repo spostato da iCloud Drive (`~/Library/Mobile Documents/...`)
 a `/Volumes/Ext.Lexar/Costola del Mac/codice-capobianco` (volume esterno).
