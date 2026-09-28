@@ -102,6 +102,37 @@ alcun candidato sopra soglia. Nota di perimetro: l'allegato II punto 1 rinvia
 ai formati del **Reg. di esecuzione (UE) 2024/2979** (portafogli EUDI), non
 ancora censito — vedi backlog in
 `docs/plan-import-lotto-eidas2-standard.md` § 7.
+- **Regolamento di esecuzione (UE) 2025/2531** — norme di riferimento e
+specifiche applicabili ai registri elettronici qualificati (art. 45 terdecies
+§3 eIDAS2). `fonte_id=23`. Import 2026-09-28, testo ufficiale italiano via
+`app/tools/cellar_fetch.py` (CELEX `32025R2531`), 2 articoli + 1 allegato,
+capitolo unico (`app/seed_data/reg_ue_2025_2531/cap01.py` + capitolo virtuale
+`cap02_relazioni_cross.py`) estratto da un solo subagent worker. 26 nodi (18
+obblighi, 8 principi), 53 item di indice: art. 1 (rinvio all'allegato), art. 2
+(entrata in vigore — l'atto **non** ha una disposizione di applicazione
+differita, quindi un solo nodo e non due), allegato punto 1 (15 definizioni
+distribuite, una riga), punto 2, punto 3 (chapeau: creare, aggiornare e
+mantenere il registro), punto 3(a) e 3(b) (designazione delle norme di
+riferimento), punto 3(a) 2.1 (aggiunte bibliografiche: ENISA, RFC 7515, FIPS
+PUB 140-3, regg. (UE) 2024/482 e 2024/3144, ISO/IEC 15408:2022) e 16 nodi,
+uno per id di requisito, per gli adattamenti a ETSI EN 319 401. **18
+relazioni**: 15 native (art. 45 terdecies §3 come base giuridica; specifica
+dell'art. 45 terdecies §1; rinvio alla clausola 1 della Fonte 10; 12
+"modifica" verso requisiti della stessa norma: `REQ-6.2-03`, `REQ-6.3-04`,
+`REQ-7.2-04`, `REQ-7.2-05`, `REQ-7.5-01`, `REQ-7.5-05`, `REQ-7.8-14`,
+`REQ-7.8-18`, `REQ-7.8-22`, `REQ-7.9.1-02`, `REQ-7.12-02` + richiamo
+all'art. 24 §5 eIDAS2) + 3 dal giro Fase 6 (2 "si sovrappone a" verso gli
+atti gemelli del lotto — Fonti 8 e 12 — per la clausola sul piano di
+cessazione, 1 verso il DPCM 22/2/2013 per il dispositivo sicuro di firma).
+**Avvertenza di mappatura**: la numerazione dell'atto non coincide sempre con
+quella della Fonte 10, perché l'atto adegua la V3.1.1 (2024-06) e la Fonte 10
+censisce la V3.2.1 (2026-01): il requisito sui firewall è `REQ-7.8-21X`
+nell'atto ma `REQ-7.8-22` nella norma censita, e l'atto cita come
+`REQ-7.8-17X` il requisito sul test di penetrazione che nella versione
+censita è `REQ-7.8-18`. Le relazioni sono agganciate per contenuto, non per
+numero, e ciascuna porta la nota dello scostamento. `REQ-6.1-12` (contenuto
+della dichiarazione sulla pratica) è invece un requisito **nuovo** — la
+clausola 6.1 della Fonte 10 si ferma a `REQ-6.1-11` — e resta senza relazioni.
 - **Regolamento di esecuzione (UE) 2015/1502** — specifiche/procedure
   tecniche minime sui livelli di garanzia (basso/significativo/elevato) dei
   mezzi di identificazione elettronica, ex art. 8 §3 eIDAS. `fonte_id=14`.
@@ -445,13 +476,13 @@ preambolo delle fonti legislative).
 
 | Categoria | Fonti | Totale |
 |---|---|---|
-| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2015/1502 | 6 |
+| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2015/1502 | 7 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
 | Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612 | 9 |
-| **Totale** | | **22** |
+| **Totale** | | **23** |
 
-21 delle 22 Fonti hanno copertura granulare completa (ADR-0007) e sono
+22 delle 23 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
