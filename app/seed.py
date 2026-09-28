@@ -180,6 +180,27 @@ from seed_data.etsi_319_422 import (
     cap04 as etsi422_cap04,
     cap05_relazioni_cross as etsi422_cap05,
 )
+from seed_data.etsi_119_432 import (
+    cap01 as etsi432_cap01,
+    cap02 as etsi432_cap02,
+    cap03 as etsi432_cap03,
+    cap04 as etsi432_cap04,
+    cap05 as etsi432_cap05,
+    cap06 as etsi432_cap06,
+    cap07 as etsi432_cap07,
+    cap08_relazioni_cross as etsi432_cap08,
+)
+from seed_data.etsi_119_612 import (
+    cap01 as etsi612_cap01,
+    cap02 as etsi612_cap02,
+    cap03 as etsi612_cap03,
+    cap04 as etsi612_cap04,
+    cap05 as etsi612_cap05,
+    cap06 as etsi612_cap06,
+    cap07 as etsi612_cap07,
+    cap08 as etsi612_cap08,
+    cap09_relazioni_cross as etsi612_cap09,
+)
 
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
 
@@ -346,6 +367,14 @@ def seed():
          "https://www.etsi.org/deliver/etsi_en/319400_319499/319422/01.01.01_60/en_319422v010101p.pdf",
          "urn:etsi:en:319422:v1.1.1",
          "V1.1.1 (2016-03), pubblicazione definitiva (adozione 22 febbraio 2016; pubblicato in precedenza come ETSI TS 101 861 e come ETSI TS 119 422)", "2016-03-31", 1),
+        (20, "ETSI TS 119 432 V1.3.1 (2026-03) - Electronic Signatures and Trust Infrastructures (ESI); Protocols for remote digital signature creation",
+         "https://www.etsi.org/deliver/etsi_ts/119400_119499/119432/01.03.01_60/ts_119432v010301p.pdf",
+         "urn:etsi:ts:119432:v1.3.1",
+         "V1.3.1 (2026-03), pubblicazione definitiva (reference RTS/ESI-0019432v131)", "2026-03-31", 1),
+        (21, "ETSI TS 119 612 V2.4.1 (2025-08) - Electronic Signatures and Trust Infrastructures (ESI); Trusted Lists",
+         "https://www.etsi.org/deliver/etsi_ts/119600_119699/119612/02.04.01_60/ts_119612v020401p.pdf",
+         "urn:etsi:ts:119612:v2.4.1",
+         "V2.4.1 (2025-08), pubblicazione definitiva (reference RTS/ESI-0019612v241)", "2025-08-31", 1),
     ])
     # CAD (fonte_id=3) e DPCM (fonte_id=4): estrazione selettiva precedente,
     # invariata nel contenuto in questa passata, solo rinumerata (gli id
@@ -1662,6 +1691,89 @@ def seed():
         etsi422_cursor, fonte_id=19, capitoli=etsi422_capitoli, lookup=cad_lookup, registro=cad_registro,
     )
 
+    # --- ETSI TS 119 432 V1.3.1 (2026-03) (fonte_id=20): Electronic
+    # Signatures and Trust Infrastructures (ESI); Protocols for remote digital
+    # signature creation. Fonte unica (documento non multi-parte). Import
+    # granulare ADR-0007 via 7 subagent paralleli per capitolo (documento di
+    # 54 pagine): cap01 clausole 1-3; cap02 clausola 4 + 5.1-5.2; cap03
+    # clausole 5.3-5.5; cap04 clausola 6 (architetture e casi d'uso, incl.
+    # EUDIW e i blocchi EXAMPLE 6.4.4.5.x); cap05 clausole 7-8 (API del
+    # servizio di creazione di firme, profilo OASIS DSS-X); cap06 Annex A
+    # (normative, profilo OpenID4VP EUDIW-centric); cap07 Annex B + Annex C
+    # (normative). 118 nodi (69 obblighi, 49 principi), 118 item di indice
+    # (uno per clausola/sottoclavola numerata con contenuto proprio, formato
+    # "clausola X.Y (Titolo)" / "Annex X.Y (Titolo)"), 12 relazioni interne
+    # da citazione letterale. Fuori perimetro: front matter non numerato,
+    # clausola 2 (References), Annex D (informative, Change history),
+    # History. La Fonte non ha richiesto l'esenzione ADR-0010 sulle ellissi
+    # per prosa: i soli `...` del testo ufficiale sono nei payload di esempio
+    # (Abbreviated payload convention, vedi app/seed_data/lib.py).
+    # Fase 6 (ADR-0009) in cap08_relazioni_cross.py, agganciato in coda alla
+    # stessa lista: 24 relazioni cross-fonte (19 toward eIDAS/eIDAS2 — 16 verso
+    # eIDAS2, 3 verso eIDAS — 4 toward ETSI TS 119 431, 1 toward DPCM
+    # 22/2/2013, di cui 3 textual), da 164
+    # coppie candidate KNN + citazioni esplicite di eIDAS/eIDAS2 rilevate a
+    # grep; pipeline ed esito completo nel docstring del modulo. Deve restare
+    # dopo i wiring di eIDAS/eIDAS2 (fonte_id=1/2), DPCM 22/2/2013 (4) ed
+    # ETSI TS 119 431 (11), i cui nodi sono referenziati da cap08.
+    etsi432_cursor = conn.cursor()
+    etsi432_capitoli = [
+        etsi432_cap01, etsi432_cap02, etsi432_cap03, etsi432_cap04,
+        etsi432_cap05, etsi432_cap06, etsi432_cap07, etsi432_cap08,
+    ]
+    seed_lib.inserisci_capitoli(
+        etsi432_cursor, fonte_id=20, capitoli=etsi432_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- ETSI TS 119 612 V2.4.1 (2025-08) (fonte_id=21): Electronic
+    # Signatures and Trust Infrastructures (ESI); Trusted Lists. Fonte unica
+    # (documento non multi-parte, nessun prefisso di parte nei `riferimento`).
+    # Import granulare ADR-0007 via 8 subagent paralleli per capitolo
+    # (documento di 81 pagine), moduli in
+    # app/seed_data/etsi_119_612/cap0[1-8].py (cap01 clausole 1, 3, 4;
+    # cap02 clausola 5 intro + 5.1-5.3; cap03 5.4 + 5.5.1-5.5.8; cap04 5.5.9 +
+    # 5.5.10 + 5.6 + 5.7; cap05 clausola 6 + Annex A/B; cap06 Annex C/D;
+    # cap07 Annex E/F/G; cap08 Annex H/I/J). Fuori perimetro: front matter
+    # (copertina/notice/Contents/IPR/Foreword/Modal verbs/Introduction),
+    # clausola 2 (References: bibliografia), History — stesso criterio delle
+    # altre Fonti ETSI. 118 nodi totali (91 obblighi, 27 principi), 118 item
+    # di indice, `riferimento` nel formato "clausola X.Y (Titolo)" /
+    # "Annex X.Y (Titolo)". La conversione PDF->testo usa `pdftotext -layout`
+    # (non la pipeline markdown delle Fonti ETSI precedenti) perché questo
+    # documento conserva i numeri di clausola nelle intestazioni, decisivi per
+    # la copertura ADR-0007; i marcatori "<!-- Page N -->" sono separatori di
+    # pagina. Ellissi autentiche del testo ufficiale in Annex D.0/D.6 (radix
+    # "http://uri.etsi.org/19612/……", "…/TrstSvc/……") e in clausola 5.5.3
+    # ("…/Svctype/.../nothavingPKIid"): coperte dalle nuove convenzioni
+    # `_ELLISSI_SU_RADIX_URI`/`_ELLISSI_IN_URI` di app/seed_data/lib.py.
+    # 164 relazioni interne fra i capitoli (tutte "richiama"/textual, da
+    # rinvii testuali puntuali a clausole/annessi).
+    # Fase 6 (ADR-0009) in cap09_relazioni_cross.py, agganciato in coda alla
+    # stessa lista: 54 relazioni cross-fonte (31 si sovrappone a, 19 specifica,
+    # 3 richiama, 1 richiede come precondizione; 1 textual - citazione
+    # letterale di Article 3(16)/3(46) del Reg. 910/2014 - e 53 inferred), da
+    # 321 coppie candidate (258 KNN soglia 0.80 + 63 da citazioni esplicite),
+    # 60 proposte del classificatore LLM, 7 scartate (glossario vs glossario)
+    # e 0 respinte dalla verifica anti-allucinazione. Per fonte controparte:
+    # eIDAS (21), ETSI EN 319 412 (10), ETSI EN 319 401 (5), ETSI EN 319 411
+    # (5), Regole Tecniche AgID certificati qualificati (4), DPCM 22/2/2013
+    # (3), ETSI EN 319 421 (3), eIDAS2 (2), ETSI TS 119 431 (1); verificato
+    # zero verso CAD, SPID, DPCM 19/10/2021, Reg. (UE) 2025/1566, ETSI TS 119
+    # 461, Reg. AgID modalita' attuative SPID, Reg. (UE) 2015/1502, ETSI EN
+    # 319 422, ETSI TS 119 432 (nessuna citazione esplicita risolvibile ne'
+    # sovrapposizione concettuale puntuale emersa). Deve restare dopo i wiring
+    # di eIDAS/eIDAS2 (1/2) e delle altre fonti ETSI/DPCM/AgID citate, i cui
+    # nodi sono referenziati da cap09.
+    etsi612_cursor = conn.cursor()
+    etsi612_capitoli = [
+        etsi612_cap01, etsi612_cap02, etsi612_cap03, etsi612_cap04,
+        etsi612_cap05, etsi612_cap06, etsi612_cap07, etsi612_cap08,
+        etsi612_cap09,
+    ]
+    seed_lib.inserisci_capitoli(
+        etsi612_cursor, fonte_id=21, capitoli=etsi612_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
 
     # --- monitoraggio: modifiche rilevate (rilevanti ai fini eIDAS2) --------
     modifiche = [
@@ -1682,9 +1794,9 @@ def seed():
 
     embed()
 
-    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in agidcert_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in ccivile_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi411_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi421_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi422_capitoli)
-    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in agidcert_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in ccivile_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi411_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi421_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi422_capitoli)
-    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412 [5 Parti], Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 [2 Parti], Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile [import selettivo], ETSI EN 319 411 [2 Parti], ETSI EN 319 421, ETSI EN 319 422).")
+    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in agidcert_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in ccivile_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi411_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi421_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi422_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi432_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi612_capitoli)
+    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in agidcert_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in ccivile_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi411_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi421_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi422_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi432_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi612_capitoli)
+    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412 [5 Parti], Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 [2 Parti], Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile [import selettivo], ETSI EN 319 411 [2 Parti], ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612).")
 
 
 if __name__ == "__main__":

@@ -285,6 +285,94 @@ preambolo delle fonti legislative).
   3161/5816/3739/6838/7230-7235/2818, ETSI TS 119 312, ETSI EN 319 102-1,
   ETSI TS 101 861) non producono relazioni per assenza di nodo controparte.
   Nessun nodo isolato: tutti i 27 nodi hanno almeno un arco.
+- **ETSI TS 119 432 V1.3.1 (2026-03)** (Protocols for remote digital signature
+  creation). `fonte_id=20`. Documento **non multi-parte**. Import 2026-09-24
+  via 7 subagent paralleli, 7 moduli `app/seed_data/etsi_119_432/cap0[1-7].py`
+  (cap01 clausole 1-3; cap02 clausola 4 + 5.1-5.2; cap03 clausole 5.3-5.5;
+  cap04 clausola 6, architetture e casi d'uso incl. EUDIW; cap05 clausole 7-8,
+  API del servizio di creazione di firme e profilo OASIS DSS-X; cap06 Annex A
+  normativo, profilo OpenID4VP EUDIW-centric; cap07 Annex B + Annex C
+  normativi). 118 nodi (69 obblighi, 49 principi), 118 item di indice — uno per
+  clausola/sottoclavola numerata con contenuto proprio, con `riferimento` nel
+  formato `"clausola X.Y (Titolo)"` / `"Annex X.Y (Titolo)"`. Fuori perimetro:
+  front matter non numerato, clausola 2 (References), Annex D (informative,
+  Change history), History. 12 relazioni interne da citazione letterale
+  (11 textual, 1 inferred). Il testo ufficiale abbrevia con `...` i payload
+  negli EXAMPLE (token JWT/Base64, `?token=...`, `{...}`): unico caso finora
+  in cui l'ellissi è contenuto autentico e non troncamento, gestito estendendo
+  `_senza_omissis_legittimi` in `app/seed_data/lib.py` con una terza
+  convenzione a tre condizioni strette (stringa quotata, dopo `=`/`{`, oppure
+  incollata a un token con cifre/run maiuscolo — un `...` su prosa resta
+  bloccato); `app/tools/verifica_troncamento.py` ora importa la stessa
+  normalizzazione invece di duplicarla, dopo che il primo giro aveva prodotto
+  6 falsi positivi su questa Fonte. Fase 6 (ADR-0009): 164 coppie candidate
+  KNN (soglia 0.80) + citazioni esplicite rilevate a grep (eIDAS 11 estratti,
+  eIDAS2 2, ETSI TS 119 431-1/-2 4 ma solo bibliografiche), shortlist estesa
+  con 21 nodi eIDAS/eIDAS2 degli istituti pertinenti per i 10 nodi che citano
+  il regolamento, classificazione LLM in due passate (33 proposte grezze),
+  validazione con risoluzione per `fonte_id` (necessaria: le stringhe
+  "Parte 1/2: …" sono condivise fra Fonte 11 e Fonte 17, e "art. 26" fra più
+  Fonti) → **24 relazioni cross-fonte** (8 specifica, 8 si applica a, 6 si
+  sovrappone a, 1 richiama, 1 attua; 21 inferred, 3 textual) in
+  `app/seed_data/etsi_119_432/cap08_relazioni_cross.py`, verso eIDAS2 (16:
+  artt. 29 §1-bis, 29-bis §1, 5 bis §4(e)/§5(g)), eIDAS (3: artt. 26, 29 §1),
+  ETSI TS 119 431 (4) e DPCM 22/2/2013 (1). Le citazioni a standard non
+  censiti (CSC API/CSC DM — 130 occorrenze, IETF RFC, OASIS DSS-X, ETSI EN 419
+  241, EUDI ARF) non producono relazioni per assenza di nodo controparte.
+  4 nodi restano senza archi oltre `DA_FONTE` (clausole 3.1 Terms, 3.2 Symbols,
+  3.3 Abbreviations e 6.4.5.1 Introduction): sono paratesto/glossario, stessa
+  condizione di nodi analoghi già presenti in altre Fonti (es. ETSI EN 319
+  421/422), e le proposte di relazione glossario-contro-glossario sono state
+  scartate in validazione perché prive di contenuto normativo proprio.
+- **ETSI TS 119 612 V2.4.1 (2025-08)** (Trusted Lists). `fonte_id=21`.
+  Documento **non multi-parte** (nessun prefisso di parte nei `riferimento`).
+  Import 2026-09-24 via 8 subagent paralleli, 8 moduli
+  `app/seed_data/etsi_119_612/cap0[1-8].py` (cap01 clausole 1, 3, 4; cap02
+  clausola 5 intro + 5.1-5.3; cap03 5.4 + 5.5.1-5.5.8; cap04 5.5.9 + 5.5.10 +
+  5.6 + 5.7; cap05 clausola 6 + Annex A/B; cap06 Annex C/D; cap07 Annex E/F/G;
+  cap08 Annex H/I/J). 118 nodi (91 obblighi, 27 principi), 118 item di indice —
+  un nodo per clausola/sottoclausola numerata con contenuto proprio, con
+  `riferimento` nel formato `"clausola X.Y (Titolo)"` / `"Annex X.Y (Titolo)"`;
+  le intestazioni di puro raggruppamento (5, 5.1, 5.3, 5.4, 5.5, 5.6, 5.7,
+  Annex D, Annex E/F/G, Annex H/I/J) non generano nodo. Fuori perimetro: front
+  matter (copertina/notice/Contents/IPR/Foreword/Modal verbs/Introduction),
+  clausola 2 (References: bibliografia) e History — stesso criterio delle altre
+  Fonti ETSI. 164 relazioni interne fra i capitoli (tutte "richiama"/textual,
+  da rinvii testuali puntuali a clausole/annessi). Peculiarità: il testo
+  ufficiale è stato estratto con `pdftotext -layout` invece della pipeline
+  markdown usata dalle altre Fonti ETSI, perché questo documento conserva i
+  numeri di clausola nelle intestazioni (decisivi per la copertura ADR-0007);
+  i marcatori `<!-- Page N -->` sono separatori di pagina. Il testo ufficiale
+  contiene ellissi autentiche in Annex D.0/D.6 (radix degli URI registrati,
+  `"…/19612/……"`, `"…/TrstSvc/……"`) e nella clausola 5.5.3 (segnaposto di
+  segmento dentro un pattern di URI non quotato, `…/Svctype/.../nothavingPKIid`):
+  gestite estendendo `_senza_omissis_legittimi` in `app/seed_data/lib.py` con
+  `_ELLISSI_SU_RADIX_URI`/`_ELLISSI_IN_URI` (stessa normalizzazione importata
+  dall'audit `app/tools/verifica_troncamento.py`). Fase 6 (ADR-0009): 321
+  coppie candidate a zero token (258 KNN, k=8 soglia 0.80 + 63 da citazioni
+  esplicite del Reg. (UE) 910/2014, del Reg. (UE) 2024/1183 e di ETSI EN 319
+  412-5), classificazione LLM sull'intero shortlist (60 proposte), validazione
+  → **54 relazioni cross-fonte** (31 si sovrappone a, 19 specifica, 3 richiama,
+  1 richiede come precondizione; 53 inferred, 1 textual) in
+  `app/seed_data/etsi_119_612/cap09_relazioni_cross.py`, verso eIDAS (21:
+  artt. 22 §1-§5 — ETSI TS 119 612 è la specifica tecnica di formato/semantica/
+  accesso degli elenchi di fiducia — e art. 23 §1), ETSI EN 319 412 (10), ETSI
+  EN 319 401 (5), ETSI EN 319 411 (5), Regole Tecniche AgID certificati
+  qualificati (4), DPCM 22/2/2013 (3), ETSI EN 319 421 (3), eIDAS2 (2), ETSI
+  TS 119 431 (1). La sola relazione "textual" è la clausola 5.5.1.2, che cita
+  letteralmente "Article 3(16)"/"Article 3(46) of Regulation (EU) 910/2014":
+  risolta sul nodo vigente "art. 3 (definizioni)" di eIDAS2, perché in eIDAS
+  (fonte 1) l'art. 3 non ha un nodo — stessa rimappatura sui successori vigenti
+  già applicata nel giro Fase 6 di ETSI EN 319 421. Verificato zero verso CAD,
+  SPID (DPCM 24/10/2014), DPCM 19/10/2021, Reg. (UE) 2025/1566, ETSI TS 119
+  461, Reg. AgID modalità attuative SPID, Reg. (UE) 2015/1502, ETSI EN 319 422
+  ed ETSI TS 119 432. Le citazioni a fonti non censite (Commission Decision
+  2009/767/EC, ETSI TS 119 312, ISO/IEC 15408 e 19790, IETF RFC 3161/5280,
+  CID (EU) 2015/1505, direttiva (UE) 2022/2555) non producono relazioni per
+  assenza di nodo controparte. 34 dei 118 nodi restano senza archi tipizzati
+  oltre `DA_FONTE` (clausole di campo, registri di URI e annessi senza rinvii
+  interni espliciti) — nessun nodo isola quanto a `DA_FONTE`, e le proposte
+  glossario-contro-glossario sono state scartate come per la Fonte 20.
 
 
 ## Riepilogo
@@ -294,10 +382,10 @@ preambolo delle fonti legislative).
 | Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2015/1502 | 4 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
-| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422 | 7 |
-| **Totale** | | **18** |
+| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612 | 9 |
+| **Totale** | | **20** |
 
-17 delle 18 Fonti hanno copertura granulare completa (ADR-0007) e sono
+19 delle 20 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
@@ -309,16 +397,9 @@ correzione 2026-09-23 dell'incoerenza iniziale su TS 119 431/EN 319 411
 per uniformare il criterio di modellazione a tutte le fonti multi-parte
 censite.
 
-**Nota di stato repo (2026-09-24)**: l'import delle 8 Fonti aggiunte dopo il
-2026-09-21 (codice in `app/seed_data/`, wiring in `app/seed.py`, guardia
-`verifica_completezza_testo_integrale` in `app/seed_data/lib.py`, questo
-file, `CLAUDE.md`, `CONTEXT.md`), il successivo import di ETSI EN 319 411
-(`fonte_id=17`, poi consolidato da due Fonti separate 17/18), l'ampliamento
-di ETSI EN 319 412 alle Parti 1-4 con consolidamento a Fonte unica
-(`app/seed_data/etsi_319_412/`, directory `etsi_319_412_5/` rinominata), il
-successivo consolidamento di ETSI TS 119 431 (`fonte_id=11`, da 11/12) ed
-ETSI EN 319 411 (`fonte_id=17`, da 17/18) a Fonte unica per ciascuna e l'import
-di ETSI EN 319 421 (`fonte_id=18`, 6 capitoli + Fase 6 in
-`app/seed_data/etsi_319_421/`) e l'import di ETSI EN 319 422 (`fonte_id=19`,
-4 capitoli + Fase 6 in `app/seed_data/etsi_319_422/`) risultano scritti su
-disco ma non ancora committati — commit previsto in sessione separata.
+**Allineamento codice/commit**: non dichiarato qui, per non invecchiare al
+primo commit. Prima di ogni import, verificare con `git status --short` e
+`git log --oneline -- app/seed_data app/seed.py docs/fonti-censite.md` quali
+Fonti siano già committate e quali siano solo su disco: la nota di stato
+precedente (2026-09-24) indicava come non committati gli import di ETSI EN
+319 421/422, già chiusi in `15ffd30`.

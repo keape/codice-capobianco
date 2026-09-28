@@ -140,12 +140,11 @@ import — non aggiungere qui l'elenco delle singole Fonti, aggiornare
 `docs/procedura-import-granulare.md`; problemi infrastrutturali noti:
 `docs/runbook-neo4j-import.md`.
 
-**Nota di stato repo**: al 2026-09-23 l'import delle 8 Fonti più recenti
-(codice in `app/seed_data/`, wiring in `app/seed.py`, guardia
-`verifica_completezza_testo_integrale` in `app/seed_data/lib.py`,
-`docs/fonti-censite.md`, questo aggiornamento a `CLAUDE.md`/`CONTEXT.md`)
-risulta scritto su disco ma **non ancora committato** — commit previsto in
-sessione separata. Prima del prossimo import, verificare `git status` su
-questi path.
+**Nota di stato repo**: rimossa — l'unica fonte di verità su cosa è
+committato e cosa è solo su disco è `git`, non una nota scritta a mano qui:
+prima di ogni nuovo import, `git status --short` e
+`git log --oneline -- app/seed_data app/seed.py docs/fonti-censite.md`. La
+versione precedente di questa nota dichiarava non committati gli import di
+ETSI EN 319 421/422, già chiusi in `15ffd30`.
 
 
