@@ -114,3 +114,13 @@ Ogni relazione inserita porta `evidence_type`/`confidence` per-arco (ADR-0005)
   da un seed (es. correzione manuale via Cypher), rilanciare
   `app/tools/verifica_troncamento.py` per confermare l'assenza di altre
   troncature prima di considerare il dato affidabile.
+- La guardia esenta le convenzioni in cui `...`/`((...))` sono contenuto
+  autentico: Normattiva `((...))`, estensibilità ASN.1 `| ...)`,
+  abbreviazione dei payload negli EXAMPLE (ETSI TS 119 432, 2026-09-24) e
+  ellissi sul radix degli URI registrati in Annex D di ETSI TS 119 612
+  (2026-09-24).
+  L'elenco vive in `seed_data.lib._senza_omissis_legittimi`; l'audit
+  `app/tools/verifica_troncamento.py` importa la stessa normalizzazione, mai
+  duplicarla, altrimenti l'audit segnala falsi positivi appena la lista
+  cresce. Un `...` collocato al posto di prosa reale resta troncamento (e va
+  corretto, mai esentato).

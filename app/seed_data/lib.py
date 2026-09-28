@@ -79,6 +79,36 @@ def verifica_copertura(indice: list[str], mappatura: dict[str, list[str]]) -> No
 _MARKER_TRONCAMENTO = ("…", "...", "[...]", "[…]")
 _OMISSIS_NORMATTIVA = re.compile(r"\(\(\s*\.{3}\s*\)\)")
 _ASN1_EXTENSIBILITY = re.compile(r"\|\s*\.\.\.\s*[\)\}]")
+# Terza convenzione nota (ETSI TS 119 432 V1.3.1, import 2026-09-24): nei
+# blocchi EXAMPLE di quello standard il testo ufficiale abbrevia esso stesso i
+# payload (token JWT/Base64, parametri di richiesta HTTP, URL con segnaposto)
+# con `...`. L'ellissi e' quindi contenuto autentico, non un'elisione del
+# modello. Riconoscerla senza aprire un varco alle troncature di prosa
+# richiede tre condizioni strette — dentro una stringa quotata, oppure dopo
+# `=`/`{`, oppure incollata a un token che porta cifre o un run maiuscolo: un
+# `...` incollato a una parola di prosa (il caso reale di troncamento, es.
+# "il prestatore qualificato...") non ricade in nessuna delle tre e resta
+# bloccato.
+_ELLISSI_IN_STRINGA = re.compile(r'"[^"\n]*\.\.\.[^"\n]*"')
+_ELLISSI_SEGNAPOSTO = re.compile(r"[={]\s?\.\.\.")
+_ELLISSI_SU_TOKEN = re.compile(
+    r"(?=[A-Za-z0-9+/_.\-]{8,}\.\.\.)"
+    r"(?:[A-Za-z0-9+/_.\-]*[0-9][A-Za-z0-9+/_.\-]*|[A-Z/+_.\-]{6,})\.\.\."
+)
+# Quarta convenzione nota (ETSI TS 119 612 V2.4.1, import 2026-09-24): in
+# Annex D (registro normativo degli URI) il testo ufficiale abbrevia con
+# un'ellissi il radix degli URI registrati, dentro una stringa quotata che
+# contiene un URI: "http://uri.etsi.org/19612/……" e
+# "http://uri.etsi.org/TrstSvc/……". Condizione ristretta alla stringa quotata
+# contenente un radix http/https: un'ellissi di prosa non ha mai questa forma,
+# quindi resta bloccata.
+_ELLISSI_SU_RADIX_URI = re.compile(r'"[^"\n]*https?://[^"\n]*(?:…+|\.\.\.)[^"\n]*"')
+# Quinta convenzione nota (ETSI TS 119 612 V2.4.1, clausola 5.5.3): l'ellissi
+# e' usata come segnaposto di segmento dentro un pattern di URI NON quotato
+# ("http://uri.etsi.org/TrstSvc/Svctype/.../nothavingPKIid"). Condizione
+# ristretta: l'ellissi e' dentro un token contiguo che inizia con http(s)://,
+# senza spazi — una prosa con ellissi non ha mai questa forma.
+_ELLISSI_IN_URI = re.compile(r'https?://[^\s"\']*(?:…+|\.\.\.)[^\s"\',;)]*')
 
 
 def _senza_omissis_legittimi(testo: str) -> str:
@@ -88,9 +118,20 @@ def _senza_omissis_legittimi(testo: str) -> str:
       riportato letteralmente così nel testo ufficiale italiano consolidato;
     - marcatore di estensibilità ASN.1 (`| ...)` / `| ...}`, ITU-T X.680):
       sintassi normativa reale nelle dichiarazioni QC-STATEMENT/SEQUENCE,
-      non un'abbreviazione del modello."""
+      non un'abbreviazione del modello;
+    - abbreviazione di payload negli EXAMPLE di ETSI TS 119 432 (vedi
+      `_ELLISSI_IN_STRINGA`/`_ELLISSI_SEGNAPOSTO`/`_ELLISSI_SU_TOKEN`);
+    - ellissi sul radix degli URI registrati in Annex D di ETSI TS 119 612
+      (vedi `_ELLISSI_SU_RADIX_URI`) e segnaposto di segmento dentro un
+      pattern di URI non quotato nella clausola 5.5.3 dello stesso documento
+      (vedi `_ELLISSI_IN_URI`)."""
     testo = _OMISSIS_NORMATTIVA.sub("", testo)
     testo = _ASN1_EXTENSIBILITY.sub("", testo)
+    testo = _ELLISSI_IN_STRINGA.sub("", testo)
+    testo = _ELLISSI_SEGNAPOSTO.sub("", testo)
+    testo = _ELLISSI_SU_TOKEN.sub("", testo)
+    testo = _ELLISSI_SU_RADIX_URI.sub("", testo)
+    testo = _ELLISSI_IN_URI.sub("", testo)
     return testo
 
 
@@ -101,9 +142,12 @@ def verifica_completezza_testo_integrale(capitoli: list) -> None:
     riportarlo per intero, in violazione di ADR-0007/ADR-0010 (copertura
     completa vale anche all'interno di una singola riga, non solo tra
     articoli). Un testo ufficiale verbatim non contiene mai questi
-    marcatori (salvo la convenzione Normattiva `((...))`, esclusa a monte —
-    vedi `_senza_omissis_legittimi`): se compaiono, sono stati introdotti dal
-    modello in fase di estrazione al posto di una porzione di testo reale.
+    marcatori salvo le convenzioni note elencate in
+    `_senza_omissis_legittimi` (Normattiva `((...))`, estensibilità ASN.1,
+    abbreviazione di payload negli EXAMPLE di ETSI TS 119 432, ellissi sul
+    radix degli URI registrati in Annex D di ETSI TS 119 612), escluse a
+    monte: se compaiono, sono stati introdotti dal modello in fase di
+    estrazione al posto di una porzione di testo reale.
 
     Chiamata da `inserisci_capitoli` prima di qualunque INSERT, sullo stesso
     modello di `verifica_copertura` — blocca l'intero seed, non solo la riga

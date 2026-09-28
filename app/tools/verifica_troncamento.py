@@ -6,11 +6,16 @@ audita ciò che è già nel grafo (incluse correzioni fatte a mano via Cypher,
 fonti seedate prima dell'introduzione della guardia, o import futuri che
 bypassano `inserisci_capitoli`). Stesso criterio (ADR-0010): marcatore di
 elisione (`…`, `...`, `[...]`) in `testo_integrale` = estrazione troncata,
-mai un dato accettabile nel censimento — esclusa la convenzione Normattiva
-`((...))` (testo soppresso da una modifica legislativa, riportato
-letteralmente così nel testo ufficiale consolidato) e il marcatore di
-estensibilità ASN.1 `| ...)` (ITU-T X.680): entrambi contenuto normativo/
-tecnico autentico, non un'elisione di estrazione.
+mai un dato accettabile nel censimento — escluse le convenzioni note di
+contenuto autentico (Normattiva `((...))`, estensibilità ASN.1 `| ...)`,
+abbreviazione dei payload negli EXAMPLE di ETSI TS 119 432, ellissi sul
+radix degli URI registrati in Annex D di ETSI TS 119 612).
+
+La normalizzazione NON è duplicata qui: è importata da `seed_data.lib`
+(`_senza_omissis_legittimi`, `_MARKER_TRONCAMENTO`), unica fonte di verità.
+Senza questo riuso l'audit segnala falsi positivi appena la lista delle
+convenzioni note cresce (è accaduto al primo giro su ETSI TS 119 432, dove
+i payload di esempio abbreviati sono contenuto ufficiale).
 
 Uso:
     app/.venv/bin/python app/tools/verifica_troncamento.py [--fonte-id N]
@@ -21,23 +26,16 @@ una correzione manuale o come controllo periodico).
 """
 
 import argparse
-import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from neo4j_common import get_driver, get_database  # noqa: E402
-
-MARKER_TRONCAMENTO = ("…", "...", "[...]", "[…]")
-OMISSIS_NORMATTIVA = re.compile(r"\(\(\s*\.{3}\s*\)\)")
-ASN1_EXTENSIBILITY = re.compile(r"\|\s*\.\.\.\s*[\)\}]")
-
-
-def _senza_omissis_legittimi(testo: str) -> str:
-    testo = OMISSIS_NORMATTIVA.sub("", testo)
-    testo = ASN1_EXTENSIBILITY.sub("", testo)
-    return testo
+from seed_data.lib import (  # noqa: E402
+    _MARKER_TRONCAMENTO as MARKER_TRONCAMENTO,
+    _senza_omissis_legittimi,
+)
 
 
 def audita(fonte_id: int | None = None) -> list[dict]:
