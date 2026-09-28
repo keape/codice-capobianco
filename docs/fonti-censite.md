@@ -36,6 +36,40 @@ nazionale necessario).
   (`app/seed_data/reg_ue_2025_1566/cap01.py`). 3 relazioni native + 3 cross
   verso eIDAS/eIDAS2 dopo pipeline grep+KNN+LLM (116 coppie candidate)
   — modulo `cap02_relazioni_cross.py`.
+- **Regolamento di esecuzione (UE) 2025/1567** — modalità di applicazione
+del regolamento (UE) n.910/2014 per quanto riguarda la gestione di
+dispositivi qualificati per la creazione di una firma elettronica a
+distanza e di dispositivi qualificati per la creazione di un sigillo
+elettronico a distanza come servizi fiduciari qualificati (art. 29 bis §2
+e art. 39 bis eIDAS2). `fonte_id=12`. Import 2026-09-28, testo ufficiale
+italiano acquisito con `app/tools/cellar_fetch.py` (CELEX `32025R1567`,
+provenienza e sha256 in `app/.source_cache/reg_ue_2025_1567/`), un solo
+capitolo (`app/seed_data/reg_ue_2025_1567/cap01.py` + capitolo virtuale di
+Fase 6 `cap02_relazioni_cross.py`). Atto breve (2 articoli + allegato di 7
+punti di adeguamento a ETSI TS 119 431-1 V1.3.1): 14 nodi (9 obblighi, 5
+principi), 14 item di indice — un nodo per articolo/comma e **per ogni
+requirement id introdotto dall'atto** (OVR-6.1-04, OVR-6.4.4-02/-03,
+OVR-6.4.9-02, OVR-6.5.5-02/-03, OVR-6.8.5-01/-02, OVR-A.3-02), esclusa la
+sola formula di chiusura dell'art. 2 comma 3. **20 relazioni**: 12 native
+(2 "attua" verso eIDAS2 artt. 29 bis §2 e 39 bis; 7 "modifica" verso i
+requisiti delle clausole che l'atto integra in ETSI TS 119 431-1; 1
+"specifica" verso la sua clausola 1; 2 "richiama" verso eIDAS2 art. 24 §5 ed
+ETSI EN 319 401 REQ-7.8-13) + 8 dal giro Fase 6 (7 "si sovrappone a" — i
+requisiti di ETSI EN 319 401 tradotti nella norma, la formula di
+pubblicazione internazionale di ETSI EN 319 411-1 `DIS-6.1-08` e l'obbligo
+sul piano di cessazione già presente nel Reg. 2025/1566 — e 1 "specifica"
+verso la clausola A.2 di ETSI TS 119 431-1, policy EUSPv2). `fonte_id=12`
+era l'unico id libero della tabella `fonti` (ex-Fonte "ETSI TS 119 431-2",
+consolidata nella 11 il 2026-09-23). **Limite noto**: l'atto designa ETSI EN
+319 401 V3.1.1 (2024-06), mentre la Fonte 10 censita è la V3.2.1 (2026-01);
+le relazioni della Fase 6 verso quella Fonte vanno riverificate insieme ad
+essa, non separatamente. 4 dei 14 nodi restano senza archi tipizzati oltre
+`DA_FONTE` (art. 2 «entrata in vigore» e «applicazione», l'aggiunta
+bibliografica di cui al punto 1 dell'allegato e il punto 6 OVR-6.8.5-02 sul
+rinvio ai meccanismi crittografici ENISA, documento non censito): nessuno è
+un'isola quanto a `DA_FONTE`, e le relazioni "entrata in vigore" ↔ "entrata
+in vigore" proposte dal KNN a score 1.0 sono state scartate come nel giro
+Fase 6 del Reg. 2025/1566.
 - **Regolamento di esecuzione (UE) 2015/1502** — specifiche/procedure
   tecniche minime sui livelli di garanzia (basso/significativo/elevato) dei
   mezzi di identificazione elettronica, ex art. 8 §3 eIDAS. `fonte_id=14`.
@@ -379,13 +413,13 @@ preambolo delle fonti legislative).
 
 | Categoria | Fonti | Totale |
 |---|---|---|
-| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2015/1502 | 4 |
+| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2015/1502 | 5 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
 | Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612 | 9 |
-| **Totale** | | **20** |
+| **Totale** | | **21** |
 
-19 delle 20 Fonti hanno copertura granulare completa (ADR-0007) e sono
+20 delle 21 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
