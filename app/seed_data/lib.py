@@ -111,6 +111,16 @@ _ELLISSI_SU_RADIX_URI = re.compile(r'"[^"\n]*https?://[^"\n]*(?:…+|\.\.\.)[^"\
 _ELLISSI_IN_URI = re.compile(r'https?://[^\s"\']*(?:…+|\.\.\.)[^\s"\',;)]*')
 
 
+# Sesta convenzione nota (ETSI EN 319 102-1 V1.4.1, clausola 5.1.3, tabella
+# "Reported Validation Information", import 2026-09-28): lo standard abbrevia
+# esso stesso un elenco esemplificativo dentro parentesi - "the algorithms that
+# have been used in material (e.g. the signature value, a certificate...)".
+# Condizione ristretta: l'ellissi sta dentro una parentesi che si apre con
+# "e.g." - una troncatura di prosa introdotta in estrazione non ha questa
+# forma, e un'ellissi su prosa resta bloccata.
+_ELLISSI_IN_PARENTESI_ESEMPLIFICATIVA = re.compile(r"\(e\.g\.[^)\n]*(?:…+|\.\.\.)[^)\n]*\)")
+
+
 def _senza_omissis_legittimi(testo: str) -> str:
     """Rimuove le convenzioni note in cui `...`/`((...))` sono contenuto
     normativo/tecnico autentico e non un'elisione introdotta in estrazione:
@@ -124,7 +134,9 @@ def _senza_omissis_legittimi(testo: str) -> str:
     - ellissi sul radix degli URI registrati in Annex D di ETSI TS 119 612
       (vedi `_ELLISSI_SU_RADIX_URI`) e segnaposto di segmento dentro un
       pattern di URI non quotato nella clausola 5.5.3 dello stesso documento
-      (vedi `_ELLISSI_IN_URI`)."""
+      (vedi `_ELLISSI_IN_URI`);
+    - elenco esemplificativo abbreviato dallo standard dentro parentesi
+      (vedi `_ELLISSI_IN_PARENTESI_ESEMPLIFICATIVA`, ETSI EN 319 102-1)."""
     testo = _OMISSIS_NORMATTIVA.sub("", testo)
     testo = _ASN1_EXTENSIBILITY.sub("", testo)
     testo = _ELLISSI_IN_STRINGA.sub("", testo)
@@ -132,6 +144,7 @@ def _senza_omissis_legittimi(testo: str) -> str:
     testo = _ELLISSI_SU_TOKEN.sub("", testo)
     testo = _ELLISSI_SU_RADIX_URI.sub("", testo)
     testo = _ELLISSI_IN_URI.sub("", testo)
+    testo = _ELLISSI_IN_PARENTESI_ESEMPLIFICATIVA.sub("", testo)
     return testo
 
 
@@ -145,9 +158,11 @@ def verifica_completezza_testo_integrale(capitoli: list) -> None:
     marcatori salvo le convenzioni note elencate in
     `_senza_omissis_legittimi` (Normattiva `((...))`, estensibilità ASN.1,
     abbreviazione di payload negli EXAMPLE di ETSI TS 119 432, ellissi sul
-    radix degli URI registrati in Annex D di ETSI TS 119 612), escluse a
-    monte: se compaiono, sono stati introdotti dal modello in fase di
-    estrazione al posto di una porzione di testo reale.
+    radix degli URI registrati in Annex D di ETSI TS 119 612 e segnaposto di
+    segmento negli URI della clausola 5.5.3, elenco esemplificativo
+    abbreviato dentro parentesi in ETSI EN 319 102-1), escluse a monte: se
+    compaiono, sono stati introdotti dal modello in fase di estrazione al
+    posto di una porzione di testo reale.
 
     Chiamata da `inserisci_capitoli` prima di qualunque INSERT, sullo stesso
     modello di `verifica_copertura` — blocca l'intero seed, non solo la riga

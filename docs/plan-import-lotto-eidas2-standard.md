@@ -152,7 +152,7 @@ che è il modello di riferimento per una fonte di questo tipo:
 | 1 | Reg. 2025/1567 | 12 | ☑ | ☑ | ☑ | ☑ 8 rel. | ☑ | ☑ |
 | 2 | Reg. 2025/1569 | 22 | ☑ | ☑ 3 cap. | ☑ | ☑ 4 rel. | ☑ | ☑ |
 | 3 | Reg. 2025/2531 | 23 | ☑ | ☑ 1 cap. | ☑ | ☑ 3 rel. | ☑ | ☑ |
-| 4 | Reg. 2025/2532 | 24 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 4 | Reg. 2025/2532 | 24 | ☑ | ☑ 1 cap. | ☑ | ☑ 3 rel. | ☑ | ☑ |
 | 5 | ETSI TS 119 312 | 25 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 | 6 | ETSI TS 119 101 | 26 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 | 7 | ETSI EN 319 102-1 | 27 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
@@ -176,6 +176,17 @@ Elencato per non perderlo, non come lavoro in corso:
   identità digitale), citato testualmente nell'allegato II punto 1 di 1569
   come sede dei formati ammessi per gli attestati — quindi non un atto di
   contorno ma una norma di riferimento richiamata da un atto già censito.
+  Aggiunti durante gli import di 2531 e 2532 (2026-09-28), tutti richiamati
+  come norme di riferimento dagli allegati di quegli atti e quindi rilevanti
+  per chi eroga registri elettronici o archiviazione qualificata:
+  **CEN/TS 18170:2025** (norma CEN su cui poggia l'intero allegato di 2532:
+  è l'unico caso del lotto in cui la fonte portante non è ETSI — il
+  censimento oggi non ha nessuna fonte CEN); **regg. di esecuzione (UE)
+  2024/482 e 2024/3144** (sistema europeo di certificazione della
+  cibersicurezza basato sui criteri comuni, EUCC); **ISO 14721:2025** (OAIS),
+  **ISO 23257:2022** e **ISO/TS 23635:2022** (blockchain/DLT); **IETF RFC
+  7515** (JWS); **FIPS PUB 140-3**; **ISO/IEC 15408:2022**; il documento
+  ENISA «Agreed Cryptographic Mechanisms» del gruppo ECCG.
 - **eIDAS1 di cornice**: CID (UE) 2015/1505 (trusted list), CID (UE)
   2015/1506 (formati firme/sigilli riconosciuti dalla PA), CID (UE) 2016/650
   (standard di valutazione di sicurezza dei QSCD).

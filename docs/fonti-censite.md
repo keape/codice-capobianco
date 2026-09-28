@@ -133,6 +133,33 @@ censita è `REQ-7.8-18`. Le relazioni sono agganciate per contenuto, non per
 numero, e ciascuna porta la nota dello scostamento. `REQ-6.1-12` (contenuto
 della dichiarazione sulla pratica) è invece un requisito **nuovo** — la
 clausola 6.1 della Fonte 10 si ferma a `REQ-6.1-11` — e resta senza relazioni.
+- **Regolamento di esecuzione (UE) 2025/2532** — norme di riferimento e
+specifiche per i servizi di archiviazione elettronica qualificati (art. 45
+undecies §2 eIDAS2). `fonte_id=24`. Import 2026-09-28, testo ufficiale
+italiano via `app/tools/cellar_fetch.py` (CELEX `32025R2532`), 3 articoli + 1
+allegato, capitolo unico (`app/seed_data/reg_ue_2025_2532/cap01.py` + capitolo
+virtuale `cap02_relazioni_cross.py`) estratto da un subagent worker. 14 nodi
+(9 obblighi, 5 principi), 53 item di indice: art. 1 §1 (obbligo di
+conservazione), art. 1 §2 (facoltà di avvalersi di un servizio di conservazione
+qualificato), art. 2 (rinvio), art. 3 (entrata in vigore — un solo nodo,
+nessuna applicazione differita), chapeau dell'allegato che designa
+**CEN/TS 18170:2025** e le nove lettere di adeguamento a)-i), una per lettera,
+con le voci interne indicizzate. **12 relazioni**: 9 native (art. 45 undecies
+§1 e §2; art. 24 §5 per le lettere b) e h); citazione letterale di
+`REQ-7.8-13` — scansione delle vulnerabilità trimestrale — e di
+`REQ-7.8-17X`, che nella Fonte 10 censita è `REQ-7.8-18`; e le tre clausole sul
+piano di cessazione che **completano a rete completa** il gruppo di clausole
+identiche dei quattro atti del lotto: Fonti 8, 12, 23 e 24 si vedono ora
+a vicenda) + 3 dal giro Fase 6 (personale in ruoli di fiducia verso
+`REQ-7.2-04`/`REQ-7.2-05`; dispositivo sicuro di firma verso il DPCM
+22/2/2013 art. 11 c.1). **Primo caso del censimento in cui la norma portante
+non è ETSI ma CEN**: CEN/TS 18170:2025 è la sede dell'intero allegato e non è
+censita (backlog del piano § 7). I rinvii di clausola — ETSI EN 319 401 punti
+5, 7.5, 7.8, 7.10 e CEN/TS 18170 punti 6.1, 6.2, 7.3, 7.13, 13.3.1 — non
+producono relazioni, perché la Fonte 10 ha nodi per id di requisito e non per
+clausola: nessun aggancio arbitrario, esito documentato nel modulo. È il motivo
+per cui questo atto, pur essendo il più dipendente da norme tecniche, è quello
+con meno relazioni del lotto.
 - **Regolamento di esecuzione (UE) 2015/1502** — specifiche/procedure
   tecniche minime sui livelli di garanzia (basso/significativo/elevato) dei
   mezzi di identificazione elettronica, ex art. 8 §3 eIDAS. `fonte_id=14`.
@@ -476,13 +503,13 @@ preambolo delle fonti legislative).
 
 | Categoria | Fonti | Totale |
 |---|---|---|
-| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2015/1502 | 7 |
+| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502 | 8 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
 | Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612 | 9 |
-| **Totale** | | **23** |
+| **Totale** | | **24** |
 
-22 delle 23 Fonti hanno copertura granulare completa (ADR-0007) e sono
+23 delle 24 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
