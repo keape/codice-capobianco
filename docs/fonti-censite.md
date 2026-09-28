@@ -385,6 +385,32 @@ preambolo delle fonti legislative).
   censito, è stato importato successivamente come Fonte 19 (vedi voce sotto):
   i rinvii 319 421 ↔ 319 422 sono ora registrati dal lato Fonte 19. Nessun
   nodo isolato: tutti i 138 nodi hanno almeno un arco.
+- **ETSI TS 119 312 V2.1.1 (2026-06)** (Cryptographic Suites). `fonte_id=25`.
+Documento **non multi-parte** (nessun prefisso di parte nei `riferimento`).
+Import 2026-09-28 via `app/tools/split_source.py` + 4 subagent paralleli (38
+pagine di testo + annessi A-D), moduli `app/seed_data/etsi_119_312/cap0[1-4].py`
+(cap01 clausole 1-4; cap02 clausole 5-6; cap03 clausole 7-8; cap04 clausole
+9-10 + annessi A-D, perché il file assegnato arriva a fine documento; Annex E
+Bibliography e History esclusi come paratesto). 57 nodi (42 obblighi, 15
+principi), 57 item di indice. **Questa fonte non ha id di requisito nel
+testo**: la granularità è quindi di clausola/sottoclavola numerata, a
+differenza di ETSI TS 119 101 e di ETSI EN 319 102-1 che usano requirement id
+propri. Il front matter è stato tagliato prima dello split (`body.txt`),
+perché l'indice del documento ripete i titoli dei capitoli e avrebbe reso
+ambigui i marker. Peculiarità: il documento è molto citato *verso l'interno*
+(48 occorrenze di sé stesso) e cita solo IETF RFC, FIPS, ISO/IEC e standard
+ETSI non censiti (EN 319 122/132/142, TS 101 733/903, TS 102 778, TS 102
+176-1): **zero relazioni native**. Il valore dell'import è tutto nel giro
+inverso: **21 relazioni "richiama"** in `cap05_relazioni_cross.py`, dalle
+fonti già censite verso questa — 20 nodi in 7 Fonti (7, 10, 11, 17, 18, 19,
+21) la richiamavano e quei rinvii restavano muti per assenza di nodo
+controparte. È il caso che l'ADR-0009 non copre (la sua pipeline guarda solo
+"fonte nuova → fonti esistenti"); lo stesso fenomeno già visto con il Codice
+Civile, qui in scala molto maggiore. Gli agganci sono **per contenuto, non per
+numero**: le citazioni più vecchie usano la numerazione V1.x (annessi A.8/A.9,
+clausola 11) mentre la V2.1.1 ha rinumerato in clausole 5, 6, 7, 9 e 10 — solo
+le lunghezze di chiave conservano lo stesso numero (9.3). Tabella di mappatura
+completa, proposte scartate e limite noto nel docstring del modulo.
 - **ETSI EN 319 422 V1.1.1 (2016-03)** (Time-stamping protocol and time-stamp
   token profiles). `fonte_id=19`. Documento **non multi-parte**. Import
   2026-09-24 via 4 subagent paralleli, 4 moduli
@@ -506,10 +532,10 @@ preambolo delle fonti legislative).
 | Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502 | 8 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
-| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612 | 9 |
-| **Totale** | | **24** |
+| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312 | 10 |
+| **Totale** | | **25** |
 
-23 delle 24 Fonti hanno copertura granulare completa (ADR-0007) e sono
+24 delle 25 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
