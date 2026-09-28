@@ -213,6 +213,17 @@ from seed_data.etsi_119_101 import (
     cap04 as etsi101_cap04,
     cap05_relazioni_cross as etsi101_cap05,
 )
+from seed_data.etsi_319_102 import (
+    cap01 as etsi319102_cap01,
+    cap02 as etsi319102_cap02,
+    cap03 as etsi319102_cap03,
+    cap04 as etsi319102_cap04,
+    cap05 as etsi319102_cap05,
+    cap06 as etsi319102_cap06,
+    cap07 as etsi319102_cap07,
+    cap08 as etsi319102_cap08,
+    cap09_relazioni_cross as etsi319102_cap09,
+)
 from seed_data.etsi_119_612 import (
     cap01 as etsi612_cap01,
     cap02 as etsi612_cap02,
@@ -422,6 +433,10 @@ def seed():
          "https://www.etsi.org/deliver/etsi_ts/119100_119199/119101/01.01.01_60/ts_119101v010101p.pdf",
          "urn:etsi:ts:119101:v1.1.1",
          "V1.1.1 (2016-03), pubblicazione definitiva (unica versione mai pubblicata del documento)", "2016-03-22", 1),
+        (27, "ETSI EN 319 102-1 V1.4.1 (2024-06) - Electronic Signatures and Trust Infrastructures (ESI); Procedures for Creation and Validation of AdES Digital Signatures; Part 1: Creation and Validation",
+         "https://www.etsi.org/deliver/etsi_en/319100_319199/31910201/01.04.01_60/en_31910201v010401p.pdf",
+         "urn:etsi:en:319102-1:v1.4.1",
+         "V1.4.1 (2024-06), pubblicazione definitiva (deliverable multi-parte: censita la sola Parte 1; riferimenti senza prefisso di parte, vedi decisione in docs/plan-import-lotto-eidas2-standard.md)", "2024-06-30", 1),
     ])
     # CAD (fonte_id=3) e DPCM (fonte_id=4): estrazione selettiva precedente,
     # invariata nel contenuto in questa passata, solo rinumerata (gli id
@@ -2012,6 +2027,40 @@ def seed():
         etsi101_cursor, fonte_id=26, capitoli=etsi101_capitoli, lookup=cad_lookup, registro=cad_registro,
     )
 
+    # --- ETSI EN 319 102-1 V1.4.1 (fonte_id=27): import granulare a copertura
+    # completa (ADR-0007). Documento di 88 pagine, il piu' esteso del lotto,
+    # diviso in 8 capitoli con app/tools/split_source.py (front matter
+    # tagliato prima dello split) e affidato a 8 subagent in due lotti
+    # (clausola 5 spaccata in cinque capitoli: 5.1 / 5.2 / 5.3-5.4 / 5.5 /
+    # 5.6). 136 nodi (82 obblighi, 54 principi), 136 item di indice. Ex
+    # clausola 5.6 (convalida a lungo termine, 44k caratteri) e' il capitolo
+    # piu' oneroso. Annex D (Change history) e la sezione History esclusi
+    # come paratesto editoriale, con decisione esplicita in corso d'opera su
+    # richiesta del subagent di cap08.
+    # Fase 6 (ADR-0009) in cap09_relazioni_cross.py: nessuna relazione nativa
+    # e 9 relazioni "richiama" in direzione INVERSA - nodi di Fonti 9, 19 e 20
+    # citano questa norma, compresa una citazione di sottoclavola puntuale
+    # ("Figure 1 derived from ETSI EN 319 102-1, clause 4.2.1" da Fonte 20).
+    # Terzo caso del lotto di relazioni inverse (dopo Fonti 25 e 26).
+    # NOTA DI REVISIONE, dichiarata e non nascosta: le clausole "Input/Inputs"
+    # sono state classificate Obbligo da cap05 (5.3.2, 5.4.2) e cap06 (5.5.2) e
+    # Principio da cap04 (5.2.x) e cap07 (5.6.x), pur avendo le rispettive
+    # tabelle la stessa colonna Requirement con valori Mandatory/Optional
+    # (verificato a mano su 5.2.2.2 e 5.3.2). Non e' stato normalizzato in
+    # questa sessione per non riscrivere due moduli grandi a fine lavorazione:
+    # da risolvere in revisione umana (tutte le righe sono comunque
+    # stato_validazione='bozza'), decidendo il criterio una volta per la Fonte.
+    # Deve restare dopo i wiring delle Fonti citanti (9, 19, 20).
+    etsi319102_cursor = conn.cursor()
+    etsi319102_capitoli = [
+        etsi319102_cap01, etsi319102_cap02, etsi319102_cap03, etsi319102_cap04,
+        etsi319102_cap05, etsi319102_cap06, etsi319102_cap07, etsi319102_cap08,
+        etsi319102_cap09,
+    ]
+    seed_lib.inserisci_capitoli(
+        etsi319102_cursor, fonte_id=27, capitoli=etsi319102_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
 
     # --- monitoraggio: modifiche rilevate (rilevanti ai fini eIDAS2) --------
     modifiche = [
@@ -2032,9 +2081,9 @@ def seed():
 
     embed()
 
-    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in agidcert_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in ccivile_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi411_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi421_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi422_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi432_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi612_capitoli) + len(reg1567_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1569_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2531_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2532_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi312_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi101_capitoli)
-    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in agidcert_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in ccivile_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi411_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi421_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi422_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi432_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi612_capitoli) + len(reg1567_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in reg1569_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2531_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2532_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi312_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi101_capitoli)
-    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412 [5 Parti], Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 [2 Parti], Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile [import selettivo], ETSI EN 319 411 [2 Parti], ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, Regolamento (UE) 2025/1567, Regolamento (UE) 2025/1569, Regolamento (UE) 2025/2531, Regolamento (UE) 2025/2532, ETSI TS 119 312, ETSI TS 119 101).")
+    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in agidcert_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in ccivile_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi411_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi421_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi422_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi432_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi612_capitoli) + len(reg1567_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1569_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2531_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2532_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi312_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi101_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi319102_capitoli)
+    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in agidcert_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in ccivile_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi411_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi421_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi422_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi432_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi612_capitoli) + len(reg1567_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in reg1569_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2531_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2532_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi312_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi101_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi319102_capitoli)
+    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412 [5 Parti], Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 [2 Parti], Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile [import selettivo], ETSI EN 319 411 [2 Parti], ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, Regolamento (UE) 2025/1567, Regolamento (UE) 2025/1569, Regolamento (UE) 2025/2531, Regolamento (UE) 2025/2532, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1).")
 
 
 if __name__ == "__main__":

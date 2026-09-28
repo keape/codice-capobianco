@@ -438,6 +438,36 @@ il giro KNN in direzione diretta: su 275 nodi lo shortlist è dominato dal
 lessico comune degli standard ETSI e non da corrispondenze prescrittive; il
 limite è dichiarato nel docstring del modulo invece di essere mascherato da
 un elenco di proposte scartate.
+- **ETSI EN 319 102-1 V1.4.1 (2024-06)** (Procedures for Creation and
+Validation of AdES Digital Signatures; Parte 1: Creation and Validation).
+`fonte_id=27`. Documento **multi-parte** di cui è censita la sola Parte 1.
+Import 2026-09-28, il più esteso del lotto (88 pagine): front matter tagliato
+prima dello split, 8 capitoli via `split_source.py` e 8 subagent in due lotti
+(la clausola 5 è spaccata in cinque capitoli: 5.1 / 5.2 / 5.3-5.4 / 5.5 /
+5.6), moduli `app/seed_data/etsi_319_102/cap0[1-9].py`. 136 nodi (82 obblighi,
+54 principi), 136 item di indice. Annex D (Change history) e la sezione
+History esclusi come paratesto editoriale (decisione presa in corso d'opera su
+richiesta del subagent di cap08). **9 relazioni "richiama"** nel solo giro
+inverso (`cap09_relazioni_cross.py`): nodi delle Fonti 9, 19 e 20 citano questa
+norma, e due di essi la citano con il risultato di convalida
+(TOTAL-PASSED) definito dallo standard; Fonte 20 lo cita una volta con
+riferimento **puntuale di sottoclavola** («Figure 1 (derived from ETSI EN 319
+102-1, clause 4.2.1)»). Terzo caso del lotto di relazioni inverse, dopo Fonti
+25 e 26.
+  - **Nota sul prefisso di parte**: i `riferimento` di questa Fonte non portano
+    `"Parte 1: "`, a differenza di ETSI EN 319 412/TS 119 431/EN 319 411. È una
+    decisione documentata (sezione "Decisione presa in corso d'import" di
+    `docs/plan-import-lotto-eidas2-standard.md`): con una sola Parte nella Fonte
+    non esiste ambiguità, e il prefisso va aggiunto — su questi 8 moduli, sul
+    capitolo di Fase 6 e sui riferimenti a Fonte 27 in altre Fonti — se e quando
+    si importerà TS 119 102-2 nella stessa Fonte.
+  - **Nota di revisione aperta**: le clausole "Input/Inputs" sono classificate
+    Obbligo da cap05 (5.3.2, 5.4.2) e cap06 (5.5.2) e Principio da cap04 (5.2.x)
+    e cap07 (5.6.x), pur avendo le rispettive tabelle la stessa colonna
+    Requirement con valori Mandatory/Optional (verificato a mano su 5.2.2.2 e
+    5.3.2). Incoerenza **dichiarata, non nascosta**: da risolvere in revisione
+    umana decidendo il criterio una volta per la Fonte — tutte le righe sono
+    comunque `stato_validazione='bozza'`.
 - **ETSI EN 319 422 V1.1.1 (2016-03)** (Time-stamping protocol and time-stamp
   token profiles). `fonte_id=19`. Documento **non multi-parte**. Import
   2026-09-24 via 4 subagent paralleli, 4 moduli
@@ -559,10 +589,10 @@ un elenco di proposte scartate.
 | Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502 | 8 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
-| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101 | 11 |
-| **Totale** | | **26** |
+| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1 | 12 |
+| **Totale** | | **27** |
 
-25 delle 26 Fonti hanno copertura granulare completa (ADR-0007) e sono
+26 delle 27 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente

@@ -35,6 +35,23 @@ Per il criterio già applicato a ETSI EN 319 412, TS 119 431 ed EN 319 411
 successivo nella stessa Fonte — stesso percorso già seguito da ETSI EN 319 412
 (Parte 5 prima, Parti 1-4 dopo).
 
+**Decisione presa in corso d'import (2026-09-28)**: i `riferimento` di Fonte 27
+portano la forma **senza** prefisso di parte (`"clausola 4 (Signature
+creation)"`, `"Annex A.1 (Overview)"`), non `"Parte 1: clausola ..."` come
+questa sezione prevedeva in origine. Motivo: è la stessa sequenza del
+precedente qui citato — ETSI EN 319 412 fu importata prima come Parte 5
+**senza** prefisso e il prefisso è stato aggiunto al momento del
+consolidamento in Fonte unica. Con una sola Parte nella Fonte non esiste
+ambiguità da risolvere, e riscrivere 8 moduli appena prodotti (≈ 400 nodi) per
+un prefisso che serve solo in presenza di una seconda Parte è l'operazione più
+esposta delle due. **Condizione di retrofit**, da rispettare se e quando si
+importerà TS 119 102-2 nella stessa Fonte: i file da riscrivere sono
+gli 8 moduli `app/seed_data/etsi_319_102/cap0[1-8].py`, il capitolo virtuale di
+Fase 6 e i riferimenti a Fonte 27 nei moduli di altre Fonti — la riscrittura
+riguarda solo le stringhe di `riferimento`, `INDICE_ARTICOLI_LOCALE`,
+`MAPPATURA_LOCALE` (chiavi e valori) e `RELAZIONI`, mai i campi `testo`
+(sintesi in prosa che possono contenere "clausola X.Y").
+
 ## 2. Ordine di esecuzione
 
 L'ordine è quello indicato dall'utente: 1567 → 1569 → 2531 → 2532 →
@@ -89,6 +106,19 @@ solo per ispezione, la scrittura passa da `seed.py`).
 5. **Seed e verifica**: `app/.venv/bin/python app/seed.py`;
    `app/.venv/bin/python app/tools/verifica_troncamento.py --fonte-id <N>`;
    controllo che tutte le nuove righe siano `stato_validazione='bozza'`.
+   **Due regole apprese a spese del lotto (2026-09-28)**:
+   - il seed va lanciato con `set -o pipefail`: una pipe verso `tail` restituisce
+     il codice di uscita di `tail` (0) anche quando Python e' crollato, e il
+     fallimento passa per successo — e' accaduto davvero su Fonte 27, dove il
+     grafo e' rimasto a 26 fonti mentre il task risultava `exit=0`;
+   - prima del seed va eseguito
+     `app/tools/preflight_relazioni.py <fonte_id> app/seed_data/<fonte>`: verifica
+     OGNI relazione contro i moduli della fonte stessa (riferimenti interni,
+     `fonte_id_o_None = None`) e contro il grafo (riferimenti esterni). I
+     controlli precedenti saltavano i riferimenti interni e non hanno visto un
+     tipo di nodo invertito (relazione dichiarata verso un Obbligo che il modulo
+     capitolo aveva scritto come Principio), che ha fatto fallire il seed a
+     meta' strada dopo aver ricostruito tutto il grafo in memoria.
 6. **Fase 6** (ADR-0009): grep delle citazioni esplicite su `raw.txt` + KNN
    sui nodi delle altre Fonti (soglia 0.85), classificazione solo sullo
    shortlist, validazione anti-allucinazione dei `riferimento` proposti
@@ -155,7 +185,7 @@ che è il modello di riferimento per una fonte di questo tipo:
 | 4 | Reg. 2025/2532 | 24 | ☑ | ☑ 1 cap. | ☑ | ☑ 3 rel. | ☑ | ☑ |
 | 5 | ETSI TS 119 312 | 25 | ☑ | ☑ 4 cap. | ☑ | ☑ 21 rel. inverse | ☑ | ☑ |
 | 6 | ETSI TS 119 101 | 26 | ☑ | ☑ 4 cap. | ☑ | ☑ 14 rel. inverse | ☑ | ☑ |
-| 7 | ETSI EN 319 102-1 | 27 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 7 | ETSI EN 319 102-1 | 27 | ☑ | ☑ 8 cap. | ☑ | ☑ 9 rel. inverse | ☑ | ☑ |
 
 ## 7. Fuori perimetro di questo lotto (backlog, non eseguito)
 
