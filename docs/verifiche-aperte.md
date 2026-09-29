@@ -11,9 +11,9 @@ dichiarato**, non quando è un lavoro da fare (per quello ci sono i piani in
 esito è scritto nella scheda della Fonte in `docs/fonti-censite.md` o nel
 docstring del modulo interessato.
 
-Ultimo aggiornamento: 2026-09-29 (import di Fonte 28, Reg. di esecuzione (UE)
-2024/2979, e apertura di Fonte 29/30, Reg. 2024/482 e 2024/3144: § 10
-rilanciata con i conteggi aggiornati). Aggiornamento precedente: 2026-09-28
+Ultimo aggiornamento: 2026-09-29 (chiusura di Fonti 28, 29 e 30 - Reg. di
+esecuzione (UE) 2024/2979, 2024/482 e 2024/3144 - con § 10 rilanciata ai
+tre giri e la nuova voce § 3-bis). Aggiornamento precedente: 2026-09-28
 (chiusura del lotto 1: atti di esecuzione eIDAS2 + TS 119 312, TS 119 101, EN
 319 102-1; poi decisioni sull'apertura del lotto 2: § 7 chiusa, § 9 integrata
 con i rinvii ratificati).
@@ -71,6 +71,51 @@ le guardie verificano la copertura, non l'omogeneità dei criteri.
 
 **Quando riverificare.** A ogni nuovo capitolo di una fonte ETSI che contenga
 tabelle di input/output: il criterio va applicato, non reinventato.
+
+## 3-bis. Fonte 29 (Reg. UE 2024/482, EUCC) — tipo_obbligo delle conseguenze della non conformità
+
+**In sospeso, serve una decisione dell'utente.** I capitoli di Fonte 29, scritti
+in parallelo da 14 subagent worker, hanno classificato le conseguenze della non
+conformità / non compliance in due modi diversi, e il testo del regolamento non
+dirime la questione:
+
+- **Obbligo "sanzionatorio"**: art. 28 §6, art. 29 §2, art. 29 §3 (cap05) e
+  art. 35 §6 (cap06) — il titolare non propone misure correttive adeguate, la
+  violazione è continuata o ricorrente, l'aggiornamento della relazione di
+  valutazione non viene fornito: conseguenze della violazione.
+- **Obbligo "procedurale"**: art. 14 §1 (cap02) e art. 20 §1 (cap03) — revoca
+  del certificato EUCC; art. 21 §5 e art. 22 §6 (cap04) — revoca
+  dell'autorizzazione dell'organismo di certificazione e dell'ITSEF; art. 31
+  §1-§3 (cap05) — misure in caso di mancato rispetto degli obblighi da parte di
+  organismi e ITSEF; art. 30 §1-§6 (cap05) — procedura di sospensione.
+
+**Perché conta.** è lo stesso istituto (conseguenza del venire meno dei
+requisiti o di una violazione) classificato in due modi, in moduli diversi della
+stessa Fonte: la Fonte è internamente incoerente pur passando tutte le guardie,
+esattamente come il caso "Input/Inputs" di Fonte 27 (§ 3). Il corpus non decide
+al posto nostro: le 23 righe già a "sanzionatorio" in tutto il grafo
+(2026-09-29) comprendono sia sanzioni in senso proprio e responsabilità civile
+(CAD art. 32-bis, eIDAS art. 13 §1) sia misure di enforcement conseguenti a una
+violazione (CAD art. 37 c.4-ter, "intima di ottemperarvi"; SPID art. 12 c.4,
+"previa accertamento della violazione"). La revoca di un certificato o di
+un'autorizzazione sta in mezzo alle due letture.
+
+**Due letture possibili**, da scegliere una volta per la Fonte:
+1. "sanzionatorio" = solo sanzioni e responsabilità (pecuniarie o civili):
+   allora le quattro righe di cap05/cap06 vanno portate a "procedurale";
+2. "sanzionatorio" = qualunque conseguenza giuridica di una violazione o di un
+   accertamento, revoca e sospensione incluse (lettura suggerita dal precedente
+   CAD art. 37 c.4-ter e SPID art. 12 c.4): allora vanno portate a
+   "sanzionatorio" le righe di cap02, cap03, cap04 e cap05 elencate sopra.
+
+**Dove agire.** `app/seed_data/reg_ue_2024_482/cap02.py`, `cap03.py`, `cap04.py`,
+`cap05.py`, `cap06.py` (solo il campo `tipo_obbligo` delle righe indicate; mai
+`testo_integrale`). Le righe sono tutte `stato_validazione='bozza'`.
+
+**Quando riverificare.** Alla prima revisione umana di Fonte 29, insieme al
+altro presidio dichiarato nel wiring di `seed.py` (nota di revisione su cap05).
+Il criterio deciso vale anche per le Fonti future che contengano revoche,
+sospensioni e misure di enforcement: va applicato, non reinventato.
 
 ## 4. Fonte 25 (ETSI TS 119 312) — relazioni mappate dalla numerazione V1.x
 
@@ -191,6 +236,12 @@ aggiunge 11, tutti classificati: vedi sotto; gli altri due casi in meno
 rispetto al primo giro dipendono dalla normalizzazione di Fonte 27 del
 2026-09-28 e dalla deduplica dell'audit, non da nuove verifiche).
 
+**Esito del terzo giro** (2026-09-29, dopo l'import di Fonti 29 e 30 - EUCC e
+atto modificativo): 1.375 relazioni `textual` esaminate, **356 senza traccia**
+(+156 relazioni textual e +10 segnalazioni rispetto al giro precedente: Fonte
+30 non ne produce nessuna). Le segnalazioni delle Fonti 28 e 29 sono
+classificate nei due paragrafi seguenti.
+
 **Fonte 28 (Reg. (UE) 2024/2979), 11 casi, tutti esaminati e classificati:** 7
 sono **falsi positivi dello strumento** — il `testo_integrale` del nodo citante
 cita i commi/lettere al plurale o in forma riassuntiva ("di cui ai paragrafi 1
@@ -203,6 +254,25 @@ contenuto**, non citato puntualmente: la base giuridica art. 5 bis §23 eIDAS2
 non l'articolo o il punto di allegato agganciato (scelta documentata nel
 docstring di `app/seed_data/reg_ue_2024_2979/cap06_relazioni_cross.py`).
 Nessuno dei 11 casi è un'etichetta gonfiata da correggere.
+
+**Fonte 29 (Reg. (UE) 2024/482, EUCC), 14 casi — 10 falsi positivi e 4
+etichette corrette.** I 10 falsi positivi sono della stessa classe di Fonte 28:
+i moduli cap02 e cap07 citano l'articolo in blocco ("di cui all'articolo 7",
+"si applicano le disposizioni dell'articolo 13") mentre il bersaglio dichiarato
+e' un comma, e l'estrattore cerca l'ordinale del paragrafo; la scelta di miratura
+e' documentata nei docstring dei due moduli. I 4 casi rimanenti erano
+un'etichetta `textual` attribuita a un aggancio di contenuto: il punto 16 della
+sezione V.1 dell'allegato V rinvia "alla sezione VI.2", ma la sezione che
+disciplina l'adattamento del traguardo di sicurezza e' la **V.2** — nel testo
+ufficiale della Gazzetta la numerazione romana di questi rinvii interni e'
+sbagliata di uno (stessa anomalia al punto 1 della sezione V.2, che cita
+"VI.1" per la V.1). Le quattro relazioni verso i punti della sezione V.2 sono
+state quindi riclassificate `evidence_type="inferred"` con confidence 0.70
+(bersaglio giusto, citazione non letterale) e annotate nel modulo; nessun arco
+e' stato creato verso l'allegato VI, sezione VI.2, che riguarda la composizione
+del gruppo di valutazione inter pares e non l'adattamento del traguardo di
+sicurezza. Fonte 30 (atto modificativo): 0 casi su 21 relazioni `textual`, tutte
+citazioni letterali dell'articolo o dell'allegato modificato.
 
 **Perché non è una diagnosi.** Le due cause possibili — (a) etichetta gonfiata
 (relazione costruita per costruzione ma dichiarata citazione letterale) e (b)

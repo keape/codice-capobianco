@@ -232,6 +232,31 @@ from seed_data.reg_ue_2024_2979 import (
     cap05 as reg2979_cap05,
     cap06_relazioni_cross as reg2979_cap06,
 )
+from seed_data.reg_ue_2024_482 import (
+    cap01 as reg482_cap01,
+    cap02 as reg482_cap02,
+    cap03 as reg482_cap03,
+    cap04 as reg482_cap04,
+    cap05 as reg482_cap05,
+    cap06 as reg482_cap06,
+    cap07 as reg482_cap07,
+    cap08 as reg482_cap08,
+    cap09 as reg482_cap09,
+    cap10 as reg482_cap10,
+    cap11 as reg482_cap11,
+    cap12 as reg482_cap12,
+    cap13 as reg482_cap13,
+    cap14 as reg482_cap14,
+    cap15_relazioni_cross as reg482_cap15,
+)
+from seed_data.reg_ue_2024_3144 import (
+    cap01 as reg3144_cap01,
+    cap02 as reg3144_cap02,
+    cap03 as reg3144_cap03,
+    cap04 as reg3144_cap04,
+    cap05 as reg3144_cap05,
+    cap06_relazioni_cross as reg3144_cap06,
+)
 from seed_data.etsi_119_612 import (
     cap01 as etsi612_cap01,
     cap02 as etsi612_cap02,
@@ -449,6 +474,14 @@ def seed():
          "https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32024R2979",
          "urn:lex:eu:regulation:2024:2979",
          "testo originario (atto come adottato il 28 novembre 2024)", "2024-12-24", 1),
+        (29, "Regolamento di esecuzione (UE) 2024/482 della Commissione - modalità di applicazione del regolamento (UE) 2019/881 per quanto riguarda l'adozione del sistema europeo di certificazione della cibersicurezza basato sui criteri comuni (EUCC)",
+         "https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32024R0482",
+         "urn:lex:eu:regulation:2024:482",
+         "testo originario (atto adottato il 31 gennaio 2024; entrata in vigore il 27 febbraio 2024, applicazione differita di 12 mesi al 27 febbraio 2025 - art. 50, salvo i requisiti del capo IV e dell'allegato V, applicabili dall'entrata in vigore)", "2024-02-27", 1),
+        (30, "Regolamento di esecuzione (UE) 2024/3144 della Commissione - modifica del regolamento di esecuzione (UE) 2024/482 per quanto riguarda le norme internazionali applicabili e rettifica di tale regolamento di esecuzione",
+         "https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32024R3144",
+         "urn:lex:eu:regulation:2024:3144",
+         "testo originario (atto adottato il 18 dicembre 2024; l'art. 1 §4 si applica a decorrere dall'8 gennaio 2025)", "2025-01-08", 1),
     ])
     # CAD (fonte_id=3) e DPCM (fonte_id=4): estrazione selettiva precedente,
     # invariata nel contenuto in questa passata, solo rinumerata (gli id
@@ -2101,6 +2134,57 @@ def seed():
         reg2979_cursor, fonte_id=28, capitoli=reg2979_capitoli, lookup=cad_lookup, registro=cad_registro,
     )
 
+    # --- Regolamento di esecuzione (UE) 2024/482 (fonte_id=29) - EUCC: import
+    # granulare a copertura completa (ADR-0007). Secondo import del lotto 2
+    # (docs/plan-import-lotto-2-backlog-e-ades.md, blocco A). Atto UE di 135k
+    # caratteri, il piu' esteso del lotto 2, diviso in 14 capitoli con
+    # app/tools/split_source.py (Capi I-XI + Allegati I-IX) e affidato a 14
+    # subagent worker. Granularita': un comma = una riga (le lettere restano
+    # dentro il comma, mappate al proprio item di indice); gli allegati sono
+    # censiti per punto/sezione. Il preambolo (33 considerando), l'epigrafe, la
+    # formula di chiusura, la firma, le note a pie' di pagina e la riga ELI non
+    # producono nodi, come in tutte le Fonti gia' censite.
+    # NOTA DI REVISIONE, dichiarata e non nascosta: le conseguenze della non
+    # conformita' / non compliance sono classificate in modo non uniforme dai
+    # capitoli scritti in parallelo - art. 28 §6, 29 §2, 29 §3 (cap05) e
+    # art. 35 §6 (cap06) come Obbligo "sanzionatorio", mentre la revoca del
+    # certificato (art. 14 §1, cap02), del certificato di profilo (art. 20 §1,
+    # cap03) e dell'autorizzazione di organismi/ITSEF (art. 21 §5 e 22 §6,
+    # cap04) e le misure dell'art. 31 (cap05) sono "procedurale". Il criterio
+    # va deciso una volta per la Fonte in revisione umana (tutte le righe sono
+    # stato_validazione='bozza'), come per il criterio Input/Inputs di Fonte
+    # 27: vedi docs/verifiche-aperte.md § 3-bis.
+    # Fase 6 (ADR-0009) in cap15_relazioni_cross.py: relazioni cross-capitolo
+    # della stessa Fonte (i rinvii da un capo all'altro, deliberatamente non
+    # dichiarati dai worker per non rischiare riferimenti non ancora scritti) e
+    # relazioni cross-fonte.
+    reg482_cursor = conn.cursor()
+    reg482_capitoli = [
+        reg482_cap01, reg482_cap02, reg482_cap03, reg482_cap04, reg482_cap05,
+        reg482_cap06, reg482_cap07, reg482_cap08, reg482_cap09, reg482_cap10,
+        reg482_cap11, reg482_cap12, reg482_cap13, reg482_cap14, reg482_cap15,
+    ]
+    seed_lib.inserisci_capitoli(
+        reg482_cursor, fonte_id=29, capitoli=reg482_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
+    # --- Regolamento di esecuzione (UE) 2024/3144 (fonte_id=30): import
+    # granulare a copertura completa (ADR-0007). Terzo import del lotto 2. E' un
+    # atto MODIFICATIVO e RETTIFICATIVO della Fonte 29, quindi le sue righe sono
+    # le disposizioni proprie dell'atto (i punti dell'art. 1 e dell'art. 2, gli
+    # artt. 2-3, i suoi due allegati), non le disposizioni del regolamento
+    # modificato: quelle restano in Fonte 29 e non sono duplicate. Le relazioni
+    # "modifica"/"abroga"/"sostituisce" verso la Fonte 29 stanno in
+    # cap06_relazioni_cross.py. Deve restare dopo il wiring di Fonte 29.
+    reg3144_cursor = conn.cursor()
+    reg3144_capitoli = [
+        reg3144_cap01, reg3144_cap02, reg3144_cap03, reg3144_cap04, reg3144_cap05,
+        reg3144_cap06,
+    ]
+    seed_lib.inserisci_capitoli(
+        reg3144_cursor, fonte_id=30, capitoli=reg3144_capitoli, lookup=cad_lookup, registro=cad_registro,
+    )
+
 
     # --- monitoraggio: modifiche rilevate (rilevanti ai fini eIDAS2) --------
     modifiche = [
@@ -2121,9 +2205,9 @@ def seed():
 
     embed()
 
-    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in agidcert_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in ccivile_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi411_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi421_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi422_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi432_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi612_capitoli) + len(reg1567_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1569_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2531_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2532_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi312_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi101_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi319102_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2979_capitoli)
-    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in agidcert_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in ccivile_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi411_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi421_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi422_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi432_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi612_capitoli) + len(reg1567_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in reg1569_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2531_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2532_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi312_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi101_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi319102_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2979_capitoli)
-    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412 [5 Parti], Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 [2 Parti], Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile [import selettivo], ETSI EN 319 411 [2 Parti], ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, Regolamento (UE) 2025/1567, Regolamento (UE) 2025/1569, Regolamento (UE) 2025/2531, Regolamento (UE) 2025/2532, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1, Regolamento di esecuzione (UE) 2024/2979).")
+    n_obblighi = len(obblighi) + sum(len(m.RIGHE_OBBLIGHI) for m in cad_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in dpcm_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi461_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi401_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi431_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in spidatt_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1502_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in agidcert_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in ccivile_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi411_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi421_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi422_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi432_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi612_capitoli) + len(reg1567_cap01.RIGHE_OBBLIGHI) + sum(len(m.RIGHE_OBBLIGHI) for m in reg1569_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2531_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2532_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi312_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi101_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in etsi319102_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg2979_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg482_capitoli) + sum(len(m.RIGHE_OBBLIGHI) for m in reg3144_capitoli)
+    n_principi = len(principi) + sum(len(m.RIGHE_PRINCIPI) for m in cad_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in dpcm_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spid_capitoli) + len(dpcm2021_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi412_capitoli) + len(reg1566_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in etsi461_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi401_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi431_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in spidatt_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg1502_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in agidcert_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in ccivile_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi411_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi421_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi422_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi432_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi612_capitoli) + len(reg1567_cap01.RIGHE_PRINCIPI) + sum(len(m.RIGHE_PRINCIPI) for m in reg1569_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2531_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2532_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi312_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi101_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in etsi319102_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg2979_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg482_capitoli) + sum(len(m.RIGHE_PRINCIPI) for m in reg3144_capitoli)
+    print(f"Scritti su Neo4j {n_obblighi} obblighi e {n_principi} principi (eIDAS, eIDAS2, CAD, DPCM 22/2/2013, SPID, DPCM 19/10/2021, ETSI EN 319 412 [5 Parti], Regolamento (UE) 2025/1566, ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 [2 Parti], Regolamento AgID modalità attuative SPID, Regolamento (UE) 2015/1502, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile [import selettivo], ETSI EN 319 411 [2 Parti], ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, Regolamento (UE) 2025/1567, Regolamento (UE) 2025/1569, Regolamento (UE) 2025/2531, Regolamento (UE) 2025/2532, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1, Regolamento di esecuzione (UE) 2024/2979, Regolamento di esecuzione (UE) 2024/482 [EUCC], Regolamento di esecuzione (UE) 2024/3144).")
 
 
 if __name__ == "__main__":

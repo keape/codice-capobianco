@@ -112,7 +112,17 @@ piano del lotto 1, con in più:
 
 ## 5. Stato
 
-**Aggiornamento 2026-09-29.** Blocco A: **Fonte 28 chiusa** — Reg. di
+**Aggiornamento 2026-09-29 (sera).** Blocco A: **Fonti 28, 29 e 30 chiuse** —
+Reg. 2024/2979 (portafogli EUDI, 48 nodi), Reg. 2024/482 (EUCC, 256 nodi, 171
+relazioni: il documento piu' esteso del lotto, 135k caratteri, 14 capitoli) e
+Reg. 2024/3144 (atto modificativo e rettificativo della 482, 19 nodi, 21
+relazioni verso Fonte 29). Schede in `docs/fonti-censite.md`; note di revisione
+dichiarate in `docs/verifiche-aperte.md` (§ 3-bis sul criterio `tipo_obbligo`
+delle conseguenze della non conformita' in Fonte 29, § 10 rilanciata). Prossimo
+passo del blocco A: FIPS PUB 140-3 (2019), poi IETF RFC 7515, poi ENISA ECCG
+«Agreed Cryptographic Mechanisms»; quindi il blocco B (famiglia AdES).
+
+**Aggiornamento 2026-09-29 (mattina).** Blocco A: **Fonte 28 chiusa** — Reg. di
 esecuzione (UE) 2024/2979, 48 nodi (35 obblighi, 13 principi), 95 item di
 indice, 24 relazioni (14 native interne + 10 cross-fonte, compresa una in
 direzione inversa da Fonte 22), Fase 6 in

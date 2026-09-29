@@ -207,6 +207,58 @@ dichiarato**: la citazione dell'art. 3 §1 all'art. 5 bis §4 eIDAS2 resta
   «la lettera b)» in una forma che l'estrattore non riconosce) e 4 con
   bersaglio scelto per contenuto (base giuridica nel preambolo; tre richiami
   al Reg. 2015/1502 senza numero di articolo/allegato nel testo citante).
+- **Regolamento di esecuzione (UE) 2024/482** — EUCC: sistema europeo di
+  certificazione della cibersicurezza basato sui criteri comuni (modalità di
+  applicazione del regolamento (UE) 2019/881). `fonte_id=29`. Secondo import
+  del lotto 2. Testo ufficiale italiano via `app/tools/cellar_fetch.py` (CELEX
+  `32024R0482`, 135k caratteri, provenienza e sha256 in
+  `app/.source_cache/reg_ue_2024_482/`), il documento più esteso del lotto:
+  14 capitoli (Capi I-XI + Allegati I-IX), autoria su 14 subagent worker.
+  **256 nodi** (196 obblighi, 60 principi), 572 item di indice — un comma una
+  riga, le lettere mappate al comma di appartenenza quando non hanno precetto
+  autonomo, gli allegati censiti per punto e sezione. **171 relazioni**: 86
+  interne ai capitoli (rinvii fra commi dello stesso articolo e fra articoli
+  dello stesso capitolo) + **85 nel capitolo virtuale**
+  `app/seed_data/reg_ue_2024_482/cap15_relazioni_cross.py` — 81 «richiama»
+  `textual` cross-capitolo (citazioni letterali di articoli, ancorate ai soli
+  articoli bersaglio con al più 3 righe: 51 ulteriori candidati verso articoli
+  spezzati in molti commi restano senza arco, perché l'ancoraggio a un comma
+  singolo sarebbe arbitrario) e 4 cross-fonte: 2 «richiama» `inferred` da
+  eIDAS2 artt. 5 quater §2 e 12-bis §2 (la certificazione di portafoglio e
+  regimi va fatta «in conformità dei sistemi europei di certificazione della
+  cibersicurezza», categoria di cui l'EUCC è un'istanza), 1 «si sovrappone a»
+  `inferred` dall'art. 3 (criteri comuni come base della valutazione) verso
+  eIDAS art. 30 §3 (certificazione dei dispositivi per la creazione di firma
+  qualificata), 1 «richiama» `textual` in direzione inversa (Fonte 24,
+  adeguamento e) sui controlli crittografici: il dispositivo crittografico
+  sicuro dell'EATSP è certificato EUCC). **Note di revisione dichiarate**: il
+  criterio di `tipo_obbligo` per le conseguenze della non conformità è
+  disomogeneo fra i capitoli e richiede una decisione —
+  `docs/verifiche-aperte.md` § 3-bis; i rinvii a norme esterne non censite
+  (regolamento (UE) 2019/881, ISO/IEC 15408 e 18045, regg. 2016/799 e
+  765/2008, decisione 2016/650, direttiva (UE) 2022/2555) restano senza arco.
+- **Regolamento di esecuzione (UE) 2024/3144** — modifica del regolamento di
+  esecuzione (UE) 2024/482 per quanto riguarda le norme internazionali
+  applicabili e rettifica di tale regolamento (atto **modificativo e
+  rettificativo** della Fonte 29). `fonte_id=30`. Terzo import del lotto 2;
+  testo ufficiale italiano via `app/tools/cellar_fetch.py` (CELEX `32024R3144`,
+  22k caratteri, provenienza in `app/.source_cache/reg_ue_2024_3144/`), 5
+  capitoli, autoria su 5 subagent worker. **19 nodi** (3 obblighi, 16
+  principi), 37 item di indice: le righe sono le disposizioni *dell'atto
+  modificativo* (i punti dell'art. 1 e dell'art. 2, gli artt. 2-3, i suoi due
+  allegati), con il testo sostitutivo fra virgolette nel `testo_integrale`; le
+  disposizioni del regolamento modificato non sono duplicate (vivono in Fonte
+  29). **22 relazioni**: 1 interna + **21 nel capitolo virtuale**
+  `app/seed_data/reg_ue_2024_3144/cap06_relazioni_cross.py`, tutte `textual` e
+  tutte verso la Fonte 29 tranne una — 8 «sostituisce» (artt. 2 e 3, art. 16,
+  art. 29 §2, l'allegato I dell'EUCC in due righe, i punti 5 e 6 della sezione
+  IV.3 dell'allegato IV), 7 «abroga» (tutti e cinque i commi dell'art. 23 e
+  l'art. 24, soppressi in vista del reg. di esecuzione (UE) 2024/3143, più
+  l'art. 17 §1), 5 «modifica» (artt. 5 §1, 8 §1, 48 e 49 — ancorati al primo
+  comma perché l'articolo non ha nodo di chapeau — e l'allegato IV sezione
+  IV.3) e 1 «richiama» `inferred` (0.60) verso eIDAS art. 30 §3. L'art. 1,
+  punto 3 (nuovo art. 20 bis sull'accreditamento) resta senza arco: nessun
+  nodo controparte, l'articolo è nuovo.
 
 ## 2. Fonti nazionali
 
@@ -628,13 +680,13 @@ riferimento **puntuale di sottoclavola** («Figure 1 (derived from ETSI EN 319
 
 | Categoria | Fonti | Totale |
 |---|---|---|
-| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502, Reg. (UE) 2024/2979 | 9 |
+| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502, Reg. (UE) 2024/2979, Reg. (UE) 2024/482 (EUCC), Reg. (UE) 2024/3144 (atto modificativo) | 11 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
 | Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1 | 12 |
-| **Totale** | | **28** |
+| **Totale** | | **30** |
 
-27 delle 28 Fonti hanno copertura granulare completa (ADR-0007) e sono
+29 delle 30 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
