@@ -36,38 +36,41 @@ e' ancora nel grafo quando questo modulo viene scritto: `preflight_relazioni.py`
 segnala percio' i suoi archi come riferimenti esterni non trovati, e la verifica
 va letta contro i moduli, non contro Neo4j).
 
-## Esito: 21 relazioni, tutte verso Fonte 29 tranne una
+## Esito: 15 relazioni, tutte verso Fonte 29 tranne una
 
 Tutte `evidence_type="textual"`: il testo dell'atto modificativo nomina
 letteralmente l'articolo o l'allegato che tocca, e per i bersagli qui sotto
 l'arco e' la trascrizione esatta dell'intervento disposto. `confidence` fra
-0.85 e 0.90.
+0.85 e 0.90. **Regola di miraggio (ADR-0012)**: quando l'intervento riguarda
+l'articolo o l'allegato **come unita' indivisa** ("l'articolo 3 e' sostituito
+dal seguente", "gli articoli 23 e 24 sono soppressi", "l'allegato I e'
+sostituito") il bersaglio e' la **partizione** di quell'unita', non un comma:
+l'abrogazione degli articoli 23 e 24 e' cosi' due archi invece di sei, e la
+sostituzione dell'allegato I un arco invece di due. Quando l'intervento cade su
+un **comma o lettera specifici** ("all'articolo 5, paragrafo 1, la lettera b) e'
+sostituita") il bersaglio resta il nodo di quel comma.
 
-- **`sostituisce` (8)**: art. 1, punto 1 -> "art. 2" (i punti 1 e 2 delle
-  definizioni); art. 1, punto 2 -> "art. 3" (norme di valutazione, sostituito
-  integralmente dal nuovo testo che fissa ISO/IEC 15408-*:2022 e ISO/IEC
-  18045:2022 e la disciplina transitoria fino al 31 dicembre 2027); art. 1,
-  punto 7 -> "allegato I, punto 1" e "allegato I, punto 2" (sostituzione
-  integrale dell'allegato I: due archi, uno per ciascuna riga dell'allegato
-  censito); art. 2, punto 3 -> "art. 16"; art. 2, punto 5 -> "art. 29 §2";
-  allegato II, punto 5 -> "allegato IV, sezione IV.3, punto 5" e allegato II,
-  punto 6 -> "allegato IV, sezione IV.3, punto 6" (i due punti dell'allegato
-  IV sostituiti dal testo di cui all'allegato II della 3144).
-- **`abroga` (7)**: art. 1, punto 4 -> "art. 23 §1" ... "art. 23 §5" (cinque
-  archi: la soppressione dell'articolo 23 colpisce tutti i suoi commi, non
-  esistendo un nodo di chapeau dell'articolo) e -> "art. 24" (soppresso con
-  l'articolo 23 in vista del regolamento di esecuzione (UE) 2024/3143 sulle
-  notifiche); art. 2, punto 4 -> "art. 17 §1" (soppressione del solo primo
-  paragrafo).
-- **`modifica` (5)**: art. 1, punto 5 -> "art. 48 §1" (aggiunta di un
-  paragrafo 4: l'ancora e' il primo comma dell'articolo, perche' l'articolo non
-  ha un nodo di chapeau e il nuovo paragrafo si colloca in coda); art. 1, punto
-  6 -> "art. 49 §1" (stessa fattispecie); art. 1, punto 8 -> "allegato IV,
-  sezione IV.3" (l'allegato IV e' modificato conformemente all'allegato II
-  dell'atto: qui l'ancora e' la sezione, che e' la riga che il regolamento
-  modificato dedica alla sezione intervenuta); art. 2, punto 1 -> "art. 5 §1"
-  (sostituzione della sola lettera b) del primo comma); art. 2, punto 2 ->
-  "art. 8 §1" (rettifica della rubrica dell'articolo e del primo comma).
+- **`sostituisce` (7)**: art. 1, punto 1 -> partizione "art. 2" (i punti 1 e 2
+  delle definizioni); art. 1, punto 2 -> partizione "art. 3" (norme di
+  valutazione, sostituito dal nuovo testo che fissa ISO/IEC 15408-*:2022 e
+  ISO/IEC 18045:2022 e la disciplina transitoria fino al 31 dicembre 2027);
+  art. 1, punto 7 -> partizione "allegato I" (sostituzione integrale
+  dell'allegato); art. 2, punto 3 -> partizione "art. 16"; art. 2, punto 5 ->
+  nodo "art. 29 §2" (sostituzione del solo secondo paragrafo); allegato II,
+  punto 5 -> nodo "allegato IV, sezione IV.3, punto 5" e allegato II, punto 6 ->
+  nodo "allegato IV, sezione IV.3, punto 6" (i due punti dell'allegato IV
+  sostituiti dal testo di cui all'allegato II della 3144).
+- **`abroga` (3)**: art. 1, punto 4 -> partizione "art. 23" e partizione
+  "art. 24" (soppressione dei due articoli in vista del regolamento di
+  esecuzione (UE) 2024/3143 sulle notifiche); art. 2, punto 4 -> nodo
+  "art. 17 §1" (soppressione del solo primo paragrafo).
+- **`modifica` (5)**: art. 1, punto 5 -> partizione "art. 48" (aggiunta di un
+  paragrafo 4 in coda all'articolo); art. 1, punto 6 -> partizione "art. 49"
+  (stessa fattispecie); art. 1, punto 8 -> partizione "allegato IV, sezione
+  IV.3" (l'allegato IV e' modificato conformemente all'allegato II dell'atto);
+  art. 2, punto 1 -> nodo "art. 5 §1" (sostituzione della sola lettera b) del
+  primo comma); art. 2, punto 2 -> nodo "art. 8 §1" (rettifica della rubrica
+  dell'articolo e del primo comma).
 - **`richiama` (1, `inferred`, confidence 0.60)**: art. 1, punto 2 -> Fonte 1
   "art. 30 §3". Il testo sostitutivo dell'art. 3, paragrafo 4 nomina il
   regolamento (UE) n. 910/2014 fra gli atti il cui uso di un profilo di
@@ -110,91 +113,56 @@ RELAZIONI = [
     # --- Fonte 29, Reg. di esecuzione (UE) 2024/482 (EUCC) ----------------
     {
         "nodo_da": ("principio", None, "art. 1, punto 1"),
-        "nodo_a": ("principio", 29, "art. 2"),
+        "nodo_a": ("partizione", 29, "art. 2"),
         "tipo_relazione": "sostituisce",
         "evidence_type": "textual",
         "confidence": 0.90,
     },
     {
         "nodo_da": ("principio", None, "art. 1, punto 2"),
-        "nodo_a": ("principio", 29, "art. 3"),
+        "nodo_a": ("partizione", 29, "art. 3"),
         "tipo_relazione": "sostituisce",
         "evidence_type": "textual",
         "confidence": 0.90,
     },
     {
         "nodo_da": ("principio", None, "art. 1, punto 4"),
-        "nodo_a": ("obbligo", 29, "art. 23 §1"),
+        "nodo_a": ("partizione", 29, "art. 23"),
         "tipo_relazione": "abroga",
         "evidence_type": "textual",
         "confidence": 0.90,
     },
     {
         "nodo_da": ("principio", None, "art. 1, punto 4"),
-        "nodo_a": ("obbligo", 29, "art. 23 §2"),
-        "tipo_relazione": "abroga",
-        "evidence_type": "textual",
-        "confidence": 0.90,
-    },
-    {
-        "nodo_da": ("principio", None, "art. 1, punto 4"),
-        "nodo_a": ("obbligo", 29, "art. 23 §3"),
-        "tipo_relazione": "abroga",
-        "evidence_type": "textual",
-        "confidence": 0.90,
-    },
-    {
-        "nodo_da": ("principio", None, "art. 1, punto 4"),
-        "nodo_a": ("obbligo", 29, "art. 23 §4"),
-        "tipo_relazione": "abroga",
-        "evidence_type": "textual",
-        "confidence": 0.90,
-    },
-    {
-        "nodo_da": ("principio", None, "art. 1, punto 4"),
-        "nodo_a": ("obbligo", 29, "art. 23 §5"),
-        "tipo_relazione": "abroga",
-        "evidence_type": "textual",
-        "confidence": 0.90,
-    },
-    {
-        "nodo_da": ("principio", None, "art. 1, punto 4"),
-        "nodo_a": ("obbligo", 29, "art. 24"),
+        "nodo_a": ("partizione", 29, "art. 24"),
         "tipo_relazione": "abroga",
         "evidence_type": "textual",
         "confidence": 0.90,
     },
     {
         "nodo_da": ("principio", None, "art. 1, punto 5"),
-        "nodo_a": ("principio", 29, "art. 48 §1"),
+        "nodo_a": ("partizione", 29, "art. 48"),
         "tipo_relazione": "modifica",
         "evidence_type": "textual",
         "confidence": 0.85,
     },
     {
         "nodo_da": ("principio", None, "art. 1, punto 6"),
-        "nodo_a": ("principio", 29, "art. 49 §1"),
+        "nodo_a": ("partizione", 29, "art. 49"),
         "tipo_relazione": "modifica",
         "evidence_type": "textual",
         "confidence": 0.85,
     },
     {
         "nodo_da": ("principio", None, "art. 1, punto 7"),
-        "nodo_a": ("principio", 29, "allegato I, punto 1"),
-        "tipo_relazione": "sostituisce",
-        "evidence_type": "textual",
-        "confidence": 0.90,
-    },
-    {
-        "nodo_da": ("principio", None, "art. 1, punto 7"),
-        "nodo_a": ("principio", 29, "allegato I, punto 2"),
+        "nodo_a": ("partizione", 29, "allegato I"),
         "tipo_relazione": "sostituisce",
         "evidence_type": "textual",
         "confidence": 0.90,
     },
     {
         "nodo_da": ("principio", None, "art. 1, punto 8"),
-        "nodo_a": ("principio", 29, "allegato IV, sezione IV.3"),
+        "nodo_a": ("partizione", 29, "allegato IV, sezione IV.3"),
         "tipo_relazione": "modifica",
         "evidence_type": "textual",
         "confidence": 0.85,
@@ -215,7 +183,7 @@ RELAZIONI = [
     },
     {
         "nodo_da": ("principio", None, "art. 2, punto 3"),
-        "nodo_a": ("obbligo", 29, "art. 16"),
+        "nodo_a": ("partizione", 29, "art. 16"),
         "tipo_relazione": "sostituisce",
         "evidence_type": "textual",
         "confidence": 0.90,
@@ -248,7 +216,6 @@ RELAZIONI = [
         "evidence_type": "textual",
         "confidence": 0.90,
     },
-    # --- Fonte 1, Regolamento eIDAS (UE) 910/2014 -------------------------
     {
         "nodo_da": ("principio", None, "art. 1, punto 2"),
         "nodo_a": ("obbligo", 1, "art. 30 §3"),

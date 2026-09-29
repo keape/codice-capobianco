@@ -32,7 +32,7 @@ from pathlib import Path
 APP_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(APP_DIR))
 
-from neo4j_common import get_database, get_driver  # noqa: E402
+from neo4j_common import get_database, get_driver, partizioni_di  # noqa: E402
 
 
 def carica(percorso: Path):
@@ -57,8 +57,12 @@ def main() -> int:
     for modulo in moduli:
         for riga in modulo.RIGHE_OBBLIGHI:
             interni.add(("obbligo", fonte_id, riga["riferimento"]))
+            for rif_partizione, _tipo in partizioni_di(riga["riferimento"]):
+                interni.add(("partizione", fonte_id, rif_partizione))
         for riga in modulo.RIGHE_PRINCIPI:
             interni.add(("principio", fonte_id, riga["riferimento"]))
+            for rif_partizione, _tipo in partizioni_di(riga["riferimento"]):
+                interni.add(("partizione", fonte_id, rif_partizione))
 
     driver = get_driver()
     mancanti = []
@@ -73,7 +77,7 @@ def main() -> int:
                         if (tipo, fonte_id, riferimento) not in interni:
                             mancanti.append((lato, tipo, "INTERNO", riferimento))
                         continue
-                    etichetta = "Obbligo" if tipo == "obbligo" else "Principio"
+                    etichetta = {"obbligo": "Obbligo", "principio": "Principio", "partizione": "Partizione"}[tipo]
                     trovato = sessione.run(
                         f"MATCH (n:{etichetta}) WHERE n.fonte_id=$f AND n.riferimento=$r RETURN count(n) AS c",
                         f=fonte, r=riferimento,

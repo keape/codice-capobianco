@@ -100,12 +100,18 @@ citabile in blocco.
   `neo4j_common.partizioni_di`, `seed_data/lib.py`, `migrate_to_neo4j.py`, un
   adeguamento di `web_ui.py`, un wire in `seed.py`. Nessuna modifica ai moduli
   dei capitoli già scritti (restano validi).
-- **Lavoro aperto dichiarato**: i rinvii già censiti che oggi sono ancorati a un
-  comma "per forza" (Fonte 29: 81 archi) vanno rimappati sulle partizioni, e i
-  52 rinvii lasciati senza arco (Fonte 29: 51, Fonte 28: 1) vanno creati. La
-  decisione è presa; l'esecuzione è un passo separato, perché tocca i moduli
-  `cap15_relazioni_cross.py` di Fonte 29, `cap06_relazioni_cross.py` di Fonte 28
-  e i `modifica`/`abroga` di Fonte 30.
+- **Rimappatura eseguita lo stesso giorno** (non lasciata aperta): i 139 rinvii
+  di Fonte 29 si dividono ora in **130 archi verso partizioni** (citazione
+  dell'articolo o dell'allegato in blocco, compresi i 51 che prima restavano
+  senza arco) e **9 verso nodi di comma** (citazione di paragrafo esplicita);
+  Fonte 28 ha creato l'arco prima impossibile dell'art. 3 §1 verso la partizione
+  "art. 5 bis" di eIDAS2; Fonte 30 ha convertito gli archi di unità indivisa
+  (abrogazione degli artt. 23 e 24: da sei archi a due; sostituzione
+  dell'allegato I: da due a uno; artt. 2, 3, 16, 48 e 49 verso le loro
+  partizioni ai fini della gerarchia). Effetto collaterale positivo misurato con
+  `verifica_relazioni_textual.py`: le segnalazioni di Fonte 29 scendono da 14 a
+  5 (restano i cinque casi interni al capitolo già documentati dai moduli, dove
+  il testo cita l'articolo in blocco e il bersaglio dichiarato è un comma).
 - Il comando di applicazione dello schema documentato in `CLAUDE.md` va usato
   dopo aver rimosso le righe di commento `//`: lo split ingenuo per `;`
   spezzava i commenti di intestazione in "statement" invalidi.

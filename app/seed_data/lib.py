@@ -259,6 +259,12 @@ def inserisci_capitoli(cursor, fonte_id: int, capitoli: list, lookup: dict, regi
     verifica_copertura(indice_totale, mappatura_totale)
     verifica_completezza_testo_integrale(capitoli)
 
+    # Partizioni (ADR-0012): prima di risolvere le relazioni di questa fonte, assicura che
+    # esistano nel registro le partizioni di TUTTE le righe già inserite (comprese le Fonti i
+    # cui dati stanno inline in seed.py, che non passano da qui): una relazione può avere come
+    # estremo la partizione di un articolo di un'altra Fonte. Idempotente.
+    registra_partizioni_mancanti(cursor, registro)
+
     for modulo in capitoli:
         for riga in modulo.RIGHE_OBBLIGHI:
             cursor.execute(

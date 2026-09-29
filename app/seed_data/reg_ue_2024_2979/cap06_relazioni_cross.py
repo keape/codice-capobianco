@@ -108,15 +108,13 @@ lette e confrontate sulle due parti:
 
 ## Proposte valutate e scartate
 
-- **Rinvio ad art. 5 bis §4 eIDAS2 in art. 3 §1**: nessuna relazione, perche'
-  Fonte 2 modella l'art. 5 bis §4 per lettere (da §4(a) a §4(g)) senza un nodo
-  di chapeau del paragrafo. L'art. 3 §1 rinvia al paragrafo come insieme
-  ("nessuna funzionalita' di cui all'articolo 5 bis, paragrafo 4"): agganciarlo
-  a una lettera qualsiasi sarebbe arbitrario e sostanzialmente falso (la
-  lettera dice una cosa diversa dal paragrafo), quindi il rinvio resta senza
-  arco. E' una limitazione di modellazione di Fonte 2, non una relazione
-  omessa per svista: se in futuro Fonte 2 ricevesse un nodo di chapeau per il
-  §4, la relazione va creata verso quello.
+- **Rinvio ad art. 5 bis §4 eIDAS2 in art. 3 §1**: risolto il 2026-09-29 con il
+  livello delle partizioni (ADR-0012). Fonte 2 modella l'art. 5 bis §4 per
+  lettere (da §4(a) a §4(g)) senza un nodo di chapeau del paragrafo, mentre
+  l'art. 3 §1 rinvia al paragrafo come insieme ("nessuna funzionalita' di cui
+  all'articolo 5 bis, paragrafo 4"): agganciarlo a una lettera qualsiasi sarebbe
+  arbitrario. La relazione e' ora dichiarata verso la **partizione "art. 5 bis"**
+  di Fonte 2, che rappresenta l'articolo intero e quindi anche il paragrafo 4.
 - **Coppie KNN sotto ~0.86 verso Fonte 2, 3, 4, 22**: rumore da linguaggio
   normativo comune (registri, revoca, misure di sicurezza, "informazioni
   necessarie"), verificato leggendo le controparti. Esempi scartati dopo
@@ -176,6 +174,16 @@ INDICE_ARTICOLI_LOCALE = []
 MAPPATURA_LOCALE = {}
 
 RELAZIONI = [
+    # ADR-0012: l'art. 3 §1 rinvia all'art. 5 bis §4 eIDAS2 come insieme; Fonte 2
+    # modella quel paragrafo per lettere (nessun nodo di chapeau), quindi il
+    # bersaglio e' la partizione dell'articolo.
+    {
+        "nodo_da": ("obbligo", None, "art. 3 §1"),
+        "nodo_a": ("partizione", 2, "art. 5 bis"),
+        "tipo_relazione": "richiama",
+        "evidence_type": "textual",
+        "confidence": 0.85,
+    },
     # --- Fonte 2 (eIDAS2, Reg. (UE) 2024/1183) ----------------------------
     {
         "nodo_da": ("principio", None, "art. 1"),

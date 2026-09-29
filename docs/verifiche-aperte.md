@@ -236,7 +236,17 @@ rispetto al primo giro dipendono dalla normalizzazione di Fonte 27 del
 **Esito del terzo giro** (2026-09-29, dopo l'import di Fonti 29 e 30 - EUCC e
 atto modificativo): 1.375 relazioni `textual` esaminate, **356 senza traccia**
 (+156 relazioni textual e +10 segnalazioni rispetto al giro precedente: Fonte
-30 non ne produce nessuna). Le segnalazioni delle Fonti 28 e 29 sono
+30 non ne produce nessuna).
+
+**Esito del quarto giro** (2026-09-29, dopo la rimappatura sulle partizioni,
+ADR-0012): 1.429 relazioni `textual` esaminate, **351 senza traccia**. La
+rimappatura ha migliorato la verificabilità: le segnalazioni di **Fonte 29
+scendono da 14 a 5** (le cinque restanti sono quelle interne al capitolo
+documentate dai moduli cap02 e cap07, dove il testo cita l'articolo in blocco e
+il bersaglio dichiarato è un comma), **Fonte 30 resta a 0** e Fonte 28 resta a
+11 (i suoi casi documentati). Le 130 relazioni di Fonte 29 verso partizioni
+passano il gate perché il riferimento del bersaglio è ora l'articolo stesso,
+che il testo citante nomina. Le segnalazioni delle Fonti 28 e 29 sono
 classificate nei due paragrafi seguenti.
 
 **Fonte 28 (Reg. (UE) 2024/2979), 11 casi, tutti esaminati e classificati:** 7

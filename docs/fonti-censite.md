@@ -185,7 +185,7 @@ con meno relazioni del lotto.
   `app/seed_data/reg_ue_2024_2979/cap0[1-6].py`. 48 nodi (35 obblighi, 13
   principi), 95 item di indice — un nodo per comma e per lettera, gli allegati
   per punto numerato, l'art. 2 (15 definizioni) come **un solo** Principio
-  definitorio con le 15 voci indicizzate una per una. **24 relazioni**: 14
+  definitorio con le 15 voci indicizzate una per una. **25 relazioni**: 14
   native interne (rinvii tra articoli e all'allegato I) + 10 dal giro di Fase
   6 in `cap06_relazioni_cross.py` — 9 in direzione diretta (1 «attua»
   dall'art. 1 verso eIDAS2 art. 5 bis §23 come base giuridica dell'atto; 4
@@ -199,9 +199,10 @@ con meno relazioni del lotto.
   punto 1» —`richiama`→ «allegato II» di questa Fonte): è il rinvio che il
   modulo di Fase 6 di Fonte 22 dichiarava senza bersaglio. **Limite
 dichiarato**: la citazione dell'art. 3 §1 all'art. 5 bis §4 eIDAS2 resta
-  senza arco, perché Fonte 2 modella quel paragrafo per lettere (§4(a)-(g))
-  senza un nodo di chapeau del paragrafo, e agganciarlo a una lettera sarebbe
-  arbitrario. **Audit § 10 di `docs/verifiche-aperte.md`**: 11 relazioni
+  senza arco **fino al 2026-09-29**, perché Fonte 2 modella quel paragrafo per
+  lettere (§4(a)-(g)) senza un nodo di chapeau del paragrafo, e agganciarlo a una
+  lettera sarebbe arbitrario. Il rinvio è ora un arco verso la partizione
+  "art. 5 bis" di Fonte 2 (ADR-0012). **Audit § 10 di `docs/verifiche-aperte.md`**: 11 relazioni
   `textual` di questa Fonte segnalate senza traccia del riferimento citato, di
   cui 7 falsi positivi dello strumento (il testo cita «i paragrafi 1 e 2» o
   «la lettera b)» in una forma che l'estrattore non riconosce) e 4 con
@@ -216,14 +217,14 @@ dichiarato**: la citazione dell'art. 3 §1 all'art. 5 bis §4 eIDAS2 resta
   14 capitoli (Capi I-XI + Allegati I-IX), autoria su 14 subagent worker.
   **256 nodi** (196 obblighi, 60 principi), 572 item di indice — un comma una
   riga, le lettere mappate al comma di appartenenza quando non hanno precetto
-  autonomo, gli allegati censiti per punto e sezione. **171 relazioni**: 86
+  autonomo, gli allegati censiti per punto e sezione. **229 relazioni**: 86
   interne ai capitoli (rinvii fra commi dello stesso articolo e fra articoli
-  dello stesso capitolo) + **85 nel capitolo virtuale**
-  `app/seed_data/reg_ue_2024_482/cap15_relazioni_cross.py` — 81 «richiama»
-  `textual` cross-capitolo (citazioni letterali di articoli, ancorate ai soli
-  articoli bersaglio con al più 3 righe: 51 ulteriori candidati verso articoli
-  spezzati in molti commi restano senza arco, perché l'ancoraggio a un comma
-  singolo sarebbe arbitrario) e 4 cross-fonte: 2 «richiama» `inferred` da
+  dello stesso capitolo) + **143 nel capitolo virtuale**
+  `app/seed_data/reg_ue_2024_482/cap15_relazioni_cross.py` — 139 «richiama»
+  `textual` cross-capitolo (citazioni letterali risolte con la regola di
+  miraggio dell'ADR-0012: **130 verso partizioni** di articolo o allegato citati
+  «in blocco», compresi i 51 rinvii che prima restavano senza arco, e **9 verso
+  nodi di comma** su citazione di paragrafo esplicita) e 4 cross-fonte: 2 «richiama» `inferred` da
   eIDAS2 artt. 5 quater §2 e 12-bis §2 (la certificazione di portafoglio e
   regimi va fatta «in conformità dei sistemi europei di certificazione della
   cibersicurezza», categoria di cui l'EUCC è un'istanza), 1 «si sovrappone a»
@@ -248,15 +249,18 @@ dichiarato**: la citazione dell'art. 3 §1 all'art. 5 bis §4 eIDAS2 resta
   modificativo* (i punti dell'art. 1 e dell'art. 2, gli artt. 2-3, i suoi due
   allegati), con il testo sostitutivo fra virgolette nel `testo_integrale`; le
   disposizioni del regolamento modificato non sono duplicate (vivono in Fonte
-  29). **22 relazioni**: 1 interna + **21 nel capitolo virtuale**
+  29). **17 relazioni**: 1 interna + **16 nel capitolo virtuale**
   `app/seed_data/reg_ue_2024_3144/cap06_relazioni_cross.py`, tutte `textual` e
-  tutte verso la Fonte 29 tranne una — 8 «sostituisce» (artt. 2 e 3, art. 16,
-  art. 29 §2, l'allegato I dell'EUCC in due righe, i punti 5 e 6 della sezione
-  IV.3 dell'allegato IV), 7 «abroga» (tutti e cinque i commi dell'art. 23 e
-  l'art. 24, soppressi in vista del reg. di esecuzione (UE) 2024/3143, più
-  l'art. 17 §1), 5 «modifica» (artt. 5 §1, 8 §1, 48 e 49 — ancorati al primo
-  comma perché l'articolo non ha nodo di chapeau — e l'allegato IV sezione
-  IV.3) e 1 «richiama» `inferred` (0.60) verso eIDAS art. 30 §3. L'art. 1,
+  tutte verso la Fonte 29 tranne una — 7 «sostituisce» (partizioni artt. 2, 3,
+  16 e allegato I, nodo art. 29 §2, nodi «allegato IV, sezione IV.3, punto 5 e
+  6»), 3 «abroga» (partizioni artt. 23 e 24, soppressi in vista del reg. di
+  esecuzione (UE) 2024/3143, più il nodo art. 17 §1), 5 «modifica» (partizioni
+  artt. 48 e 49 e allegato IV sezione IV.3, nodi artt. 5 §1 e 8 §1) e 1
+  «richiama» `inferred` (0.60) verso eIDAS art. 30 §3. Con la regola di
+  miraggio dell'ADR-0012 gli interventi su un'unità indivisa vanno alla
+  partizione dell'unità (l'abrogazione degli artt. 23-24 è due archi invece di
+  sei, la sostituzione dell'allegato I un arco invece di due) e restano sul nodo
+  di comma solo gli interventi puntuali. L'art. 1,
   punto 3 (nuovo art. 20 bis sull'accreditamento) resta senza arco: nessun
   nodo controparte, l'articolo è nuovo.
 
