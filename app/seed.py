@@ -2144,16 +2144,16 @@ def seed():
     # censiti per punto/sezione. Il preambolo (33 considerando), l'epigrafe, la
     # formula di chiusura, la firma, le note a pie' di pagina e la riga ELI non
     # producono nodi, come in tutte le Fonti gia' censite.
-    # NOTA DI REVISIONE, dichiarata e non nascosta: le conseguenze della non
-    # conformita' / non compliance sono classificate in modo non uniforme dai
-    # capitoli scritti in parallelo - art. 28 §6, 29 §2, 29 §3 (cap05) e
-    # art. 35 §6 (cap06) come Obbligo "sanzionatorio", mentre la revoca del
-    # certificato (art. 14 §1, cap02), del certificato di profilo (art. 20 §1,
-    # cap03) e dell'autorizzazione di organismi/ITSEF (art. 21 §5 e 22 §6,
-    # cap04) e le misure dell'art. 31 (cap05) sono "procedurale". Il criterio
-    # va deciso una volta per la Fonte in revisione umana (tutte le righe sono
-    # stato_validazione='bozza'), come per il criterio Input/Inputs di Fonte
-    # 27: vedi docs/verifiche-aperte.md § 3-bis.
+    # NOTA DI REVISIONE, risolta il 2026-09-29: le conseguenze della non
+    # conformita' / non compliance erano classificate in modo non uniforme dai
+    # capitoli scritti in parallelo. Il criterio e' stato deciso dall'utente
+    # ("sanzionatorio" comprende qualunque conseguenza giuridica del venire meno
+    # dei requisiti o di una violazione - revoca, sospensione e misure incluse -,
+    # mentre chi disciplina solo la comunicazione della conseguenza resta
+    # "informativo/trasparenza") e applicato: nove righe portate a
+    # "sanzionatorio" in cap02, cap03, cap04 e cap05. Vedi
+    # docs/verifiche-aperte.md § 3-bis, che vale come precedente per le Fonti
+    # future.
     # Fase 6 (ADR-0009) in cap15_relazioni_cross.py: relazioni cross-capitolo
     # della stessa Fonte (i rinvii da un capo all'altro, deliberatamente non
     # dichiarati dai worker per non rischiare riferimenti non ancora scritti) e

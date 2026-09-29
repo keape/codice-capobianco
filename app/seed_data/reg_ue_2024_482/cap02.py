@@ -573,7 +573,7 @@ RIGHE_OBBLIGHI = [
         "riferimento": "art. 14 §1",
         "testo": "Fatto salvo l'articolo 58, paragrafo 8, lettera e), del regolamento (UE) 2019/881, un certificato EUCC è revocato dall'organismo di certificazione che lo ha rilasciato.",
         "testo_integrale": "Articolo 14\n\nRevoca del certificato EUCC\n\n1. Fatto salvo l'articolo 58, paragrafo 8, lettera e), del regolamento (UE) 2019/881, un certificato EUCC è revocato dall'organismo di certificazione che lo ha rilasciato.",
-        "tipo_obbligo": "procedurale",
+        "tipo_obbligo": "sanzionatorio",
         "stato": "vigente",
         "condizione_applicabilita": "Fatto salvo l'articolo 58, paragrafo 8, lettera e), del regolamento (UE) 2019/881.",
         "soggetti": [{"categoria": "Terza parte", "ruolo": "obbligato"}],

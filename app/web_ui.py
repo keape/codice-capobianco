@@ -261,6 +261,10 @@ def stats():
             "MATCH (o:Obbligo) RETURN o.stato_validazione AS stato, count(*) AS c"
         ).data()
         counts = {r["stato"]: r["c"] for r in obblighi_counts}
+        principi_counts = session.run(
+            "MATCH (p:Principio) RETURN p.stato_validazione AS stato, count(*) AS c"
+        ).data()
+        pcounts = {r["stato"]: r["c"] for r in principi_counts}
         n_principi = session.run("MATCH (p:Principio) RETURN count(p) AS c").single()["c"]
         n_fonti = session.run("MATCH (f:Fonte) RETURN count(f) AS c").single()["c"]
         n_relazioni = session.run(
@@ -275,6 +279,8 @@ def stats():
         "obblighi_validati": counts.get("validato", 0),
         "obblighi_bozza": counts.get("bozza", 0),
         "principi": n_principi,
+        "principi_validati": pcounts.get("validato", 0),
+        "principi_bozza": pcounts.get("bozza", 0),
         "relazioni": n_relazioni,
         "modifiche_da_esaminare": n_modifiche,
     }
@@ -536,6 +542,12 @@ def ricerca_ibrida(
 
 @app.get("/api/revisione")
 def coda_revisione():
+    """Coda di revisione: le bozze di ENTRAMBI i tipi di nodo.
+
+    Storicamente la coda copriva solo gli Obblighi. Dal 2026-09-29 include i
+    Principi: ogni nodo del censimento nasce 'bozza' e richiede un nulla osta
+    umano esplicito, anche quando non impone un comportamento a un soggetto.
+    """
     with _session() as session:
         rows = session.run(
             _OBBLIGHI_QUERY.split("ORDER BY")[0].replace(
@@ -543,7 +555,13 @@ def coda_revisione():
             ) + " ORDER BY o.id",
         ).data()
         bozze = [_riga_obbligo(r) for r in rows]
-    return {"status": "ok", "bozze": bozze}
+        righe_principi = session.run(
+            _PRINCIPI_QUERY.split("ORDER BY")[0].replace(
+                "MATCH (p:Principio)", "MATCH (p:Principio {stato_validazione: 'bozza'})"
+            ) + " ORDER BY p.id",
+        ).data()
+        bozze_principi = [_riga_principio(r) for r in righe_principi]
+    return {"status": "ok", "bozze": bozze, "bozze_principi": bozze_principi}
 
 
 class CorrezioneBozza(BaseModel):
@@ -558,6 +576,18 @@ class CorrezioneBozza(BaseModel):
     condizione_applicabilita: str | None = None
     soggetti_obbligati: list[str] = []
     destinatari: list[str] = []
+    validato_da: str = "sistema"
+
+
+class CorrezioneBozzaPrincipio(BaseModel):
+    riferimento: str
+    testo: str
+    tipo_principio: str
+    stato_obbligo: str
+    data_inizio_vigore: str | None = None
+    data_fine_vigore: str | None = None
+    condizione_applicabilita: str | None = None
+    oggetti_giuridici: list[str] = []
     validato_da: str = "sistema"
 
 
@@ -620,6 +650,75 @@ def rifiuta_bozza(obbligo_id: int):
         rec = session.run(
             "MATCH (o:Obbligo {id: $id, stato_validazione: 'bozza'}) DETACH DELETE o RETURN count(o) AS c",
             id=obbligo_id,
+        ).single()
+        if rec["c"] == 0:
+            raise HTTPException(404, "Bozza non trovata (già validata/rifiutata?)")
+    return {"status": "ok"}
+
+
+@app.post("/api/revisione/principio/{principio_id}/valida")
+def valida_bozza_principio(principio_id: int, body: CorrezioneBozzaPrincipio):
+    """Nulla osta umano su un Principio.
+
+    Stessa semantica di `valida_bozza` per gli Obblighi, sui campi propri del
+    Principio (`tipo_principio` e oggetti giuridici invece di `tipo_obbligo` e
+    categorie di soggetto). La vigenza usa la stessa lookup: nel grafo la
+    proprietà si chiama `stato_obbligo` anche sui nodi Principio.
+    """
+    if body.tipo_principio not in TIPI_PRINCIPIO or body.stato_obbligo not in STATI_NORMA:
+        raise HTTPException(400, "Valore di lookup sconosciuto (tipo_principio/stato_obbligo)")
+
+    with _session() as session:
+        esiste = session.run(
+            "MATCH (p:Principio {id: $id, stato_validazione: 'bozza'}) RETURN p.id AS id",
+            id=principio_id,
+        ).single()
+        if esiste is None:
+            raise HTTPException(404, "Bozza non trovata (già validata/rifiutata?)")
+
+        oggetti_esistenti = {
+            r["nome"] for r in session.run("MATCH (o:OggettoGiuridico) RETURN o.nome AS nome")
+        }
+        for nome in body.oggetti_giuridici:
+            if nome not in oggetti_esistenti:
+                raise HTTPException(400, f"Oggetto giuridico sconosciuto: {nome}")
+
+        session.run(
+            """
+            MATCH (p:Principio {id: $id})
+            SET p.riferimento = $riferimento, p.testo = $testo, p.tipo_principio = $tipo_principio,
+                p.stato_obbligo = $stato_obbligo, p.data_inizio_vigore = $data_inizio_vigore,
+                p.data_fine_vigore = $data_fine_vigore,
+                p.condizione_applicabilita = $condizione_applicabilita,
+                p.stato_validazione = 'validato', p.validato_da = $validato_da,
+                p.data_validazione = $data_validazione
+            """,
+            id=principio_id, riferimento=body.riferimento, testo=body.testo,
+            tipo_principio=body.tipo_principio, stato_obbligo=body.stato_obbligo,
+            data_inizio_vigore=body.data_inizio_vigore, data_fine_vigore=body.data_fine_vigore,
+            condizione_applicabilita=body.condizione_applicabilita, validato_da=body.validato_da,
+            data_validazione=date.today().isoformat(),
+        )
+
+        session.run("MATCH (:Principio {id: $id})-[r:HA_OGGETTO]->() DELETE r", id=principio_id)
+        for nome in body.oggetti_giuridici:
+            session.run(
+                "MATCH (p:Principio {id: $id}), (o:OggettoGiuridico {nome: $nome}) "
+                "CREATE (p)-[:HA_OGGETTO]->(o)",
+                id=principio_id, nome=nome,
+            )
+
+    return {"status": "ok", "principio_id": principio_id}
+
+
+@app.post("/api/revisione/principio/{principio_id}/rifiuta")
+def rifiuta_bozza_principio(principio_id: int):
+    # Decisione ticket 03, estesa ai Principi il 2026-09-29: le bozze rifiutate
+    # vengono eliminate, nessuna traccia storica.
+    with _session() as session:
+        rec = session.run(
+            "MATCH (p:Principio {id: $id, stato_validazione: 'bozza'}) DETACH DELETE p RETURN count(p) AS c",
+            id=principio_id,
         ).single()
         if rec["c"] == 0:
             raise HTTPException(404, "Bozza non trovata (già validata/rifiutata?)")
@@ -829,8 +928,10 @@ async function renderConsultazione(){
   <div class="tiles">
     <div class="tile"><div class="v">${s?s.fonti:"—"}</div><div class="k">fonti</div></div>
     <div class="tile"><div class="v">${s?s.obblighi_validati:"—"}</div><div class="k">obblighi validati</div></div>
+    <div class="tile"><div class="v">${s?s.principi_validati:"—"}</div><div class="k">principi validati</div></div>
     <div class="tile"><div class="v">${s?s.principi:"—"}</div><div class="k">principi</div></div>
-    <div class="tile"><div class="v">${s?s.obblighi_bozza:"—"}</div><div class="k">bozze in coda</div></div>
+    <div class="tile"><div class="v">${s?s.obblighi_bozza:"—"}</div><div class="k">bozze obblighi in coda</div></div>
+    <div class="tile"><div class="v">${s?s.principi_bozza:"—"}</div><div class="k">bozze principi in coda</div></div>
     <div class="tile"><div class="v">${s?s.relazioni:"—"}</div><div class="k">relazioni tipizzate</div></div>
   </div>
   <div class="panel">
@@ -1061,18 +1162,42 @@ async function renderRevisione(){
 function paintRevisione(){
   const lk = state.lookup;
   const b = state.bozze.bozze;
+  const bp = state.bozze.bozze_principi || [];
   const opt = (values, cur) => values.map(v => `<option value="${esc(v)}" ${v===cur?"selected":""}>${esc(v)}</option>`).join("");
   const catCheckboxes = (name, obbligoId, selected) => lk.categorie_soggetto.map(c => `
     <label style="display:inline-flex;gap:4px;align-items:center;margin-right:10px;font-size:12px">
       <input type="checkbox" data-role="${name}" data-cat="${esc(c)}" ${selected.includes(c)?"checked":""}> ${esc(c)}
     </label>`).join("");
+  const oggettoCheckboxes = (selected) => lk.oggetti_giuridici.map(o => `
+    <label style="display:inline-flex;gap:4px;align-items:center;margin-right:10px;font-size:12px">
+      <input type="checkbox" data-role="oggetto" data-obj="${esc(o)}" ${selected.includes(o)?"checked":""}> ${esc(o)}
+    </label>`).join("");
 
   $("#view").innerHTML = `<div class="panel">
     <div class="hd" style="justify-content:space-between">
-      <h2 style="margin:0">Coda di revisione (${b.length} bozze)</h2>
-      ${b.length ? `<button class="act primary" onclick="validaTutte()" ${state.validazioneInCorso?"disabled":""}>Valida tutte</button>` : ""}
+      <h2 style="margin:0">Coda di revisione (${b.length} obblighi + ${bp.length} principi)</h2>
+      ${(b.length || bp.length) ? `<button class="act primary" onclick="validaTutte()" ${state.validazioneInCorso?"disabled":""}>Valida tutte</button>` : ""}
     </div>
-    ${b.length ? "" : '<div class="muted">Nessuna bozza in attesa di revisione.</div>'}
+    ${(b.length || bp.length) ? "" : '<div class="muted">Nessuna bozza in attesa di revisione.</div>'}
+    ${bp.length ? `<h3 style="margin:14px 0 6px">Principi (${bp.length})</h3>` : ""}
+    ${bp.map(p => `
+    <div class="card" id="bozza-p-${p.principio_id}" style="cursor:default">
+      <div class="hd"><span class="ref">${esc(p.fonte)}</span><span class="tag ok">principio</span><span class="tag warn">bozza</span></div>
+      <div class="grid2">
+        <div class="field"><label>Riferimento</label><input type="text" id="rif-p-${p.principio_id}" value="${esc(p.riferimento)}"></div>
+        <div class="field"><label>Tipo principio</label><select id="tipo-p-${p.principio_id}">${opt(lk.tipi_principio, p.tipo_principio)}</select></div>
+        <div class="field"><label>Stato</label><select id="stato-p-${p.principio_id}">${opt(lk.stati_obbligo, p.stato_obbligo)}</select></div>
+        <div class="field"><label>Condizione di applicabilità</label><input type="text" id="cond-p-${p.principio_id}" value="${esc(p.condizione_applicabilita||"")}"></div>
+      </div>
+      <div class="field"><label>Testo</label><textarea id="testo-p-${p.principio_id}" rows="2">${esc(p.testo)}</textarea></div>
+      <div class="field"><label>Oggetto giuridico</label>${oggettoCheckboxes(p.oggetti_giuridici)}</div>
+      ${renderTestoIntegrale(p.testo_integrale)}
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="act primary" onclick="validaPrincipio(${p.principio_id})">Valida</button>
+        <button class="act danger" onclick="rifiutaPrincipio(${p.principio_id})">Rifiuta (elimina)</button>
+      </div>
+    </div>`).join("")}
+    ${b.length ? `<h3 style="margin:14px 0 6px">Obblighi (${b.length})</h3>` : ""}
     ${b.map(o => `
     <div class="card" id="bozza-${o.obbligo_id}" style="cursor:default">
       <div class="hd"><span class="ref">${esc(o.fonte)}</span><span class="tag warn">bozza</span></div>
@@ -1132,11 +1257,17 @@ async function validaTutte(){
   if(state.validazioneInCorso) return;
   state.validazioneInCorso = true;
   const ids = state.bozze.bozze.map(o => o.obbligo_id);
+  const idsP = (state.bozze.bozze_principi || []).map(p => p.principio_id);
   const errori = [];
   for(const id of ids){
     if(!document.getElementById(`bozza-${id}`)) continue; // già rimossa dal DOM (validata/rifiutata altrove)
     try{ await valida(id, {silent:true}); }
-    catch(e){ errori.push(`#${id}: ${e.message}`); }
+    catch(e){ errori.push(`obbligo #${id}: ${e.message}`); }
+  }
+  for(const id of idsP){
+    if(!document.getElementById(`bozza-p-${id}`)) continue;
+    try{ await validaPrincipio(id, {silent:true}); }
+    catch(e){ errori.push(`principio #${id}: ${e.message}`); }
   }
   state.validazioneInCorso = false;
   await refreshBadges();
@@ -1147,6 +1278,38 @@ async function validaTutte(){
 async function rifiuta(id){
   try{
     await api(`/api/revisione/${id}/rifiuta`, {method:"POST"});
+    await refreshBadges();
+    await renderRevisione();
+  }catch(e){ showErr(e.message); }
+}
+
+function checkedOggetti(principioId){
+  return [...document.querySelectorAll(`#bozza-p-${principioId} input[data-role="oggetto"]:checked`)].map(x => x.dataset.obj);
+}
+
+async function validaPrincipio(id, opts){
+  const silent = opts && opts.silent;
+  const body = {
+    riferimento: document.getElementById(`rif-p-${id}`).value,
+    testo: document.getElementById(`testo-p-${id}`).value,
+    tipo_principio: document.getElementById(`tipo-p-${id}`).value,
+    stato_obbligo: document.getElementById(`stato-p-${id}`).value,
+    condizione_applicabilita: document.getElementById(`cond-p-${id}`).value || null,
+    oggetti_giuridici: checkedOggetti(id),
+    validato_da: "sistema",
+  };
+  try{
+    await api(`/api/revisione/principio/${id}/valida`, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+    if(!silent){ await refreshBadges(); await renderRevisione(); }
+  }catch(e){
+    if(silent) throw e;
+    showErr(e.message);
+  }
+}
+
+async function rifiutaPrincipio(id){
+  try{
+    await api(`/api/revisione/principio/${id}/rifiuta`, {method:"POST"});
     await refreshBadges();
     await renderRevisione();
   }catch(e){ showErr(e.message); }

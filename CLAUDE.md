@@ -96,7 +96,7 @@ una query `read-cypher` non sostituisce un controllo bloccante come
 
 Le bozze di Obbligo/Principio sono generate da LLM solo dentro sessioni Claude Code interattive (mai come chiamata batch autonoma né con una API key propria verso un servizio LLM) — vedi `docs/adr/0003-estrazione-solo-dentro-sessioni-claude-code.md`. La web UI (`web_ui.py`) è puramente di lettura/scrittura sul DB: consultazione, coda di revisione, nessuna chiamata LLM propria.
 
-Ogni riga estratta nasce con `stato_validazione='bozza'` e richiede validazione umana esplicita (coda di revisione in UI) prima di essere considerata autorevole; i campi `validato_da`/`data_validazione` tracciano chi/quando.
+Ogni riga estratta — Obbligo **e** Principio — nasce con `stato_validazione='bozza'` e richiede un nulla osta umano esplicito (coda di revisione in UI) prima di essere considerata autorevole; i campi `validato_da`/`data_validazione` tracciano chi/quando. La coda copre entrambi i tipi di nodo: `GET /api/revisione` restituisce `bozze` (Obblighi) e `bozze_principi` (Principi), con `POST /api/revisione/{id}/valida|rifiuta` per gli Obblighi e `POST /api/revisione/principio/{id}/valida|rifiuta` per i Principi (estensione del 2026-09-29: prima solo gli Obblighi erano validabili, i Principi restavano fuori dalla coda per una scelta del ticket d'origine).
 
 ### `web_ui.py`: backend FastAPI + SPA inline, un solo file
 

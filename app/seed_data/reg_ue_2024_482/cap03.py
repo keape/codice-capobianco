@@ -329,7 +329,7 @@ RIGHE_OBBLIGHI = [
         "riferimento": "art. 20 §1",
         "testo": "Fatto salvo l'articolo 58, paragrafo 8, lettera e), del regolamento (UE) 2019/881, un certificato EUCC per un profilo di protezione è revocato dall'organismo di certificazione che lo ha rilasciato; l'articolo 14 si applica mutatis mutandis.",
         "testo_integrale": "Articolo 20\n\nRevoca del certificato EUCC per un profilo di protezione\n\n1. Fatto salvo l'articolo 58, paragrafo 8, lettera e), del regolamento (UE) 2019/881, un certificato EUCC per un profilo di protezione è revocato dall'organismo di certificazione che lo ha rilasciato. L'articolo 14 si applica mutatis mutandis.",
-        "tipo_obbligo": "procedurale",
+        "tipo_obbligo": "sanzionatorio",
         "stato": "vigente",
         "soggetti": [{"categoria": "Terza parte", "ruolo": "obbligato"}],
     },

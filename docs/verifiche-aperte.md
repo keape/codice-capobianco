@@ -74,48 +74,45 @@ tabelle di input/output: il criterio va applicato, non reinventato.
 
 ## 3-bis. Fonte 29 (Reg. UE 2024/482, EUCC) — tipo_obbligo delle conseguenze della non conformità
 
-**In sospeso, serve una decisione dell'utente.** I capitoli di Fonte 29, scritti
-in parallelo da 14 subagent worker, hanno classificato le conseguenze della non
-conformità / non compliance in due modi diversi, e il testo del regolamento non
-dirime la questione:
+**Chiusa il 2026-09-29 su decisione dell'utente: criterio "sanzionatorio" esteso,
+da riapplicare.** I capitoli di Fonte 29, scritti in parallelo da 14 subagent
+worker, avevano classificato le conseguenze della non conformità / non
+compliance in due modi diversi:
 
-- **Obbligo "sanzionatorio"**: art. 28 §6, art. 29 §2, art. 29 §3 (cap05) e
-  art. 35 §6 (cap06) — il titolare non propone misure correttive adeguate, la
-  violazione è continuata o ricorrente, l'aggiornamento della relazione di
-  valutazione non viene fornito: conseguenze della violazione.
-- **Obbligo "procedurale"**: art. 14 §1 (cap02) e art. 20 §1 (cap03) — revoca
-  del certificato EUCC; art. 21 §5 e art. 22 §6 (cap04) — revoca
-  dell'autorizzazione dell'organismo di certificazione e dell'ITSEF; art. 31
-  §1-§3 (cap05) — misure in caso di mancato rispetto degli obblighi da parte di
-  organismi e ITSEF; art. 30 §1-§6 (cap05) — procedura di sospensione.
+- **"sanzionatorio"**: art. 28 §6, art. 29 §2, art. 29 §3 (cap05) e art. 35 §6
+  (cap06) — il titolare non propone misure correttive adeguate, la violazione è
+  continuata o ricorrente, l'aggiornamento della relazione di valutazione non
+  viene fornito.
+- **"procedurale"**: art. 14 §1 (cap02) e art. 20 §1 (cap03) — revoca del
+  certificato EUCC; art. 21 §5 e art. 22 §6 (cap04) — revoca dell'autorizzazione
+  dell'organismo di certificazione e dell'ITSEF; art. 31 §1-§3 e art. 30 §1 e §6
+  (cap05) — misure per la non compliance e sospensione.
 
-**Perché conta.** è lo stesso istituto (conseguenza del venire meno dei
-requisiti o di una violazione) classificato in due modi, in moduli diversi della
-stessa Fonte: la Fonte è internamente incoerente pur passando tutte le guardie,
-esattamente come il caso "Input/Inputs" di Fonte 27 (§ 3). Il corpus non decide
-al posto nostro: le 23 righe già a "sanzionatorio" in tutto il grafo
-(2026-09-29) comprendono sia sanzioni in senso proprio e responsabilità civile
-(CAD art. 32-bis, eIDAS art. 13 §1) sia misure di enforcement conseguenti a una
-violazione (CAD art. 37 c.4-ter, "intima di ottemperarvi"; SPID art. 12 c.4,
-"previa accertamento della violazione"). La revoca di un certificato o di
-un'autorizzazione sta in mezzo alle due letture.
+**Criterio deciso** (vale come precedente per ogni Fonte futura che contenga
+revoche, sospensioni o misure di enforcement): "sanzionatorio" comprende
+**qualunque conseguenza giuridica del venire meno dei requisiti o di una
+violazione o di un accertamento** — revoca, sospensione e misure restrittive
+incluse — e non solo sanzioni pecuniarie e responsabilità civile. Sotto-regola
+adottata per non estendere l'etichetta ai meri obblighi di comunicazione: chi
+**dispone o modula la conseguenza** va a "sanzionatorio"; chi disciplina solo la
+**comunicazione della conseguenza** già disposta resta
+"informativo/trasparenza". Lettura coerente con i precedenti del corpus (CAD
+art. 37 c.4-ter, "intima di ottemperarvi"; SPID art. 12 c.4, previo accertamento
+della violazione).
 
-**Due letture possibili**, da scegliere una volta per la Fonte:
-1. "sanzionatorio" = solo sanzioni e responsabilità (pecuniarie o civili):
-   allora le quattro righe di cap05/cap06 vanno portate a "procedurale";
-2. "sanzionatorio" = qualunque conseguenza giuridica di una violazione o di un
-   accertamento, revoca e sospensione incluse (lettura suggerita dal precedente
-   CAD art. 37 c.4-ter e SPID art. 12 c.4): allora vanno portate a
-   "sanzionatorio" le righe di cap02, cap03, cap04 e cap05 elencate sopra.
+**Applicazione (2026-09-29, `fonte_id=29`).** Portate a "sanzionatorio" nove
+righe, tutte quelle che dispongono o modulano la conseguenza: art. 14 §1
+(cap02); art. 20 §1 (cap03); art. 21 §5 e art. 22 §6 (cap04); art. 30 §1, art. 30
+§6, art. 31 §1, art. 31 §2 e art. 31 §3 (cap05). Restano "informativo/trasparenza"
+le quattro righe che notificano o pubblicano una conseguenza già disposta (art.
+30 §2, §3, §4 e §5 di cap05) e restano "sanzionatorio" le quattro righe già
+classificate così (art. 28 §6, art. 29 §2, art. 29 §3, art. 35 §6). Fonte 29 ha
+ora 13 righe "sanzionatorio" su 196 obblighi. Il grafo è stato riallineato con
+un nuovo `app/seed.py`; nessun campo `testo`/`testo_integrale` è stato toccato.
 
-**Dove agire.** `app/seed_data/reg_ue_2024_482/cap02.py`, `cap03.py`, `cap04.py`,
-`cap05.py`, `cap06.py` (solo il campo `tipo_obbligo` delle righe indicate; mai
-`testo_integrale`). Le righe sono tutte `stato_validazione='bozza'`.
-
-**Quando riverificare.** Alla prima revisione umana di Fonte 29, insieme al
-altro presidio dichiarato nel wiring di `seed.py` (nota di revisione su cap05).
-Il criterio deciso vale anche per le Fonti future che contengano revoche,
-sospensioni e misure di enforcement: va applicato, non reinventato.
+**Quando riverificare.** A ogni nuova Fonte con disposizioni di revoca,
+sospensione o enforcement: il criterio va **applicato**, non reinventato — è il
+senso di questa voce.
 
 ## 4. Fonte 25 (ETSI TS 119 312) — relazioni mappate dalla numerazione V1.x
 
