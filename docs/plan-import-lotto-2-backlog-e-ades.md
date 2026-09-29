@@ -112,6 +112,26 @@ piano del lotto 1, con in più:
 
 ## 5. Stato
 
+**Aggiornamento 2026-09-29.** Blocco A: **Fonte 28 chiusa** — Reg. di
+esecuzione (UE) 2024/2979, 48 nodi (35 obblighi, 13 principi), 95 item di
+indice, 24 relazioni (14 native interne + 10 cross-fonte, compresa una in
+direzione inversa da Fonte 22), Fase 6 in
+`app/seed_data/reg_ue_2024_2979/cap06_relazioni_cross.py`, scheda in
+`docs/fonti-censite.md`. Subito dopo, su richiesta dell'utente, **Fonte 29
+(Reg. di esecuzione (UE) 2024/482, EUCC) e Fonte 30 (Reg. di esecuzione (UE)
+2024/3144, che modifica e rettifica la 482)**: testi ufficiali acquisiti via
+CELLAR (`app/.source_cache/reg_ue_2024_482/`, 135k caratteri;
+`app/.source_cache/reg_ue_2024_3144/`, 22k), split in 14 + 5 capitoli
+(`app/tools/split_source.py`), autoria affidata a 19 subagent worker. La 3144
+è un atto modificativo: le sue righe sono i punti dell'art. 1 e dell'art. 2,
+gli artt. 2-3 e i suoi due allegati, con le relazioni `modifica`/`abroga`
+verso la Fonte 29 costruite nella Fase 6 della Fonte 30.
+
+Nota di perimetro sulla questione aperta all'inizio del lotto: la 2024/3144
+rettifica la 2024/482 anche sull'allegato IV, quindi la voce § 9 di
+`docs/verifiche-aperte.md` (rinvii a norme esterne) va riletta dopo il seed
+delle due Fonti.
+
 **Aggiornamento 2026-09-28 (sera).** Blocco A **in corso**: primo import =
 Fonte 28, Reg. di esecuzione (UE) 2024/2979 (testo ufficiale in
 `app/.source_cache/reg_ue_2024_2979/`, provenienza CELLAR, split in 5 capitoli:

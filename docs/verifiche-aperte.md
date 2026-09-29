@@ -11,9 +11,12 @@ dichiarato**, non quando è un lavoro da fare (per quello ci sono i piani in
 esito è scritto nella scheda della Fonte in `docs/fonti-censite.md` o nel
 docstring del modulo interessato.
 
-Ultimo aggiornamento: 2026-09-28 (chiusura del lotto 1: atti di esecuzione
-eIDAS2 + TS 119 312, TS 119 101, EN 319 102-1; poi decisioni sull'apertura del
-lotto 2: § 7 chiusa, § 9 integrata con i rinvii ratificati).
+Ultimo aggiornamento: 2026-09-29 (import di Fonte 28, Reg. di esecuzione (UE)
+2024/2979, e apertura di Fonte 29/30, Reg. 2024/482 e 2024/3144: § 10
+rilanciata con i conteggi aggiornati). Aggiornamento precedente: 2026-09-28
+(chiusura del lotto 1: atti di esecuzione eIDAS2 + TS 119 312, TS 119 101, EN
+319 102-1; poi decisioni sull'apertura del lotto 2: § 7 chiusa, § 9 integrata
+con i rinvii ratificati).
 
 ---
 
@@ -176,10 +179,30 @@ relazioni possibili.
 citante contenga almeno una traccia del `riferimento` citato (id di requisito,
 articolo con ordinale, clausola, annesso, punto).
 
-**Esito del primo giro**: 1.243 relazioni `textual` esaminate, **337 senza
-traccia** del riferimento citato. Distribuzione per fonte citante: Fonte 18
-(ETSI EN 319 421) **155**, Fonte 21 (TS 119 612) 40, Fonte 17 (EN 319 411-1) 28,
-Fonte 4 (DPCM 22/2/2013) 21, Fonte 20 (TS 119 432) 15, altre sotto 15.
+**Esito del primo giro** (2026-09-28): 1.243 relazioni `textual` esaminate,
+**337 senza traccia** del riferimento citato. Distribuzione per fonte citante:
+Fonte 18 (ETSI EN 319 421) **155**, Fonte 21 (TS 119 612) 40, Fonte 17 (EN 319
+411-1) 28, Fonte 4 (DPCM 22/2/2013) 21, Fonte 20 (TS 119 432) 15, altre sotto
+15.
+
+**Esito del secondo giro** (2026-09-29, dopo l'import di Fonte 28): 1.219
+relazioni `textual` esaminate, **346 senza traccia** (l'import di Fonte 28 ne
+aggiunge 11, tutti classificati: vedi sotto; gli altri due casi in meno
+rispetto al primo giro dipendono dalla normalizzazione di Fonte 27 del
+2026-09-28 e dalla deduplica dell'audit, non da nuove verifiche).
+
+**Fonte 28 (Reg. (UE) 2024/2979), 11 casi, tutti esaminati e classificati:** 7
+sono **falsi positivi dello strumento** — il `testo_integrale` del nodo citante
+cita i commi/lettere al plurale o in forma riassuntiva ("di cui ai paragrafi 1
+e 2", "i meccanismi di autenticazione di cui alla lettera b)", "conforme ai
+requisiti di cui all'art. 6"), mentre l'estrattore cerca l'ordinale singolare
+del `riferimento` bersaglio; 4 hanno invece un **bersaglio scelto per
+contenuto**, non citato puntualmente: la base giuridica art. 5 bis §23 eIDAS2
+(citata nell'epigrafe dell'atto, fuori dai nodi) e i tre richiami al Reg.
+2015/1502 degli artt. 4 §3, 5 §1 e 13, dove il testo nomina il regolamento ma
+non l'articolo o il punto di allegato agganciato (scelta documentata nel
+docstring di `app/seed_data/reg_ue_2024_2979/cap06_relazioni_cross.py`).
+Nessuno dei 11 casi è un'etichetta gonfiata da correggere.
 
 **Perché non è una diagnosi.** Le due cause possibili — (a) etichetta gonfiata
 (relazione costruita per costruzione ma dichiarata citazione letterale) e (b)
@@ -196,8 +219,9 @@ sui casi segnalati, non su campioni casuali.
 dichiarare la provenienza si presentava come citazione letterale. Il default è
 ora `"inferred"` (la classe di evidenza più debole): `textual` va dichiarato
 esplicitamente da chi ha verificato la citazione sul testo. **Il cambio vale
-per le relazioni future**: le 337 già nel grafo portano l'etichetta attribuita
-dal default precedente e vanno riviste con lo strumento.
+per le relazioni future**: le centinaia di relazioni già nel grafo (346 al
+giro del 2026-09-29) portano in parte l'etichetta attribuita dal default
+precedente e vanno riviste con lo strumento.
 
 **Dove agire.** `app/tools/verifica_relazioni_textual.py --fonte-id 18` per il
 cluster più grande, poi le altre fonti. Il file non va modificato a mano: le

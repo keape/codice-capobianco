@@ -100,8 +100,13 @@ in larga parte nuovi rispetto al corpus censito, orientato a certificati,
 formati AdES, marche temporali e identity proofing; 10 dei 53 nodi non hanno
 alcun candidato sopra soglia. Nota di perimetro: l'allegato II punto 1 rinvia
 ai formati del **Reg. di esecuzione (UE) 2024/2979** (portafogli EUDI), non
-ancora censito — vedi backlog in
-`docs/plan-import-lotto-eidas2-standard.md` § 7.
+ancora censito al momento dell'import — vedi backlog in
+`docs/plan-import-lotto-eidas2-standard.md` § 7. **Aggiornamento
+2026-09-29**: il Reg. 2024/2979 è stato importato come Fonte 28 e quel rinvio
+è ora un arco tipizzato (Fonte 22 «allegato II, punto 1» —`richiama`→ Fonte 28
+«allegato II»), creato dal giro di Fase 6 della Fonte 28. Il modulo
+`app/seed_data/reg_ue_2025_1569/cap04_relazioni_cross.py` lo elenca ancora tra
+i rinvii senza bersaglio (nota storica della sessione, non più vera).
 - **Regolamento di esecuzione (UE) 2025/2531** — norme di riferimento e
 specifiche applicabili ai registri elettronici qualificati (art. 45 terdecies
 §3 eIDAS2). `fonte_id=23`. Import 2026-09-28, testo ufficiale italiano via
@@ -169,6 +174,39 @@ con meno relazioni del lotto.
   relazioni da pipeline grep+KNN+LLM (704 candidati) verso DPCM 19/10/2021,
   Regolamento AgID modalità attuative SPID e 2 standard ETSI — modulo
   `cap04_relazioni_cross.py`.
+- **Regolamento di esecuzione (UE) 2024/2979** — modalità di applicazione del
+  regolamento (UE) n. 910/2014 per quanto riguarda l'integrità e le
+  funzionalità di base dei portafogli europei di identità digitale (base
+  giuridica: art. 5 bis §23 eIDAS2). `fonte_id=28`. Primo import del lotto 2
+  (blocco A, `docs/plan-import-lotto-2-backlog-e-ades.md`). Testo ufficiale
+  italiano acquisito con `app/tools/cellar_fetch.py` (CELEX `32024R2979`,
+  provenienza e sha256 in `app/.source_cache/reg_ue_2024_2979/`), split in 5
+  capitoli (Capi I-IV + Allegati I-V) e autoria su 5 subagent paralleli:
+  `app/seed_data/reg_ue_2024_2979/cap0[1-6].py`. 48 nodi (35 obblighi, 13
+  principi), 95 item di indice — un nodo per comma e per lettera, gli allegati
+  per punto numerato, l'art. 2 (15 definizioni) come **un solo** Principio
+  definitorio con le 15 voci indicizzate una per una. **24 relazioni**: 14
+  native interne (rinvii tra articoli e all'allegato I) + 10 dal giro di Fase
+  6 in `cap06_relazioni_cross.py` — 9 in direzione diretta (1 «attua»
+  dall'art. 1 verso eIDAS2 art. 5 bis §23 come base giuridica dell'atto; 4
+  «specifica» verso eIDAS2 art. 5 bis — §5(e) politiche di divulgazione
+  incorporate, §4(b) pseudonimi, §4(d) registro delle transazioni, §4(e)
+  firma/sigillo qualificato; 3 «richiama» verso il Reg. 2015/1502, in
+  particolare l'allegato punto 2.2.1 per la progettazione del mezzo di
+  identificazione a livello elevato; 1 «si sovrappone a» verso Fonte 22 per la
+  stessa lista di norme sugli attestati, imposta dal lato del fornitore e dal
+  lato del portafoglio) **+ 1 in direzione inversa** (Fonte 22 «allegato II,
+  punto 1» —`richiama`→ «allegato II» di questa Fonte): è il rinvio che il
+  modulo di Fase 6 di Fonte 22 dichiarava senza bersaglio. **Limite
+dichiarato**: la citazione dell'art. 3 §1 all'art. 5 bis §4 eIDAS2 resta
+  senza arco, perché Fonte 2 modella quel paragrafo per lettere (§4(a)-(g))
+  senza un nodo di chapeau del paragrafo, e agganciarlo a una lettera sarebbe
+  arbitrario. **Audit § 10 di `docs/verifiche-aperte.md`**: 11 relazioni
+  `textual` di questa Fonte segnalate senza traccia del riferimento citato, di
+  cui 7 falsi positivi dello strumento (il testo cita «i paragrafi 1 e 2» o
+  «la lettera b)» in una forma che l'estrattore non riconosce) e 4 con
+  bersaglio scelto per contenuto (base giuridica nel preambolo; tre richiami
+  al Reg. 2015/1502 senza numero di articolo/allegato nel testo citante).
 
 ## 2. Fonti nazionali
 
@@ -590,13 +628,13 @@ riferimento **puntuale di sottoclavola** («Figure 1 (derived from ETSI EN 319
 
 | Categoria | Fonti | Totale |
 |---|---|---|
-| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502 | 8 |
+| Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502, Reg. (UE) 2024/2979 | 9 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
 | Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1 | 12 |
-| **Totale** | | **27** |
+| **Totale** | | **28** |
 
-26 delle 27 Fonti hanno copertura granulare completa (ADR-0007) e sono
+27 delle 28 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
