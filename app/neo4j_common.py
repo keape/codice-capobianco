@@ -251,6 +251,26 @@ def partizioni_di(riferimento: str) -> list[tuple[str, str]]:
         catena.append((f"allegato {m.group(1)}" if m.group(1) else "allegato", TIPO_PARTIZIONE_ALLEGATO))
         return catena
 
+    # annessi in forma inglese degli standard ETSI ("Annex A.1.1.1 (titolo)",
+    # "Annex D (normative), premessa (...)", "Annex D, modulo ..."): la catena dei padri e'
+    # "Annex X, clausola X.a.b" -> "Annex X, clausola X.a" -> "Annex X".
+    m = re.match(r"^Annex\s+([A-Z])(?:\.(\d+(?:\.\d+)*))?", rif)
+    if m:
+        lettera, numerazione = m.group(1), m.group(2)
+        if not numerazione:
+            # forma "Annex E, clause E.1.1 (...)" usata dalle Fonti ETSI multi-annesso
+            m2 = re.match(r"^Annex\s+[A-Z],\s*(?:clause|clausola)\s+[A-Z]\.(\d+(?:\.\d+)*)", rif, re.I)
+            if m2:
+                numerazione = m2.group(1)
+        catena = []
+        if numerazione:
+            segmenti = numerazione.split(".")
+            while len(segmenti) > 1:
+                segmenti = segmenti[:-1]
+                catena.append((f"Annex {lettera}, clausola {lettera}." + ".".join(segmenti), TIPO_PARTIZIONE_CLAUSOLA))
+        catena.append((f"Annex {lettera}", TIPO_PARTIZIONE_ALLEGATO))
+        return catena
+
     # articoli (con eventuale suffisso bis/ter/quater/...)
     m = re.match(r"^(art\.\s*\d+(?:\s*-?\s*(?:bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies|undecies|duodecies|terdecies))?)", rif)
     if m:

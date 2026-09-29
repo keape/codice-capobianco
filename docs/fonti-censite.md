@@ -264,6 +264,36 @@ dichiarato**: la citazione dell'art. 3 §1 all'art. 5 bis §4 eIDAS2 resta
   punto 3 (nuovo art. 20 bis sull'accreditamento) resta senza arco: nessun
   nodo controparte, l'articolo è nuovo.
 
+- **ETSI EN 319 122-1 V1.3.1 (2023-06)** — CAdES digital signatures, Parte 1 (building
+  blocks e firme baseline). `fonte_id=31`. **Primo import del blocco B** (famiglia AdES,
+  `docs/plan-import-lotto-2-backlog-e-ades.md` § 5). Testo ufficiale dal deliver ETSI
+  (PDF, `pdftotext -layout`; provenienza, versione e sha256 in
+  `app/.source_cache/etsi_319_122/provenance.json`): 63 pagine, 194.767 caratteri, corpo
+  tagliato dal front matter (l'indice ripete i titoli delle clausole) e diviso in 7
+  capitoli, autoria su 7 subagent worker. **125 nodi** (76 obblighi, 49 principi), 125
+  item di indice: granularità alla clausola/sottoclausta, all'id di requisito dove lo
+  standard ne numera, e — nella clausola 6.3 — **una riga per ciascuno dei venti requisiti
+  aggiuntivi a)-t)** delle firme baseline, che il documento stesso indicizza dalla tabella
+  1 (scelta di granularità fine documentata nel modulo `cap04.py`; è il punto su cui si
+  può decidere una convenzione di famiglia prima degli altri quattro standard AdES).
+  **185 relazioni**: 50 interne ai capitoli + **135 nel capitolo virtuale**
+  `app/seed_data/etsi_319_122/cap08_relazioni_cross.py` — 100 «richiama» `textual`
+  cross-capitolo o verso annessi, risolte con la regola di miraggio dell'ADR-0012 (nodo
+  della clausola se esiste, altrimenti partizione padre più specifica: `clausola 5.4`,
+  `Annex A, clausola A.1`, `Annex A`); 5 «si sovrappone a» `inferred` verso Fonti 27
+  (attributi CAdES che EN 319 102-1 elenca come attributi da elaborare in convalida:
+  commitment-type-indication, signature-policy-store, signer-attributes-v2), 25 (sezione
+  CRL di TS 119 312) e 7 (moduli ASN.1 di dichiarazioni di EN 319 412-5); **30 in
+  direzione inversa** (`richiama`, `textual`, 0.85) dai nodi già censiti che nominano la
+  norma, ancorati alla partizione `clausola 1 (Scope)` perché il rinvio è allo standard
+  come insieme. **Note**: i 434 candidati KNN sono in maggioranza rumore da titoli di
+  clausola identici fra standard diversi («clausola 3.2 (Symbols)», «clausola 3.1
+  (Terms)»); le cinque coppie tenute sono state verificate leggendo entrambe le parti.
+  Dubbi di classificazione dichiarati nel modulo: le lettere di requisito con solo
+  «should» censite come Obblighi (precedente EN 319 401/319 102-1, divergente da EN 319
+  411-1), `clausola 3.2 (Symbols)` inclusa («Void.») mentre altri moduli della famiglia la
+  escludono, Annex C (Void) e Annex F (Change History) inclusi per istruzione del batch.
+
 ## 2. Fonti nazionali
 
 Diritto italiano (leggi, decreti, regolamenti AgID).
@@ -687,10 +717,10 @@ riferimento **puntuale di sottoclavola** («Figure 1 (derived from ETSI EN 319
 | Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502, Reg. (UE) 2024/2979, Reg. (UE) 2024/482 (EUCC), Reg. (UE) 2024/3144 (atto modificativo) | 11 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
-| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1 | 12 |
-| **Totale** | | **30** |
+| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1, ETSI EN 319 122-1 (CAdES) | 13 |
+| **Totale** | | **31** |
 
-29 delle 30 Fonti hanno copertura granulare completa (ADR-0007) e sono
+30 delle 31 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
