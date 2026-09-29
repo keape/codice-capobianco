@@ -112,6 +112,53 @@ piano del lotto 1, con in più:
 
 ## 5. Stato
 
+**Aggiornamento 2026-09-29 (sera, blocco B avviato).** Blocco B (famiglia AdES):
+**testi ufficiali acquisiti** per tutte e cinque le fonti, con versione pinnata
+dall'ultima edizione *pubblicata* sul deliver ETSI (`_60`), via `curl` con
+User-Agent browser e conversione `pdftotext -layout`; provenienza completa
+(URL, versione, sha256 del PDF, data di fetch) in
+`app/.source_cache/<slug>/provenance.json`.
+
+| slug | standard | versione pinnata | caratteri |
+|---|---|---|---|
+| `etsi_319_122` | ETSI EN 319 122-1 CAdES | V1.3.1 (01.03.01_60) | 194.767 |
+| `etsi_319_132` | ETSI EN 319 132-1 XAdES | V1.3.1 (01.03.01_60) | 266.763 |
+| `etsi_319_142` | ETSI EN 319 142-1 PAdES | V1.2.1 (01.02.01_60) | 86.008 |
+| `etsi_319_162` | ETSI EN 319 162-1 ASiC | V1.1.1 (01.01.01_60) | 94.764 |
+| `etsi_119_182` | ETSI TS 119 182-1 JAdES | V1.2.1 (01.02.01_60) | 228.237 |
+
+Due avvertenze sulle versioni: per **PAdES** la cartella `01.03.00_20` è una
+**bozza non pubblicata** (non usata); per **ASiC** esiste una sola edizione
+pubblicata (V1.1.1, 2016). Il testo è quello della versione pinnata, non della
+bozza.
+
+**Split: da rifare, con due correzioni note.** Il primo tentativo di split
+automatico (`/tmp/split_ades.py`, non committato) ha prodotto capitoli
+degeneri, e i suoi artefatti sono stati rimossi dalla cache. Cause, entrambe da
+correggere prima del dispatch:
+
+1. **Header/footer di pagina.** `pdftotext -layout` emette, su ogni pagina, una
+   riga di testa con numero di pagina e titolo dello standard
+   (`9                ETSI EN 319 122-1 V1.3.1 (2023-06)`). Una regex di
+   intestazione «numero + testo» li scambia per clausole: vanno **esclusi**
+   (righe che contengono `ETSI EN 319`/`ETSI TS 119` o che sono un solo numero),
+   insieme a Header/Footer del documento.
+2. **Taglio del front matter.** L'indice ripete i titoli dei capitoli: il corpo
+   va fatto partire dall'**ultima** occorrenza del titolo della clausola 1, e la
+   ricerca deve escludere le righe con i puntini guida dell'indice (già fatto)
+   **e** le righe di testa di pagina. Per PAdES la ricerca ha agganciato una
+   voce sbagliata (`1  clause 5.1.2 ...`): serve una verifica che il titolo
+   trovato sia «clause 1»/«Scope».
+
+Nessun modulo di capitolo è stato scritto per il blocco B: nessun artefatto
+parziale da riconciliare, solo i testi ufficiali in cache. Il passo successivo è
+lo split corretto (6-8 capitoli per standard, taglio alle clausole di primo
+livello con limite di dimensione), il dispatch dei worker per capitolo con le
+stesse regole del lotto 1 (copertura ADR-0007 per clausola/requisito, verbatim
+ADR-0010, nessuna relazione cross-fonte in autoria), poi Fase 6 con il livello
+delle partizioni (ADR-0012) — che per questi standard è la clausola, non
+l'articolo —, seed, schede in `docs/fonti-censite.md` e commit.
+
 **Aggiornamento 2026-09-29 (sera).** Blocco A: **Fonti 28, 29 e 30 chiuse** —
 Reg. 2024/2979 (portafogli EUDI, 48 nodi), Reg. 2024/482 (EUCC, 256 nodi, 171
 relazioni: il documento piu' esteso del lotto, 135k caratteri, 14 capitoli) e
