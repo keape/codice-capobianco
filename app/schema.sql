@@ -111,14 +111,29 @@ CREATE TABLE principio_oggetti (
 -- stessa semantica di stato_validazione sui nodi.
 CREATE TABLE relazioni (
     id INTEGER PRIMARY KEY,
-    nodo_da_tipo TEXT NOT NULL CHECK (nodo_da_tipo IN ('obbligo', 'principio')),
+    nodo_da_tipo TEXT NOT NULL CHECK (nodo_da_tipo IN ('obbligo', 'principio', 'partizione')),
     nodo_da_id INTEGER NOT NULL,
-    nodo_a_tipo TEXT NOT NULL CHECK (nodo_a_tipo IN ('obbligo', 'principio')),
+    nodo_a_tipo TEXT NOT NULL CHECK (nodo_a_tipo IN ('obbligo', 'principio', 'partizione')),
     nodo_a_id INTEGER NOT NULL,
     tipo_relazione_id INTEGER NOT NULL REFERENCES tipi_relazione(id),
     evidence_type TEXT NOT NULL DEFAULT 'inferred'
         CHECK (evidence_type IN ('textual', 'inferred', 'human-curated')),
     confidence REAL CHECK (confidence IS NULL OR (confidence BETWEEN 0.0 AND 1.0))
+);
+
+-- ADR-0012: livello strutturale delle partizioni (unità indivise citabili "in blocco":
+-- articolo, allegato, sezione di allegato, clausola o paragrafo di uno standard).
+-- Sono generate automaticamente dai riferimenti delle righe (`neo4j_common.partizioni_di`),
+-- non hanno testo normativo e non entrano nella coda di validazione: servono come bersaglio
+-- dei rinvii che indicano l'unità intera e non un singolo comma. L'appartenenza di una riga
+-- alla propria partizione (arco PARTE_DI) è derivata in migrate_to_neo4j, non è una tabella.
+CREATE TABLE partizioni (
+    id INTEGER PRIMARY KEY,
+    fonte_id INTEGER NOT NULL REFERENCES fonti(id),
+    riferimento TEXT NOT NULL,
+    tipo_partizione TEXT NOT NULL
+        CHECK (tipo_partizione IN ('articolo', 'allegato', 'sezione', 'clausola', 'paragrafo')),
+    UNIQUE (fonte_id, riferimento)
 );
 
 -- Aggiunta ticket 05: cambiamenti rilevati dal monitoraggio automatico delle Fonti.

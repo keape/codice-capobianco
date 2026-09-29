@@ -33,6 +33,12 @@ CREATE CONSTRAINT fonteIdUnica IF NOT EXISTS FOR (n:Fonte) REQUIRE n.id IS UNIQU
 CREATE CONSTRAINT categoriaSoggettoNomeUnico IF NOT EXISTS FOR (n:CategoriaSoggetto) REQUIRE n.nome IS UNIQUE;
 CREATE CONSTRAINT oggettoGiuridicoNomeUnico IF NOT EXISTS FOR (n:OggettoGiuridico) REQUIRE n.nome IS UNIQUE;
 
+// ADR-0012: partizioni (unità indivise citabili "in blocco": articolo, allegato, sezione,
+// clausola, paragrafo). Unica per fonte: i riferimenti sono unici dentro una Fonte, non a
+// livello globale ("art. 1" esiste in ogni regolamento).
+CREATE CONSTRAINT partizioneUnica IF NOT EXISTS FOR (q:Partizione) REQUIRE (q.fonte_id, q.riferimento) IS UNIQUE;
+CREATE RANGE INDEX idxPartizioneFonte IF NOT EXISTS FOR (q:Partizione) ON (q.fonte_id);
+
 // ------------------------------------------------------------------------- indici (ADR-0006)
 
 // 1. Full-text Lucene — sostituisce lo scan Python case-insensitive di /api/obblighi, /api/principi.

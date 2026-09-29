@@ -6,6 +6,7 @@ dei 14 tipi di relazione tipizzata (ADR-0004/0005/0008) verso nomi di arco Cyphe
 """
 
 import os
+import re
 import sqlite3
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
@@ -161,3 +162,98 @@ def mon_conn() -> sqlite3.Connection:
     """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_modifiche_fonte ON modifiche_rilevate(fonte_id, esaminata)")
     return conn
+
+
+# --------------------------------------------------------------------- partizioni
+# Livello strutturale intermedio fra il nodo di prescrizione (unità di censimento:
+# comma, lettera, punto di allegato) e la Fonte: un nodo `:Partizione` per ciascuna
+# unità indivisa citabile "in blocco" - articolo, sezione di allegato, clausola di
+# standard. Serve perché molti rinvii normativi hanno per bersaglio l'unità indivisa
+# e non un singolo comma ("in conformità degli articoli 13 e 19", "si applica
+# l'allegato IV", "clausola 6.8.5"): senza un nodo di partizione quei rinvii
+# restavano senza arco, o venivano agganciati a un comma scelto a mano.
+# La partizione non porta testo normativo (nessuna duplicazione) e la regola
+# ADR-0007 "un nodo di prescrizione per articolo/comma" resta intatta.
+#
+# Generazione deterministica dai riferimenti già normalizzati dei moduli (mai a mano):
+# vedi `partizioni_di`. L'arco strutturale è (nodo di prescrizione)-[:PARTE_DI]->
+# (partizione), e fra partizioni (sezione -> allegato, clausola figlia -> clausola
+# padre), generato in `migrate_to_neo4j.migrate_from_connection`.
+
+TIPO_PARTIZIONE_ARTICOLO = "articolo"
+TIPO_PARTIZIONE_ALLEGATO = "allegato"
+TIPO_PARTIZIONE_SEZIONE = "sezione"
+TIPO_PARTIZIONE_CLAUSOLA = "clausola"
+TIPO_PARTIZIONE_PARAGRAFO = "paragrafo"
+
+
+def partizioni_di(riferimento: str) -> list[tuple[str, str]]:
+    """Catena delle partizioni a cui appartiene un riferimento, dalla più specifica
+    alla radice: lista di `(riferimento_partizione, tipo_partizione)`.
+
+    Regole (deterministiche, documentate in docs/adr/0012-*.md):
+    - `art. 13 §1`, `art. 5 bis §4(a)`, `art. 2, punto 3` -> `art. 13` / `art. 5 bis` / `art. 2`;
+    - `allegato IV, sezione IV.3, punto 5` -> `allegato IV, sezione IV.3` e `allegato IV`;
+      `allegato III, punto 2` o `allegato, adeguamento a) ...` -> `allegato III` / `allegato`;
+    - `clausola 5.2.2 (titolo)` -> `clausola 5.2` e `clausola 5` (la clausola di primo
+      livello è già il nodo stesso: nessuna partizione);
+    - id di requisito ETSI con la clausola nel nome (`REQ-7.8-13`, `GEN-6.5.1-06`,
+      `ISS-8.5.1-01`, `QTS-C.2.3-03`) -> `clausola 7.8` (o `clausola 6.5.1`, `clausola
+      8.5.1`, `clausola C.2.3`) e le sue radici (`clausola 7`, ...);
+    - prefisso di parte (`Parte 2: REQ-7.8-13`) conservato nella partizione
+      (`Parte 2: clausola 7.8`), perché le parti sono censite come Fonte unica.
+
+    Riferimenti senza struttura riconoscibile (es. id di controllo di ETSI TS 119 101
+    come `SCP 13`, sigle prive di numerazione di clausola) restituiscono lista vuota:
+    la guardia `tests`/report di seed li elenca e restano senza partizione, invece di
+    produrre un nodo inventato.
+    """
+    rif = riferimento.strip()
+    prefisso = ""
+    m = re.match(r"^(Parte \d+):\s*(.+)$", rif)
+    if m:
+        prefisso, rif = m.group(1) + ": ", m.group(2).strip()
+
+    # clausola (o "par." di una fonte che numera così): se il riferimento scende a
+    # un'unità più fine (comma, punto, lettera) la partizione è la clausola che la
+    # contiene; se il riferimento È la clausola, la partizione è la sua clausola padre
+    # (la clausola stessa è già un nodo del censimento).
+    m = re.match(r"^(clausola|par\.)\s+(\d+(?:\.\d+)*)", rif)
+    if m:
+        etichetta, numerazione = m.group(1), m.group(2)
+        tipo = TIPO_PARTIZIONE_CLAUSOLA if etichetta == "clausola" else TIPO_PARTIZIONE_PARAGRAFO
+        segmenti = numerazione.split(".")
+        catena: list[tuple[str, str]] = []
+        if re.search(r"§|punto|comma|lett\.", rif[m.end():]):
+            catena.append((f"{prefisso}{etichetta} {numerazione}", tipo))
+        while len(segmenti) > 1:
+            segmenti = segmenti[:-1]
+            catena.append((f"{prefisso}{etichetta} " + ".".join(segmenti), tipo))
+        return catena
+
+    # id di requisito con la clausola nel nome (ES: REQ-7.8-13, VAL-8.3.7-04, QTS-C.2.3-03)
+    m = re.match(r"^[A-Za-z]+-([0-9A-Z][0-9A-Z.]*)-[0-9A-Za-z]+$", rif)
+    if m:
+        segmenti = m.group(1).split(".")
+        catena = [(prefisso + "clausola " + ".".join(segmenti), TIPO_PARTIZIONE_CLAUSOLA)]
+        while len(segmenti) > 1:
+            segmenti = segmenti[:-1]
+            catena.append((prefisso + "clausola " + ".".join(segmenti), TIPO_PARTIZIONE_CLAUSOLA))
+        return catena
+
+    # allegati, con o senza numero romano e con o senza sezione
+    m = re.match(r"^allegato(?:\s+([IVXL]+))?(?:,\s*sezione\s+([IVXL0-9]+(?:\.[0-9]+)*))?", rif)
+    if m and (m.group(1) or m.group(2) or rif.startswith("allegato")):
+        catena = []
+        if m.group(2):
+            etichetta = f"allegato {m.group(1)}" if m.group(1) else "allegato"
+            catena.append((f"{etichetta}, sezione {m.group(2)}", TIPO_PARTIZIONE_SEZIONE))
+        catena.append((f"allegato {m.group(1)}" if m.group(1) else "allegato", TIPO_PARTIZIONE_ALLEGATO))
+        return catena
+
+    # articoli (con eventuale suffisso bis/ter/quater/...)
+    m = re.match(r"^(art\.\s*\d+(?:\s*-?\s*(?:bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies|undecies|duodecies|terdecies))?)", rif)
+    if m:
+        return [(re.sub(r"\s*-\s*", "-", m.group(1).strip()), TIPO_PARTIZIONE_ARTICOLO)]
+
+    return []

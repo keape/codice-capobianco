@@ -52,10 +52,36 @@ Un modulo capitolo (`app/seed_data/<fonte>/cap0N.py`) espone:
 
 import json
 import re
+import sys
 from pathlib import Path
+
+if str(Path(__file__).parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from neo4j_common import partizioni_di  # noqa: E402
 
 APP_DIR = Path(__file__).parent.parent
 SOURCE_CACHE_DIR = APP_DIR / ".source_cache"
+
+
+def _registra_partizioni(cursor, fonte_id: int, riferimento: str, registro: dict) -> None:
+    """Crea, per la fonte in lavorazione, i nodi di partizione a cui appartiene la riga appena
+    inserita, e li registra come ('partizione', fonte_id, riferimento) -> id (ADR-0012).
+
+    Idempotente: la partizione gia' creata per un'altra riga della stessa fonte non viene
+    duplicata (chiave presente nel registro). Senza catena di partizioni (la riga e' essa
+    stessa l'unita' indivisa, o il riferimento non e' strutturato) non fa nulla: e' il caso
+    normale delle clausole di primo livello.
+    """
+    for rif_partizione, tipo in partizioni_di(riferimento):
+        chiave = ("partizione", fonte_id, rif_partizione)
+        if chiave in registro:
+            continue
+        cursor.execute(
+            "INSERT INTO partizioni (fonte_id, riferimento, tipo_partizione) VALUES (?, ?, ?)",
+            (fonte_id, rif_partizione, tipo),
+        )
+        registro[chiave] = cursor.lastrowid
 
 
 def verifica_copertura(indice: list[str], mappatura: dict[str, list[str]]) -> None:
@@ -249,6 +275,7 @@ def inserisci_capitoli(cursor, fonte_id: int, capitoli: list, lookup: dict, regi
             )
             obbligo_id = cursor.lastrowid
             registro[("obbligo", fonte_id, riga["riferimento"])] = obbligo_id
+            _registra_partizioni(cursor, fonte_id, riga["riferimento"], registro)
             for soggetto in riga.get("soggetti", []):
                 cursor.execute(
                     "INSERT INTO obbligo_soggetti (obbligo_id, categoria_soggetto_id, ruolo) VALUES (?, ?, ?)",
@@ -270,6 +297,7 @@ def inserisci_capitoli(cursor, fonte_id: int, capitoli: list, lookup: dict, regi
             )
             principio_id = cursor.lastrowid
             registro[("principio", fonte_id, riga["riferimento"])] = principio_id
+            _registra_partizioni(cursor, fonte_id, riga["riferimento"], registro)
             for oggetto in riga.get("oggetti_giuridici", []):
                 cursor.execute(
                     "INSERT INTO principio_oggetti (principio_id, oggetto_giuridico_id) VALUES (?, ?)",
@@ -311,3 +339,22 @@ def inserisci_capitoli(cursor, fonte_id: int, capitoli: list, lookup: dict, regi
             )
 
     return registro
+
+
+def registra_partizioni_mancanti(cursor, registro: dict) -> int:
+    """Crea i nodi di partizione per le righe inserite fuori da `inserisci_capitoli`
+    (import storici scritti inline in `seed.py`: eIDAS/eIDAS2, Codice Civile), che non
+    passano per `_registra_partizioni`. Idempotente: le partizioni già registrate non
+    vengono ricreate. Restituisce il numero di partizioni nuove.
+
+    Serve a garantire che il livello delle partizioni (ADR-0012) copra *tutte* le Fonti,
+    indipendentemente da come sono state inserite le loro righe.
+    """
+    creati = 0
+    for tabella in ("obblighi", "principi"):
+        righe = cursor.execute(f"SELECT fonte_id, riferimento FROM {tabella}").fetchall()
+        for riga in righe:
+            prima = len(registro)
+            _registra_partizioni(cursor, riga["fonte_id"], riga["riferimento"], registro)
+            creati += len(registro) - prima
+    return creati

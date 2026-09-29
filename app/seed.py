@@ -2186,6 +2186,13 @@ def seed():
     )
 
 
+    # --- partizioni (ADR-0012): livello strutturale per i rinvii a unità indivise ---
+    # Le Fonti cablate via seed_data.lib le hanno già create riga per riga; questa
+    # passata copre le Fonti i cui dati sono ancora inline in questo file (eIDAS,
+    # eIDAS2, Codice Civile). Idempotente.
+    n_partizioni_nuove = seed_lib.registra_partizioni_mancanti(conn.cursor(), cad_registro)
+    print(f"Partizioni (ADR-0012) registrate in questa passata: {n_partizioni_nuove}")
+
     # --- monitoraggio: modifiche rilevate (rilevanti ai fini eIDAS2) --------
     modifiche = [
         (1, 1, 'art. 24 §2(j)', '2026-09-09', 'Il prestatore qualificato garantisce il trattamento lecito dei dati personali ai sensi della direttiva 95/46/CE.', '[punto soppresso da eIDAS2 - Reg. (UE) 2024/1183, art. 1(19)(b)(iii)]', 0),

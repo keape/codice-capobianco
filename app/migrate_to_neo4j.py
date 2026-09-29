@@ -15,9 +15,16 @@ monitoraggio (stesso spirito "una tantum" — ripetibile senza duplicare righe).
 import sqlite3
 from collections import defaultdict
 
-from neo4j_common import DB_PATH, TIPO_RELAZIONE_TO_ARCO, get_database, get_driver, mon_conn
+from neo4j_common import (
+    DB_PATH,
+    TIPO_RELAZIONE_TO_ARCO,
+    get_database,
+    get_driver,
+    mon_conn,
+    partizioni_di,
+)
 
-LABEL_DI_TIPO = {"obbligo": "Obbligo", "principio": "Principio"}
+LABEL_DI_TIPO = {"obbligo": "Obbligo", "principio": "Principio", "partizione": "Partizione"}
 
 
 def _sqlite_conn() -> sqlite3.Connection:
@@ -67,12 +74,13 @@ def migrate_from_connection(sconn: sqlite3.Connection, driver, database: str) ->
     obbligo_soggetti_rows = [dict(r) for r in sconn.execute("SELECT * FROM obbligo_soggetti")]
     principio_oggetti_rows = [dict(r) for r in sconn.execute("SELECT * FROM principio_oggetti")]
     relazioni_rows = [dict(r) for r in sconn.execute("SELECT * FROM relazioni")]
+    partizioni_rows = [dict(r) for r in sconn.execute("SELECT * FROM partizioni")]
 
     with driver.session(database=database) as session:
         # Ripartenza pulita: rimuove solo i nodi/archi di nostra competenza (idempotente).
         session.run(
             "MATCH (n) WHERE n:Obbligo OR n:Principio OR n:Fonte OR n:CategoriaSoggetto OR n:OggettoGiuridico "
-            "DETACH DELETE n"
+            "OR n:Partizione DETACH DELETE n"
         )
 
         session.run(
@@ -123,6 +131,50 @@ def migrate_from_connection(sconn: sqlite3.Connection, driver, database: str) ->
             "UNWIND $rows AS r MATCH (p:Principio {id: r.id}), (f:Fonte {id: r.fonte_id}) CREATE (p)-[:DA_FONTE]->(f)",
             rows=[{"id": r["id"], "fonte_id": r["fonte_id"]} for r in principi_rows],
         )
+
+        # Partizioni (ADR-0012): unita' indivise citabili "in blocco" (articolo, allegato,
+        # sezione, clausola, paragrafo), generate dai riferimenti delle righe. L'appartenenza
+        # di una riga alla propria partizione e' derivata qui (PARTE_DI), non e' una tabella:
+        # l'unica fonte di verita' delle regole di derivazione e' neo4j_common.partizioni_di.
+        session.run(
+            "UNWIND $rows AS row CREATE (q:Partizione) SET q = row",
+            rows=[{
+                "id": r["id"], "fonte_id": r["fonte_id"], "riferimento": r["riferimento"],
+                "tipo_partizione": r["tipo_partizione"],
+            } for r in partizioni_rows],
+        )
+        id_partizione = {(r["fonte_id"], r["riferimento"]): r["id"] for r in partizioni_rows}
+        # appartenenza: ogni riga alla sua partizione più specifica (un arco per riga)
+        archi_appartenenza: list[dict] = []
+        for label, righe in (("Obbligo", obblighi_rows), ("Principio", principi_rows)):
+            for r in righe:
+                catena = partizioni_di(r["riferimento"])
+                if not catena:
+                    continue
+                id_a = id_partizione.get((r["fonte_id"], catena[0][0]))
+                if id_a is None:
+                    continue
+                archi_appartenenza.append({"tipo_da": label, "da_id": r["id"], "a_id": id_a})
+        # gerarchia fra partizioni (sezione -> allegato, clausola figlia -> clausola padre):
+        # calcolata una volta per partizione, non una volta per riga (altrimenti lo stesso
+        # arco viene ricreato per ogni membro della partizione).
+        archi_gerarchia: list[dict] = []
+        for r in partizioni_rows:
+            catena = partizioni_di(r["riferimento"])
+            if not catena:
+                continue
+            padre = id_partizione.get((r["fonte_id"], catena[0][0]))
+            if padre is not None and padre != r["id"]:
+                archi_gerarchia.append({"tipo_da": "Partizione", "da_id": r["id"], "a_id": padre})
+        for label, archi in (("Obbligo", archi_appartenenza), ("Principio", archi_appartenenza),
+                             ("Partizione", archi_gerarchia)):
+            righe_label = [a for a in archi if a["tipo_da"] == label]
+            if righe_label:
+                session.run(
+                    f"UNWIND $rows AS r MATCH (a:{label} {{id: r.da_id}}), (b:Partizione {{id: r.a_id}}) "
+                    "CREATE (a)-[:PARTE_DI]->(b)",
+                    rows=righe_label,
+                )
 
         session.run(
             "UNWIND $rows AS r MATCH (o:Obbligo {id: r.obbligo_id}), (c:CategoriaSoggetto {nome: r.nome}) "
@@ -184,10 +236,11 @@ def _verifica(sconn: sqlite3.Connection, driver, database: str) -> None:
             ).single()["c"],
             "obbligo_soggetti": session.run("MATCH ()-[r:HA_SOGGETTO]->() RETURN count(r) AS c").single()["c"],
             "principio_oggetti": session.run("MATCH ()-[r:HA_OGGETTO]->() RETURN count(r) AS c").single()["c"],
+            "partizioni": session.run("MATCH (q:Partizione) RETURN count(q) AS c").single()["c"],
         }
     sqlite_counts = {
         table: sconn.execute(f"SELECT COUNT(*) c FROM {table}").fetchone()["c"]
-        for table in ("obblighi", "principi", "relazioni", "obbligo_soggetti", "principio_oggetti")
+        for table in ("obblighi", "principi", "relazioni", "obbligo_soggetti", "principio_oggetti", "partizioni")
     }
 
     tutto_ok = True

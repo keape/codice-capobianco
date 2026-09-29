@@ -54,7 +54,6 @@ PESO_SEMANTICO = 0.45
 
 ARCHI_RELAZIONE = list(TIPO_RELAZIONE_TO_ARCO.values())
 
-
 @app.on_event("startup")
 def _startup():
     global _driver, _database
@@ -160,8 +159,8 @@ def _principi_all(session) -> list[dict]:
 
 # ------------------------------------------------------------------- vicini (Fase 5+7)
 
-_LABEL_DI_TIPO = {"obbligo": "Obbligo", "principio": "Principio"}
-_TIPO_DI_LABEL = {"Obbligo": "obbligo", "Principio": "principio"}
+_LABEL_DI_TIPO = {"obbligo": "Obbligo", "principio": "Principio", "partizione": "Partizione"}
+_TIPO_DI_LABEL = {"Obbligo": "obbligo", "Principio": "principio", "Partizione": "partizione"}
 _TIPI_ARCO_PATTERN = "|".join(ARCHI_RELAZIONE)
 
 
@@ -180,7 +179,7 @@ def _vicini_di(session, tipo_nodo: str, nodo_id: int, profondita: int = 1) -> li
     query = f"""
         MATCH (start:{label} {{id: $nodo_id}})
         MATCH path = (start)-[rels:{_TIPI_ARCO_PATTERN}*1..{int(profondita)}]-(other)
-        WHERE other <> start AND (other:Obbligo OR other:Principio)
+        WHERE other <> start AND (other:Obbligo OR other:Principio OR other:Partizione)
         WITH other, rels[-1] AS ultimo, length(path) AS hop
         RETURN DISTINCT other AS n, labels(other) AS other_labels, hop,
                ultimo.relazione_id AS relazione_id, ultimo.tipo_relazione AS tipo_relazione_base,
@@ -199,7 +198,11 @@ def _vicini_di(session, tipo_nodo: str, nodo_id: int, profondita: int = 1) -> li
 
     migliori: dict[tuple[str, int], dict] = {}
     for r in rows:
-        altro_label = "Obbligo" if "Obbligo" in r["other_labels"] else "Principio"
+        altro_label = (
+            "Obbligo" if "Obbligo" in r["other_labels"]
+            else "Principio" if "Principio" in r["other_labels"]
+            else "Partizione"
+        )
         altro_tipo = _TIPO_DI_LABEL[altro_label]
         chiave = (altro_tipo, r["n"]["id"])
         peso = DIRETTEZZA_PESO.get(r["tipo_relazione_base"], 0)
@@ -209,10 +212,9 @@ def _vicini_di(session, tipo_nodo: str, nodo_id: int, profondita: int = 1) -> li
             continue
         tipo_relazione = r["tipo_relazione_base"] if r["forward"] else TIPI_RELAZIONE_INVERSO[r["tipo_relazione_base"]]
         n = r["n"]
-        migliori[chiave] = {
+        voce = {
             "_rank": candidato_rank,
             "tipo_nodo": altro_tipo,
-            ("obbligo_id" if altro_tipo == "obbligo" else "principio_id"): n["id"],
             "relazione_id": r["relazione_id"],
             "tipo_relazione": tipo_relazione,
             "hop": r["hop"],
@@ -220,9 +222,18 @@ def _vicini_di(session, tipo_nodo: str, nodo_id: int, profondita: int = 1) -> li
             "confidence": r["confidence"],
             "fonte": _fonte_di(n["fonte_id"]),
             "riferimento": n["riferimento"],
-            "testo": n["testo"],
-            "stato_validazione": n["stato_validazione"],
+            # le partizioni non hanno testo normativo ne' stato di validazione (ADR-0012)
+            "testo": n.get("testo"),
+            "stato_validazione": n.get("stato_validazione"),
         }
+        if altro_tipo == "obbligo":
+            voce["obbligo_id"] = n["id"]
+        elif altro_tipo == "principio":
+            voce["principio_id"] = n["id"]
+        else:
+            voce["partizione_id"] = n["id"]
+            voce["tipo_partizione"] = n.get("tipo_partizione")
+        migliori[chiave] = voce
 
     vicini = list(migliori.values())
     vicini.sort(key=lambda v: v["_rank"])
@@ -1079,14 +1090,14 @@ async function openNodo(tipoNodo, id){
 function renderVicini(vicini){
   return `<div class="panel"><h2>Relazioni tipizzate (grafo, multi-hop)</h2>
     ${vicini.length ? vicini.map(v => `
-      <div class="card" onclick="openNodo('${v.tipo_nodo}', ${v.tipo_nodo==='principio'?v.principio_id:v.obbligo_id})">
+      <div class="card" ${v.tipo_nodo==='partizione'?'style="cursor:default"':`onclick="openNodo('${v.tipo_nodo}', ${v.tipo_nodo==='principio'?v.principio_id:v.obbligo_id})"`}>
         <div class="hd"><span class="tag">${esc(v.tipo_relazione)}</span>
           <span class="tag" title="numero di salti dal nodo di partenza">${v.hop} hop</span>
           <span class="tag ${v.evidence_type==='human-curated'?'ok':v.evidence_type==='textual'?'':'warn'}">${esc(v.evidence_type)}${v.confidence!=null?` ${Math.round(v.confidence*100)}%`:''}</span>
-          <span class="tag ${v.tipo_nodo==='principio'?'ok':''}">${v.tipo_nodo}</span>
+          <span class="tag ${v.tipo_nodo==='principio'?'ok':''}">${v.tipo_nodo}${v.tipo_partizione?` · ${esc(v.tipo_partizione)}`:""}</span>
           <span class="ref">${esc(v.fonte)} — ${esc(v.riferimento)}</span>
-          ${v.stato_validazione!=='validato' ? `<span class="tag warn">${esc(v.stato_validazione)}</span>` : ""}</div>
-        <div class="muted">${esc(v.testo)}</div>
+          ${v.stato_validazione && v.stato_validazione!=='validato' ? `<span class="tag warn">${esc(v.stato_validazione)}</span>` : ""}</div>
+        <div class="muted">${esc(v.testo||"unità indivisa: nessun testo proprio, i nodi di prescrizione sono collegati con PARTE_DI")}</div>
       </div>`).join("") : `<div class="muted">Nessuna relazione tipizzata verso altri nodi.</div>`}
   </div>`;
 }
