@@ -95,6 +95,32 @@ del provider, aumentare nel batch successivo; se si osserva, il redispatch
 riguarda solo il/i capitoli falliti (già isolati per file, nessun impatto
 sugli altri).
 
+### 3-bis. Granularità fine: ogni voce enumerata con precetto è una riga
+
+Decisione dell'utente, 2026-09-29, valida per **tutte** le Fonti:
+
+> ogni voce enumerata che porta una prescrizione ha una riga propria — passi `1)` `2)` `3)`…,
+> lettere `a)` `b)` `c)`…, qualifier, elenchi indicizzati — **anche quando il documento non la
+> richiama per numero altrove**. Restano nella riga della clausola/comma solo le intestazioni
+> di puro raggruppamento e le parti non prescrittive (elenchi di documenti, tabelle
+> informative, rubriche).
+
+**Perché**: l'obiettivo del censimento è sapere *quale singolo aspetto* di un requisito è
+prescritto, così da poterlo collegare a un obbligo esterno e da poter dire quale aspetto è
+stato violato. Una clausola intera non lo permette.
+
+**Come si applica nel prompt del worker**: va scritta come regola, senza la condizione
+"dove il documento la numera e la richiama altrove" — quella clausola ha prodotto, il
+2026-09-29, due moduli di XAdES con i passi numerati dentro la riga della sottoclausta,
+difformi dal resto della stessa Fonte. Un esempio da citare ai worker: `app/seed_data/etsi_319_122/cap04.py`
+(clausola 6.3 di CAdES: una riga per ciascuno dei venti requisiti a)-t)).
+
+**Costo dichiarato**: più nodi (indicativamente +10-20% sulle fonti che enumerano molto) e
+quindi più righe in coda di validazione umana. È il prezzo scelto per avere il dettaglio.
+
+Elenca le Fonti già censite su cui la regola non è stata applicata, con la misura dei nodi
+candidati e il metodo di decisione: `docs/plan-retrofit-regole-import.md` § 3.1.
+
 ### 4. Merge e verifica di copertura (script, non lettura manuale)
 
 Ogni capitolo produce un modulo Python indipendente

@@ -122,6 +122,17 @@ Accanto ai nodi di prescrizione (`:Obbligo`/`:Principio`, un comma o lettera o p
 
 Le partizioni **non hanno testo normativo** (nessuna duplicazione) e **non entrano nella coda di validazione**: sono struttura, non bozze. Sono generate **automaticamente** da `neo4j_common.partizioni_di(riferimento)` (mai a mano) leggendo i riferimenti già normalizzati, e l'appartenenza è derivata in `migrate_to_neo4j` con l'arco `(nodo)-[:PARTE_DI]->(partizione)` più la gerarchia fra partizioni (`sezione -> allegato`, `clausola figlia -> clausola padre`). Una riga la cui unità indivisa *è* la riga stessa (clausola di primo livello, articolo senza commi) non produce partizione; un riferimento non strutturato (es. id di controllo `SCP 13`) non produce partizione — meglio nessun nodo che un nodo inventato. Le relazioni dei 14 tipi possono avere come estremo una partizione (`("partizione", fonte_id, "art. 13")` nel registro di `seed_data/lib.py`). Dettagli, esiti del primo seed (1.070 partizioni, 4.702 archi `PARTE_DI`) e lavoro aperto (rimappatura dei rinvii già ancorati a un comma e recupero di quelli senza arco) in `docs/adr/0012-nodi-di-partizione-per-rinvii-a-unita-indivise.md`.
 
+### Regole di import e retrofit: dove sono tracciate
+
+Le regole di import precisate strada facendo — granularità **fine** di ogni voce enumerata
+con precetto, lingua dei riferimenti e delle citazioni, risoluzione (mai scrittura a mano)
+dei riferimenti cross-fonte — sono in `docs/procedura-import-granulare.md` (§ 2-bis, § 3-bis)
+e in `docs/verifiche-aperte.md` (§ 3-bis per il criterio dei tipi). Le correzioni da fare
+sulle Fonti già censite per effetto di una regola nuova, e gli adattamenti degli strumenti
+ancora mancanti (split dei PDF ETSI, fetch ETSI, risolutore di riferimenti, forme di
+citazione non riconosciute dall'audit), sono elencati con stato e misure in
+`docs/plan-retrofit-regole-import.md`: **prima di un nuovo import, leggere quella tabella**.
+
 ### Storico "ticket" nei commenti
 
 `schema.sql` e `seed.py` referenziano numeri di "ticket" sequenziali (03, 04, 05, 07, 08) come origine di varie decisioni di design (es. `modifiche_rilevate` da ticket 05, nodo Principio da ticket 08/ADR-0004). Un file `map.md` è citato nei commenti come riferimento per la cronologia di queste decisioni ma non è presente nell'albero del repo (potrebbe esistere solo nella storia git).
