@@ -249,6 +249,18 @@ passano il gate perché il riferimento del bersaglio è ora l'articolo stesso,
 che il testo citante nomina. Le segnalazioni delle Fonti 28 e 29 sono
 classificate nei due paragrafi seguenti.
 
+**Fonte 31 (ETSI EN 319 122-1, CAdES), 41 casi su 150, non ancora classificati —
+presunta causa sistematica.** Gli standard ETSI citano in inglese ("clause 5.4.2", "see
+Annex D"), mentre il `riferimento` del bersaglio nel censimento usa la forma italiana
+convenzionale ("clausola 5.4.2 (The message-digest attribute)", "Annex D"). L'estrattore
+cerca nel testo citante una traccia del riferimento *italiano* e non la trova: il gate
+segnala quindi in blocco i rinvii fra clausole degli standard in lingua inglese. È la
+stessa classe che produce i cluster di Fonte 18 (155), 21 (40), 17 (28) e 20 (15), ed è
+il motivo per cui il conteggio delle segnalazioni cresce a ogni import ETSI. Da
+verificare su un campione prima di dichiararla tutta falsa: se confermata, il rimedio è
+nell'estrattore (accettare anche la forma inglese `clause N` / `Annex X` come traccia),
+non nell'etichetta della relazione.
+
 **Fonte 28 (Reg. (UE) 2024/2979), 11 casi, tutti esaminati e classificati:** 7
 sono **falsi positivi dello strumento** — il `testo_integrale` del nodo citante
 cita i commi/lettere al plurale o in forma riassuntiva ("di cui ai paragrafi 1
