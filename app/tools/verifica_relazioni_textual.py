@@ -18,6 +18,13 @@ Cosa verifica.
      l'ordinale, una clausola o un annesso). Se non compare nulla, l'arco va
      riletto a mano: puo' essere un rinvio citato in una forma diversa (es. nel
      preambolo, che non e' nel `testo_integrale`) o un aggancio sbagliato.
+     Le tracce ammesse sono bilingui (italiano/inglese), singolari e plurali, e
+     includono la numerazione nuda multi-segmento: il censimento tiene i
+     riferimenti in forma italiana convenzionale ("clausola 5.4.2 (titolo)",
+     "Annex A, clausola A.1.1") mentre gli standard tecnici ETSI citano in
+     inglese ("clause 5.4.2", "see Annex A") e spesso con il solo numero ("as
+     defined in 5.2.2"). Un rinvio fra testi in lingue diverse e' una relazione
+     legittima, non un'etichetta gonfiata (decisione utente 2026-09-29).
      Sono esclusi dal gate i nodi citanti privi di `testo_integrale` (nessuna
      prova testuale disponibile) e le relazioni `richiama` verso la clausola di
      ambito di uno standard, che per costruzione sono rinvii generici.
@@ -96,15 +103,51 @@ def tracce(riferimento: str) -> list[str]:
     for comma in re.findall(r"\bcomma\s*(\d+)", rif):
         trovate.append(f"comma {comma}")
 
-    # clausole e annessi: clausola 5.4.2, annex a.7.3
-    for cl in re.findall(r"\bclausol[ae]\s+(\d+(?:\.\d+)*)", rif):
-        trovate.append(f"clausola {cl}")
-        trovate.append(f"clause {cl}")
-    for ann in re.findall(r"\bannex\s+([a-z](?:\.\d+(?:\.\d+)*)?)", rif):
-        trovate.append(f"annex {ann}")
-    for allg in re.findall(r"\ballegato\s+([a-z0-9](?:\.\d+)*)", rif):
-        trovate.append(f"allegato {allg}")
-        trovate.append(f"allegato {allg.upper()}")
+    # Clausole, annessi, sezioni, paragrafi e punti: le tracce sono BILINGUI perche' il
+    # censimento tiene i riferimenti nella forma italiana ("clausola 5.4.2 (titolo)",
+    # "Annex A, clausola A.1.1") mentre gli standard tecnici ETSI citano in inglese
+    # ("clause 5.4.2", "see Annex A", "subclause 6.3 m)"). Un salto linguistico fra il
+    # testo citante e il riferimento del bersaglio non e' un difetto di etichettatura: la
+    # regola di valorizzazione ammette il rinvio fra testi in lingue diverse, e questo
+    # audit deve accettarlo (decisione utente 2026-09-29).
+    ETICHETTE_CLAUSOLA = ("clausola", "clausole", "clause", "clauses", "subclause", "subclauses", "sottoclausta", "sottoclauste")
+    ETICHETTE_ANNESSO = ("annex", "annexes", "annesso", "annessi", "allegato", "allegati")
+    ETICHETTE_SEZIONE = ("sezione", "sezioni", "section", "sections")
+    ETICHETTE_PARAGRAFO = ("paragrafo", "paragrafi", "paragraph", "paragraphs")
+    ETICHETTE_PUNTO = ("punto", "punti", "point", "points", "item", "items")
+    # id simbolici degli oggetti ASN.1 e dei qualificatori ("id-aa-ets-certificateRefs",
+    # "id-spq-ets-uri"): sono il modo in cui gli annessi ETSI si citano fra loro, e nel
+    # testo citante compaiono letteralmente.
+    for id_asn1 in re.findall(r"\bid-[a-z0-9][a-z0-9-]{2,}", rif):
+        trovate.append(id_asn1)
+    # nomi di tipo ASN.1 e CamelCase citati negli annessi ("CompleteCertificateRefs",
+    # "OtherHashAlgAndValue"): l'annesso cita il tipo per nome dentro la definizione, non
+    # per numero di clausola.
+    for camel in re.findall(r"\b([A-Z][A-Za-z0-9]{3,})\b", riferimento or ""):
+        trovate.append(camel.lower())
+    # numerazione di clausola con lettera di annesso ("clause E.1.3", "Annex A.1.1.1")
+    for cl in re.findall(r"\b(?:clausol[ae]|subclaus[ae]|clauses?|subclauses?|sottoclaust[ae])\s+([a-z]?\.?\d+(?:\.\d+)*)", rif):
+        for etichetta in ETICHETTE_CLAUSOLA:
+            trovate.append(f"{etichetta} {cl}")
+        # numerazione nuda multi-segmento: gli standard ETSI citano spesso solo il numero
+        # ("as defined in 5.2.2", "see 4.7.1"). Ammessa solo se ha almeno due segmenti:
+        # un numero isolato ("5") sarebbe indistinguibile da qualunque altro numero.
+        if "." in cl:
+            trovate.append(cl)
+    for ann in re.findall(r"\b(?:annex|annesso|allegato)\s+([a-z](?:\.\d+(?:\.\d+)*)?)", rif):
+        for etichetta in ETICHETTE_ANNESSO:
+            trovate.append(f"{etichetta} {ann}")
+        if "." in ann:
+            trovate.append(ann)
+    for sez in re.findall(r"\b(?:sezione|section)\s+([a-z0-9](?:[\.\d]*(?:\.[a-z0-9]+)*))", rif):
+        for etichetta in ETICHETTE_SEZIONE:
+            trovate.append(f"{etichetta} {sez}")
+    for par in re.findall(r"\b(?:paragrafo|paragraph)\s+(\d+(?:\.\d+)*)", rif):
+        for etichetta in ETICHETTE_PARAGRAFO:
+            trovate.append(f"{etichetta} {par}")
+    for pt in re.findall(r"\b(?:punto|point|item)\s+(\d+(?:\.\d+)*)", rif):
+        for etichetta in ETICHETTE_PUNTO:
+            trovate.append(f"{etichetta} {pt}")
 
     # "punto N" e "punto 3(a)": negli atti di esecuzione il punto e' chiave
     for punto in re.findall(r"\bpunto\s+(\d+)", rif):

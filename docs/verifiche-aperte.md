@@ -249,17 +249,27 @@ passano il gate perché il riferimento del bersaglio è ora l'articolo stesso,
 che il testo citante nomina. Le segnalazioni delle Fonti 28 e 29 sono
 classificate nei due paragrafi seguenti.
 
-**Fonte 31 (ETSI EN 319 122-1, CAdES), 41 casi su 150, non ancora classificati —
-presunta causa sistematica.** Gli standard ETSI citano in inglese ("clause 5.4.2", "see
-Annex D"), mentre il `riferimento` del bersaglio nel censimento usa la forma italiana
-convenzionale ("clausola 5.4.2 (The message-digest attribute)", "Annex D"). L'estrattore
-cerca nel testo citante una traccia del riferimento *italiano* e non la trova: il gate
-segnala quindi in blocco i rinvii fra clausole degli standard in lingua inglese. È la
-stessa classe che produce i cluster di Fonte 18 (155), 21 (40), 17 (28) e 20 (15), ed è
-il motivo per cui il conteggio delle segnalazioni cresce a ogni import ETSI. Da
-verificare su un campione prima di dichiararla tutta falsa: se confermata, il rimedio è
-nell'estrattore (accettare anche la forma inglese `clause N` / `Annex X` come traccia),
-non nell'etichetta della relazione.
+**Fonte 31 (ETSI EN 319 122-1, CAdES), da 41 a 6 casi: causa sistematica confermata e
+rimossa nello strumento (2026-09-29).** Gli standard ETSI citano in inglese ("clause
+5.4.2", "see Annex D") o con la sola numerazione ("as defined in 5.2.2"), mentre il
+`riferimento` del bersaglio nel censimento usa la forma italiana convenzionale ("clausola
+5.4.2 (The message-digest attribute)") o la forma di annesso ("Annex D, id-aa-ets-certificateRefs
+(...)"). Il gate cercava solo la forma del riferimento e segnalava quindi in blocco i
+rinvii fra testi in lingue diverse — la stessa causa dei cluster di Fonte 18 (155), 21
+(40), 17 (28) e 20 (15). **Correzione applicata a `app/tools/verifica_relazioni_textual.py`**
+(su decisione utente: un rinvio fra testi in lingue diverse e' una relazione legittima):
+le tracce sono ora bilingui e comprendono forme singolari e plurali (`clausola`/`clausole`/
+`clause`/`clauses`/`subclause`), annessi (`Annex`/`annesso`/`allegato`), sezioni,
+paragrafi e punti; la **numerazione nuda multi-segmento** (`5.2.2`, `A.1.1.1`), ammessa
+solo se ha almeno due segmenti; gli **id ASN.1** (`id-aa-ets-…`, `id-spq-ets-…`) e i
+**nomi di tipo CamelCase** (`CompleteCertificateRefs`), che sono il modo in cui gli
+annessi tecnici si citano fra loro. Effetto su Fonte 31: 41 → **6 segnalazioni** su 150.
+Effetto globale: **1.609 relazioni `textual` esaminate, 304 senza traccia** (erano 351
+prima della correzione, con 180 relazioni in meno esaminate). I **6 casi residui** di
+Fonte 31 sono relazioni fra oggetti ASN.1 dell'Annex D dichiarate `textual` dal worker ma
+sostenute da una dipendenza *strutturale* (un attributo che usa il tipo definito altrove),
+non da una citazione: vanno rilette in revisione, con probabile declassamento a
+`inferred`.
 
 **Fonte 28 (Reg. (UE) 2024/2979), 11 casi, tutti esaminati e classificati:** 7
 sono **falsi positivi dello strumento** — il `testo_integrale` del nodo citante

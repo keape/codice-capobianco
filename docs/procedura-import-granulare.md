@@ -52,6 +52,26 @@ capitolo) e `app/.source_cache/<fonte>/manifest.json` (con `testo_path` e
 `modulo_path` già assegnati per ciascun capitolo — vedi
 `app/tools/split_source.py` per il formato).
 
+### 2-bis. Lingua dei riferimenti e delle citazioni (regola di valorizzazione)
+
+Il censimento tiene i `riferimento` in **forma italiana convenzionale e omogenea**
+(`clausola 5.4.2 (titolo)`, `Annex A, clausola A.1.1`, `art. 5 bis §4(a)`, `allegato IV,
+sezione IV.3`), anche quando il testo ufficiale è in inglese: serve a rendere confrontabili
+fonti diverse e a far funzionare il registro del seed e le partizioni (ADR-0012).
+
+Il **testo citante**, invece, nomina il bersaglio nella lingua che gli è propria: gli
+standard ETSI scrivono "clause 5.4.2", "see Annex A", "as defined in 5.2.2"; gli atti UE
+scrivono "l'articolo 13, paragrafo 2". **Un rinvio fra testi in lingue diverse è una
+relazione legittima**, non un'etichetta gonfiata: `evidence_type="textual"` resta corretto
+quando la citazione è letterale nella lingua del testo, e l'audit
+`app/tools/verifica_relazioni_textual.py` accetta come traccia sia la forma italiana sia
+quella inglese (singolare e plurale), la numerazione nuda multi-segmento e, negli annessi
+tecnici, gli id ASN.1 e i nomi di tipo. Decisione presa con l'utente il 2026-09-29.
+
+Conseguenza operativa per chi scrive un modulo: non tradurre il riferimento del bersaglio
+per "farlo combaciare" con la lingua del testo citante, e non rinunciare alla relazione
+solo perché le due lingue differiscono.
+
 ### 3. Dispatch dei subagent per capitolo
 
 Un `task` per capitolo, in batch unico. Nel prompt di ciascuno, passare
