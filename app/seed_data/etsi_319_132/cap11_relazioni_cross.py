@@ -17,12 +17,16 @@ Stadio 1 - candidati a zero token LLM:
 (b) direzione inversa (Fonti gia' censite -> questa Fonte): query su Neo4j per i nodi il
     cui `testo_integrale` nomina "319 132" o "XAdES": 53 nodi, ancorati alla
     partizione `clausola 1 (Scope)` perche' il rinvio e' allo standard come insieme.
-(c) candidati KNN (`app/tools/fase6_candidati_knn.py`, soglia 0.86) lanciati in
-    background sull'intero standard: **esito non ancora incorporato in questo modulo**.
-    Per CAdES il giro KNN su 434 coppie aveva prodotto 5 relazioni utili, e gran parte dei
-    candidati era rumore da titoli di clausola identici fra standard diversi; le eventuali
-    corrispondenze di istituto di XAdES saranno aggiunte in una passata successiva e
-    documentate qui.
+(c) candidati KNN (`app/tools/fase6_candidati_knn.py`, soglia 0.86, 245 coppie) letti e
+    filtrati a mano. Il quadro e' diverso da quello di CAdES: il rumore da titoli di
+    clausola ripetuti resta ("clausola 3.2 (Symbols)", "3.1 (Terms)"), ma le coppie a
+    score piu' alto sono **il gemello CAdES** (Fonte 31): i due standard definiscono in
+    parallelo gli stessi istituti (livelli di firma, requisiti sugli algoritmi, notazione
+    dei requisiti, le stesse lettere di requisiti addizionali della clausola 6.3, i
+    meccanismi alternativi di disponibilita' a lungo termine, gli attributi di tipo,
+    contenuto e policy). Nove di quelle coppie sono state tenute come "si sovrappone a"
+    (inferred, 0.70), piu' due verso Fonte 27 (marca temporale di firma / claimed signing
+    time; commitment type indication) a 0.65.
 
 Stadio 2 - classificazione nella sessione principale, leggendo le controparti in Neo4j
 prima di decidere.
@@ -722,6 +726,83 @@ RELAZIONI = [
     },
 
     # --- cross-fonte: candidati KNN giudicati sulla lettura delle controparti --
+    {
+        "nodo_da": ("principio", None, "clausola 6.1 (Signature levels)"),
+        "nodo_a": ("principio", 31, "clausola 6.1 (Signature levels)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.75,
+    },
+    {
+        "nodo_da": ("obbligo", None, "clausola 6.2.1 (Algorithm requirements)"),
+        "nodo_a": ("obbligo", 31, "clausola 6.2.1 (Algorithm requirements)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.75,
+    },
+    {
+        "nodo_da": ("principio", None, "clausola 6.2.2 (Notation for requirements)"),
+        "nodo_a": ("principio", 31, "clausola 6.2.2 (Notation for requirements)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.75,
+    },
+    {
+        "nodo_da": ("obbligo", None, "clausola 6.3, requisito addizionale a)"),
+        "nodo_a": ("obbligo", 31, "clausola 6.3, requisito addizionale a)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.70,
+    },
+    {
+        "nodo_da": ("obbligo", None, "clausola 6.3, requisito addizionale b)"),
+        "nodo_a": ("obbligo", 31, "clausola 6.3, requisito addizionale b)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.70,
+    },
+    {
+        "nodo_da": ("obbligo", None, "clausola 6.3, requisito addizionale c)"),
+        "nodo_a": ("obbligo", 31, "clausola 6.3, requisito addizionale c)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.70,
+    },
+    {
+        "nodo_da": ("obbligo", None, "clausola 5.2.3 (The CommitmentTypeIndication qualifying property)"),
+        "nodo_a": ("obbligo", 31, "clausola 5.2.3 (The commitment-type-indication attribute)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.70,
+    },
+    {
+        "nodo_da": ("obbligo", None, "clausola 5.2.9.2 (Signature policy qualifiers)"),
+        "nodo_a": ("obbligo", 31, "clausola 5.2.9.2 (The SigPolicyQualifierInfo type)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.70,
+    },
+    {
+        "nodo_da": ("obbligo", None, "Annex B (Alternative mechanisms for long term availability and integrity of validation data)"),
+        "nodo_a": ("obbligo", 31, "Annex B (Alternative mechanisms for long term availability and integrity of validation data)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.70,
+    },
+    {
+        "nodo_da": ("obbligo", None, "clausola 5.2.1 (The SigningTime qualifying property)"),
+        "nodo_a": ("obbligo", 27, "clausola 4.2.5.8 (Claimed signing time)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.65,
+    },
+    {
+        "nodo_da": ("obbligo", None, "clausola 5.2.3 (The CommitmentTypeIndication qualifying property)"),
+        "nodo_a": ("obbligo", 27, "clausola 4.2.5.6 (Commitment type indication)"),
+        "tipo_relazione": "si sovrappone a",
+        "evidence_type": "inferred",
+        "confidence": 0.65,
+    },
 
     # --- direzione inversa: nodi gia' censiti che citano questa Fonte ----------
     {
