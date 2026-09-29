@@ -294,6 +294,30 @@ dichiarato**: la citazione dell'art. 3 §1 all'art. 5 bis §4 eIDAS2 resta
   411-1), `clausola 3.2 (Symbols)` inclusa («Void.») mentre altri moduli della famiglia la
   escludono, Annex C (Void) e Annex F (Change History) inclusi per istruzione del batch.
 
+- **ETSI EN 319 132-1 V1.3.1 (2024-07)** — XAdES digital signatures, Parte 1 (building
+  blocks e firme baseline). `fonte_id=32`. **Secondo standard del blocco B** (famiglia
+  AdES). Testo ufficiale dal deliver ETSI (PDF; provenienza, versione e sha256 in
+  `app/.source_cache/etsi_319_132/provenance.json`): 77 pagine, 266.763 caratteri, corpo
+  tagliato dal front matter e diviso in 10 capitoli (clausola 1; clausola 3; clausola 4;
+  clausola 5 in tre porzioni; clausola 6; Annex A con B e C; Annex D; Annex E),
+  autoria su 10 subagent worker. **154 nodi** (141 obblighi, 13 principi), 154 item di
+  indice, con **granularità fine** dove il documento numera o indicizza i requisiti
+  (lettere a)-cc) della clausola 6.3 delle firme baseline, passi numerati delle procedure
+  di convalida, qualifier): è la convenzione di famiglia fissata con EN 319 122-1.
+  **269 relazioni**: 124 interne ai capitoli + **145 nel capitolo virtuale**
+  `app/seed_data/etsi_319_132/cap11_relazioni_cross.py` — 92 «richiama» `textual`
+  cross-capitolo o verso annessi (regola di miraggio ADR-0012: nodo se la clausola esiste
+  come riga, altrimenti partizione padre più specifica) e le altre in direzione inversa,
+  dai nodi già censiti che nominano la norma (fra cui quelli di CAdES, Fonte 31: i due
+  standard si rinviano a vicenda). **Note dichiarate**: il giro KNN cross-fonte è stato
+  lanciato ma non ancora incorporato nel modulo (resa attesa bassa, per CAdES 5 relazioni
+  utili su 434 coppie); due capitoli della clausola 5 tengono i requisiti numerati dentro
+  la riga della sottoclausta dove il documento non le richiama per numero, mentre la
+  clausola 6 e gli annessi le scompongono — differenza documentata nei moduli, da
+  riconciliare se la revisione vuole la granularità fine ovunque; le 5 relazioni `textual`
+  che citano una voce con numero nudo («references in 1) and 3)») sono segnalate
+  dall'audit § 10 perché lo strumento non le sa cercare.
+
 ## 2. Fonti nazionali
 
 Diritto italiano (leggi, decreti, regolamenti AgID).
@@ -717,10 +741,10 @@ riferimento **puntuale di sottoclavola** («Figure 1 (derived from ETSI EN 319
 | Internazionali | eIDAS, eIDAS2, Reg. (UE) 2025/1566, Reg. (UE) 2025/1567, Reg. (UE) 2025/1569, Reg. (UE) 2025/2531, Reg. (UE) 2025/2532, Reg. (UE) 2015/1502, Reg. (UE) 2024/2979, Reg. (UE) 2024/482 (EUCC), Reg. (UE) 2024/3144 (atto modificativo) | 11 |
 | Nazionali | CAD, DPCM 22/2/2013, DPCM 24/10/2014, DPCM 19/10/2021, Reg. AgID modalità attuative SPID, Regole Tecniche AgID certificati qualificati 13/2/2020, Codice Civile (selettivo) | 7 |
 | Locali | — | 0 |
-| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1, ETSI EN 319 122-1 (CAdES) | 13 |
-| **Totale** | | **31** |
+| Standard tecnici | ETSI EN 319 412 (5 Parti, Fonte unica), ETSI TS 119 461, ETSI EN 319 401, ETSI TS 119 431 (2 Parti, Fonte unica), ETSI EN 319 411 (2 Parti, Fonte unica), ETSI EN 319 421, ETSI EN 319 422, ETSI TS 119 432, ETSI TS 119 612, ETSI TS 119 312, ETSI TS 119 101, ETSI EN 319 102-1, ETSI EN 319 122-1 (CAdES), ETSI EN 319 132-1 (XAdES) | 14 |
+| **Totale** | | **32** |
 
-30 delle 31 Fonti hanno copertura granulare completa (ADR-0007) e sono
+31 delle 32 Fonti hanno copertura granulare completa (ADR-0007) e sono
 cross-collegate; nessuna resta isola nel grafo. Il Codice Civile
 (`fonte_id=16`) è l'unica eccezione deliberata: copertura selettiva (6
 articoli su ~3.000), deroga esplicita ad ADR-0007 concordata con l'utente
